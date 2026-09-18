@@ -1,0 +1,17 @@
+{
+  "name": "La Cabaña Grill",
+  "short_name": "La Cabaña",
+  "start_url": "./home.html",
+  "display": "standalone",
+  "background_color": "#131313",
+  "theme_color": "#131313",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://lacabanagrill.net/cdn/shop/files/La_cabana_logo_transparent.png?v=1753649726",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

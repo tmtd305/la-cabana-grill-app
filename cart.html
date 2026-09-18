@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/><link rel="manifest" href="manifest.json"/><meta name="theme-color" content="#131313"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#131313;color:#e5e2e1;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script src="data.js"></script><script src="cart.js"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "surface-variant": "#353534", "on-primary-container": "#4d1900", "on-tertiary-container": "#00226e", "on-secondary-container": "#5b3800", "outline-variant": "#594137", "surface-container-low": "#1c1b1b", "surface-tint": "#ffb596", "surface-dim": "#131313", "error-container": "#93000a", "on-surface-variant": "#e2bfb2", "on-secondary-fixed-variant": "#653e00", "secondary-fixed-dim": "#ffb95f", "flame-glow": "rgba(230, 90, 0, 0.24)", "on-secondary-fixed": "#2a1700", "surface-container-highest": "#353534", "on-tertiary-fixed": "#00164e", "tertiary-fixed": "#dce1ff", "on-error": "#690005", "colombian-red": "#DC2626", "on-primary-fixed-variant": "#7d2d00", "outline": "#a98a7e", "inverse-surface": "#e5e2e1", "secondary-fixed": "#ffddb8", "surface-container-lowest": "#0e0e0e", "text-secondary": "#9CA3AF", "text-primary": "#F9FAFB", "error": "#ffb4ab", "on-primary": "#581e00", "text-muted": "#6B7280", "surface-raised": "#242424", "tertiary-fixed-dim": "#b6c4ff", "background": "#131313", "on-background": "#e5e2e1", "primary": "#ffb596", "secondary-container": "#ee9800", "border-highlight": "rgba(230, 90, 0, 0.35)", "on-error-container": "#ffdad6", "border-subtle": "rgba(255, 255, 255, 0.08)", "surface": "#131313", "primary-fixed-dim": "#ffb596", "on-tertiary": "#05297a", "tertiary": "#b6c4ff", "colombian-blue": "#2563EB", "primary-container": "#f36310", "surface-bright": "#393939", "surface-container": "#201f1f", "surface-elevated": "#2E2E2E", "inverse-primary": "#a33e00", "secondary": "#ffb95f", "tertiary-container": "#748de1", "surface-container-high": "#2a2a2a", "on-surface": "#e5e2e1", "on-tertiary-fixed-variant": "#264191", "primary-fixed": "#ffdbcd", "colombian-yellow": "#FBBF24", "surface-charcoal": "#1A1A1A", "inverse-on-surface": "#313030", "on-primary-fixed": "#360f00", "on-secondary": "#472a00" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-xl": "2rem", "space-xs": "0.25rem", "gutter-tablet": "1.5rem", "space-sm": "0.5rem", "space-lg": "1.5rem", "gutter": "1rem", "space-2xl": "3rem", "margin-tablet": "2rem", "space-md": "1rem", "margin": "1rem" }, fontFamily: { "body-md": ["Manrope"], "headline-md": ["Outfit"], "label-lg": ["Manrope"], "display-lg-mobile": ["Outfit"], "body-lg": ["Manrope"], "headline-lg": ["Outfit"], "label-caps": ["Outfit"], "title-sm": ["Outfit"], "headline-xl": ["Outfit"], "body-sm": ["Manrope"], "label-md": ["Manrope"], "display-lg": ["Outfit"] }, fontSize: { "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }], "headline-md": ["18px", { lineHeight: "24px", fontWeight: "600" }], "label-lg": ["14px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "600" }], "display-lg-mobile": ["32px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700" }], "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }], "headline-lg": ["22px", { lineHeight: "28px", fontWeight: "600" }], "label-caps": ["11px", { lineHeight: "14px", letterSpacing: "0.08em", fontWeight: "700" }], "title-sm": ["16px", { lineHeight: "22px", fontWeight: "600" }], "headline-xl": ["28px", { lineHeight: "34px", letterSpacing: "-0.015em", fontWeight: "600" }], "body-sm": ["12px", { lineHeight: "16px", fontWeight: "400" }], "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }], "display-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.02em", fontWeight: "700" }] } } } };</script></head><body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen selection:bg-primary-container selection:text-white"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.45)]"><div class="h-16 px-gutter flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><button aria-label="Go back" class="w-11 h-11 flex items-center justify-center rounded-full text-text-primary hover:bg-surface-raised transition-colors shrink-0" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><img alt="Image from https://lacabanagrill.net/cdn/shop/files/La_cabana_logo_transparent.png?v=1753649726" class="h-8 w-auto object-contain shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCN97QgaC-iEE3X0ZEpZki0QDazrXRs2xMMn60kdzyZG03UQTJy6kmz6taNdPGoL_HUypG2O1UhlTWy6BlhSFPOkTD8C6RnFMv05dxMl7-vv1FEXp4WCWu8POAoc75l3vKLZflH-NHdNYCUA98DVwMOHK3luoqPmb1stTY-rtwzutJqQhnLL4V1DaT4Q4eyDM6Iv2DeVwDkF9nQ4CwjhXH11e2O2Fyp_ZMwoewBnu40rfMZQFDUJ1MJ"/><h1 class="font-headline-md text-headline-md text-text-primary truncate tracking-tight">Pickup Cart</h1></div><div class="flex items-center gap-space-xs shrink-0"><button aria-label="Share or search" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-text-primary hover:bg-surface-raised transition-colors"><span class="material-symbols-outlined text-[22px]">share</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 w-full bg-surface pt-16 pb-safe"><div class="flex flex-col w-full px-gutter pb-space-2xl gap-space-lg">
+<!-- Pickup Address & Quick Venue Context -->
+<div class="bg-surface-container rounded-xl p-space-md shadow-md flex items-center justify-between gap-space-sm mt-space-xs">
+<div class="flex items-start gap-space-sm min-w-0">
+<div class="w-10 h-10 rounded-full bg-surface-raised flex items-center justify-center shrink-0 text-primary-container">
+<span class="material-symbols-outlined text-[22px]">storefront</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-colombian-yellow">Pickup Location</span>
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span class="font-body-sm text-body-sm text-text-secondary">Open now</span>
+</div>
+<p class="font-title-sm text-title-sm text-text-primary truncate">La Cabaña Grill</p>
+<p class="font-body-sm text-body-sm text-text-muted truncate">743 Washington Ave, Miami Beach, FL</p>
+</div>
+</div>
+<button aria-label="View on map" class="px-space-sm py-1.5 bg-surface-raised hover:bg-surface-elevated text-text-primary rounded-lg font-label-md text-label-md flex items-center gap-1 shrink-0 transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">directions</span>
+<span>Map</span>
+</button>
+</div>
+<!-- Timing Selection Card -->
+<section class="bg-surface-container rounded-xl p-space-md shadow-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary-container text-[20px]">schedule</span>
+<h2 class="font-headline-md text-headline-md text-text-primary">Pickup Timing</h2>
+</div>
+<span class="font-body-sm text-body-sm text-colombian-yellow font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">local_fire_department</span> High Sizzle Time
+      </span>
+</div>
+<!-- Segmented Control: ASAP vs Schedule -->
+<div class="grid grid-cols-2 p-1 bg-surface-container-lowest rounded-xl gap-1" id="timingToggle">
+<button class="py-2.5 px-space-sm rounded-lg font-label-lg text-label-lg text-text-muted transition-all flex flex-col items-center justify-center" id="asapBtn" type="button">
+<span>ASAP</span>
+<span class="font-body-sm text-body-sm opacity-80">15-25 min</span>
+</button>
+<button class="py-2.5 px-space-sm rounded-lg font-label-lg text-label-lg bg-primary-container text-white shadow-md transition-all flex flex-col items-center justify-center" id="laterBtn" type="button">
+<span>Schedule Later</span>
+<span class="font-body-sm text-body-sm opacity-90">Select slot</span>
+</button>
+</div>
+<!-- Active Scheduled Slot Info Box -->
+<div class="bg-surface-container-low rounded-xl p-space-md flex items-center justify-between gap-space-sm" id="scheduledSlotDetails">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded-lg bg-surface-raised flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">alarm</span>
+</div>
+<div class="min-w-0">
+<p class="font-label-caps text-label-caps uppercase text-text-secondary">Estimated Prep Complete</p>
+<p class="font-title-sm text-title-sm text-text-primary font-semibold truncate">Today at 6:45 PM</p>
+</div>
+</div>
+<button class="px-space-sm py-1 rounded-lg bg-surface-raised hover:bg-surface-elevated font-label-md text-label-md text-primary transition-colors" type="button">
+        Change
+      </button>
+</div>
+<!-- Handover method: Counter vs Curbside -->
+<div class="grid grid-cols-2 gap-space-sm pt-space-xs">
+<label class="cursor-pointer bg-surface-container-low has-[:checked]:bg-surface-raised rounded-xl p-space-sm flex items-center gap-space-xs transition-colors">
+<input checked="" class="accent-primary-container w-4 h-4" name="pickup_mode" type="radio" value="counter"/>
+<div class="min-w-0">
+<p class="font-label-lg text-label-lg text-text-primary">Counter</p>
+<p class="font-body-sm text-body-sm text-text-muted">Inside lobby bar</p>
+</div>
+</label>
+<label class="cursor-pointer bg-surface-container-low has-[:checked]:bg-surface-raised rounded-xl p-space-sm flex items-center gap-space-xs transition-colors">
+<input class="accent-primary-container w-4 h-4" name="pickup_mode" type="radio" value="curbside"/>
+<div class="min-w-0">
+<p class="font-label-lg text-label-lg text-text-primary">Curbside</p>
+<p class="font-body-sm text-body-sm text-text-muted">Park at front spot</p>
+</div>
+</label>
+</div>
+</section>
+<!-- Cart Items Breakdown -->
+<section class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary-container text-[20px]">restaurant</span>
+<h2 class="font-headline-md text-headline-md text-text-primary" id="order-item-count">Your Order</h2>
+</div>
+<a href="menu.html" class="font-label-md text-label-md text-primary hover:underline">
+        Add More
+      </a>
+</div>
+<div id="cart-items-list" class="flex flex-col gap-space-sm"></div>
+<div id="cart-empty-state" class="bg-surface-container rounded-xl p-space-lg flex flex-col items-center text-center gap-2 hidden">
+<span class="material-symbols-outlined text-[32px] text-text-muted">shopping_bag</span>
+<p class="font-title-sm text-title-sm text-text-primary">Your cart is empty</p>
+<a href="menu.html" class="font-label-md text-label-md text-primary hover:underline">Browse the menu</a>
+</div>
+</section>
+<!-- Promo Code Banner Applied (shown only when a free-juice promo item is in the cart) -->
+<div id="promo-banner" class="bg-surface-container rounded-xl p-space-md shadow-md flex items-center justify-between gap-space-sm hidden">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded-full bg-emerald-950/80 flex items-center justify-center text-emerald-400 shrink-0">
+<span class="material-symbols-outlined text-[20px]">confirmation_number</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-title-sm text-title-sm text-text-primary font-bold tracking-wide">FREEJUICE</span>
+<span class="px-2 py-0.5 rounded-full bg-emerald-900/60 text-emerald-300 font-label-caps text-label-caps" id="promo-discount-label">-$0.00 applied</span>
+</div>
+<p class="font-body-sm text-body-sm text-text-muted truncate">Free juice with any Parrilla or Specialty entree</p>
+</div>
+</div>
+</div>
+<!-- Utensils & Napkins Toggle -->
+<div class="bg-surface-container rounded-xl p-space-md shadow-md flex items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-9 h-9 rounded-full bg-surface-raised flex items-center justify-center text-secondary shrink-0">
+<span class="material-symbols-outlined text-[20px]">eco</span>
+</div>
+<div class="min-w-0">
+<p class="font-title-sm text-title-sm text-text-primary font-medium">Utensils &amp; Napkins</p>
+<p class="font-body-sm text-body-sm text-text-muted">Eco-friendly packaging: add only if needed</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer shrink-0">
+<input checked="" class="sr-only peer" id="utensilsToggle" type="checkbox"/>
+<div class="w-12 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<!-- Gratuity / Kitchen Tip Selection -->
+<section class="bg-surface-container rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary-container text-[20px]">volunteer_activism</span>
+<h2 class="font-headline-md text-headline-md text-text-primary">Parrilla Team Tip</h2>
+</div>
+<span class="font-body-sm text-body-sm text-colombian-yellow">100% goes to staff</span>
+</div>
+<!-- Tip Options Buttons -->
+<div class="grid grid-cols-4 gap-space-xs mt-space-xs" id="tipGroup">
+<button class="tip-btn py-2.5 rounded-lg bg-surface-container-low hover:bg-surface-raised flex flex-col items-center justify-center transition-all" data-tip-pct="0.15" type="button">
+<span class="font-label-lg text-label-lg text-text-primary">15%</span>
+<span class="font-body-sm text-body-sm text-text-muted tip-amount-label">$0.00</span>
+</button>
+<button class="tip-btn py-2.5 rounded-lg bg-primary-container text-white shadow-md flex flex-col items-center justify-center transition-all" data-tip-pct="0.18" type="button">
+<span class="font-label-lg text-label-lg font-bold">18%</span>
+<span class="font-body-sm text-body-sm opacity-90 tip-amount-label">$0.00</span>
+</button>
+<button class="tip-btn py-2.5 rounded-lg bg-surface-container-low hover:bg-surface-raised flex flex-col items-center justify-center transition-all" data-tip-pct="0.20" type="button">
+<span class="font-label-lg text-label-lg text-text-primary">20%</span>
+<span class="font-body-sm text-body-sm text-text-muted tip-amount-label">$0.00</span>
+</button>
+<button class="tip-btn py-2.5 rounded-lg bg-surface-container-low hover:bg-surface-raised flex flex-col items-center justify-center transition-all" data-tip-pct="custom" type="button">
+<span class="font-label-lg text-label-lg text-text-primary">Custom</span>
+<span class="font-body-sm text-body-sm text-text-muted">Enter $</span>
+</button>
+</div>
+</section>
+<!-- Payment Selection Card -->
+<section class="bg-surface-container rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary-container text-[20px]">credit_card</span>
+<h2 class="font-headline-md text-headline-md text-text-primary">Payment Method</h2>
+</div>
+<button class="font-label-md text-label-md text-primary hover:underline" type="button">Change</button>
+</div>
+<!-- Active Card Display -->
+<div class="bg-surface-container-low rounded-xl p-space-md flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-11 h-8 rounded bg-surface-container-highest flex items-center justify-center text-text-primary shrink-0 shadow-sm">
+<span class="font-headline-md text-[13px] font-bold tracking-wider italic text-secondary-fixed-dim">VISA</span>
+</div>
+<div class="min-w-0">
+<p class="font-title-sm text-title-sm text-text-primary font-semibold truncate">Visa ending in •••• 4242</p>
+<p class="font-body-sm text-body-sm text-text-muted truncate">Expires 09/27 • Default</p>
+</div>
+</div>
+<div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+</div>
+<!-- Alternative Express Payment Options -->
+<div class="grid grid-cols-2 gap-space-sm pt-space-xs">
+<button class="py-2.5 px-space-sm rounded-lg bg-surface-container-low hover:bg-surface-raised text-text-primary flex items-center justify-center gap-space-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">phone_iphone</span>
+<span class="font-label-lg text-label-lg">Apple Pay</span>
+</button>
+<button class="py-2.5 px-space-sm rounded-lg bg-surface-container-low hover:bg-surface-raised text-text-primary flex items-center justify-center gap-space-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+<span class="font-label-lg text-label-lg">Google Pay</span>
+</button>
+</div>
+</section>
+<!-- Final Order Cost Summary -->
+<section class="bg-surface-container rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
+<h2 class="font-headline-md text-headline-md text-text-primary">Order Summary</h2>
+<div class="flex flex-col gap-2 pt-space-xs">
+<div class="flex justify-between items-center text-text-secondary font-body-md text-body-md">
+<span id="summarySubtotalLabel">Subtotal (0 items)</span>
+<span class="text-text-primary font-medium" id="summarySubtotalValue">$0.00</span>
+</div>
+<div class="flex justify-between items-center text-emerald-400 font-body-md text-body-md hidden" id="discount-row">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">loyalty</span> FREEJUICE Discount
+        </span>
+<span class="font-medium" id="summaryDiscountValue">-$0.00</span>
+</div>
+<div class="flex justify-between items-center text-text-secondary font-body-md text-body-md">
+<span>Taxes &amp; Local Fees</span>
+<span class="text-text-primary font-medium" id="summaryTaxesValue">$0.00</span>
+</div>
+<div class="flex justify-between items-center text-text-secondary font-body-md text-body-md">
+<span>Grill Crew Tip (18%)</span>
+<span class="text-text-primary font-medium" id="summaryTipValue">$9.35</span>
+</div>
+<div class="my-space-xs h-[1px] bg-surface-variant w-full"></div>
+<div class="flex justify-between items-baseline pt-1">
+<div>
+<span class="font-headline-lg text-headline-lg text-text-primary">Total Amount</span>
+<span class="block font-body-sm text-body-sm text-text-muted">Includes all applicable Miami Beach taxes</span>
+</div>
+<span class="font-display-lg-mobile text-display-lg-mobile text-text-primary" id="summaryTotalValue">$60.56</span>
+</div>
+</div>
+</section>
+<!-- Sticky / Bottom Floating Action Block -->
+<div class="flex flex-col gap-space-xs pt-space-xs">
+<div class="flex items-center justify-center gap-space-xs text-text-muted font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-emerald-400">verified_user</span>
+<span>256-bit encrypted secure restaurant checkout</span>
+</div>
+<button class="w-full h-14 bg-primary-container hover:bg-primary-container/90 text-white rounded-xl font-headline-md text-headline-md flex items-center justify-between px-space-lg shadow-[0_4px_24px_rgba(230,90,0,0.4)] transition-transform active:scale-[0.99]" id="placeOrderBtn" type="button">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[22px]">lock</span>
+<span>Place Pickup Order</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<span class="bg-black/25 px-2.5 py-1 rounded-md text-label-lg font-headline-md" id="btnTotalText">$60.56</span>
+<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</div>
+</button>
+<p class="text-center font-body-sm text-body-sm text-text-muted">
+      Pickup by <strong class="text-text-primary">6:45 PM</strong> at La Cabaña Grill • SMS confirmation will be sent
+    </p>
+</div>
+</div>
+<script>
+  let currentTipPct = 0.18;
+  let currentTip = 0;
+  let customTip = null;
+
+  function renderCartPage() {
+    const lines = cartLines();
+    const listEl = document.getElementById('cart-items-list');
+    const emptyEl = document.getElementById('cart-empty-state');
+    const countHeading = document.getElementById('order-item-count');
+    const totalQty = lines.reduce((n, l) => n + l.qty, 0);
+    countHeading.textContent = 'Your Order (' + totalQty + (totalQty === 1 ? ' item)' : ' items)');
+
+    if (lines.length === 0) {
+      listEl.innerHTML = '';
+      emptyEl.classList.remove('hidden');
+    } else {
+      emptyEl.classList.add('hidden');
+      const totals = computeTotals(lines);
+      listEl.innerHTML = lines.map((l) => {
+        const isFreeJuice = l.id === totals.cheapestJuiceId;
+        const lineTotal = isFreeJuice ? (l.item.price * (l.qty - 1)) : l.item.price * l.qty;
+        return `
+        <div class="bg-surface-container rounded-xl p-space-md shadow-md flex gap-space-md items-start">
+          <div class="relative w-20 h-20 rounded-lg overflow-hidden bg-surface-container-lowest shrink-0 shadow-sm">
+            <img class="w-full h-full object-cover" src="${l.item.img}" alt="${l.item.name}"/>
+            ${isFreeJuice ? '<span class="absolute bottom-1 right-1 bg-emerald-600 text-white px-1.5 py-0.5 rounded text-[10px] font-bold uppercase">Free</span>' : ''}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-start justify-between gap-space-xs">
+              <h3 class="font-title-sm text-title-sm text-text-primary font-semibold leading-tight">${l.item.name}</h3>
+              <span class="font-headline-md text-headline-md text-text-primary shrink-0">$${lineTotal.toFixed(2)}</span>
+            </div>
+            <p class="font-body-sm text-body-sm text-text-muted mt-0.5">$${l.item.price.toFixed(2)} each${isFreeJuice ? ' • 1 free with promo' : ''}</p>
+            <div class="flex items-center justify-between mt-space-sm pt-space-xs">
+              <div class="h-8 px-2 rounded-lg bg-surface-container-low flex items-center gap-2">
+                <button onclick="setQty('${l.id}', ${l.qty - 1})" class="text-text-secondary hover:text-text-primary" type="button"><span class="material-symbols-outlined text-[16px]">remove</span></button>
+                <span class="font-label-md text-label-md text-text-primary min-w-[10px] text-center">${l.qty}</span>
+                <button onclick="setQty('${l.id}', ${l.qty + 1})" class="text-primary hover:text-text-primary" type="button"><span class="material-symbols-outlined text-[16px]">add</span></button>
+              </div>
+              <button onclick="removeFromCart('${l.id}')" class="font-label-md text-label-md text-text-secondary hover:text-error transition-colors flex items-center gap-0.5" type="button">
+                <span class="material-symbols-outlined text-[16px]">delete</span> Remove
+              </button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    renderSummary();
+  }
+
+  function renderSummary() {
+    const lines = cartLines();
+    const totals = computeTotals(lines);
+    const totalQty = lines.reduce((n, l) => n + l.qty, 0);
+    const base = totals.subtotal - totals.discount;
+
+    currentTip = customTip !== null ? customTip : +(base * currentTipPct).toFixed(2);
+    document.querySelectorAll('.tip-btn[data-tip-pct]').forEach((btn) => {
+      const pct = btn.getAttribute('data-tip-pct');
+      if (pct === 'custom') return;
+      const label = btn.querySelector('.tip-amount-label');
+      if (label) label.textContent = '$' + (base * parseFloat(pct)).toFixed(2);
+    });
+
+    document.getElementById('summarySubtotalLabel').textContent = 'Subtotal (' + totalQty + (totalQty === 1 ? ' item)' : ' items)');
+    document.getElementById('summarySubtotalValue').textContent = '$' + totals.subtotal.toFixed(2);
+
+    const discountRow = document.getElementById('discount-row');
+    if (totals.promoActive) {
+      discountRow.classList.remove('hidden');
+      document.getElementById('summaryDiscountValue').textContent = '-$' + totals.discount.toFixed(2);
+      document.getElementById('promo-banner').classList.remove('hidden');
+      document.getElementById('promo-discount-label').textContent = '-$' + totals.discount.toFixed(2) + ' applied';
+    } else {
+      discountRow.classList.add('hidden');
+      document.getElementById('promo-banner').classList.add('hidden');
+    }
+
+    document.getElementById('summaryTaxesValue').textContent = '$' + totals.taxes.toFixed(2);
+    document.getElementById('summaryTipValue').textContent = '$' + currentTip.toFixed(2);
+
+    const total = (totals.subtotal - totals.discount + totals.taxes + currentTip);
+    document.getElementById('summaryTotalValue').textContent = '$' + total.toFixed(2);
+    document.getElementById('btnTotalText').textContent = '$' + total.toFixed(2);
+  }
+
+  (function() {
+    const tipButtons = document.querySelectorAll('.tip-btn');
+    tipButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tipButtons.forEach(b => {
+          b.className = 'tip-btn py-2.5 rounded-lg bg-surface-container-low hover:bg-surface-raised flex flex-col items-center justify-center transition-all text-text-primary';
+        });
+        btn.className = 'tip-btn py-2.5 rounded-lg bg-primary-container text-white shadow-md flex flex-col items-center justify-center transition-all';
+
+        const tipVal = btn.getAttribute('data-tip-pct');
+        if (tipVal !== 'custom') {
+          customTip = null;
+          currentTipPct = parseFloat(tipVal);
+        } else {
+          const entered = prompt('Enter a custom tip amount ($)', '10.00');
+          if (entered !== null) customTip = Math.max(0, parseFloat(entered) || 0);
+        }
+        renderSummary();
+      });
+    });
+
+    const asapBtn = document.getElementById('asapBtn');
+    const laterBtn = document.getElementById('laterBtn');
+    const slotDetails = document.getElementById('scheduledSlotDetails');
+
+    asapBtn.addEventListener('click', () => {
+      asapBtn.className = 'py-2.5 px-space-sm rounded-lg font-label-lg text-label-lg bg-primary-container text-white shadow-md transition-all flex flex-col items-center justify-center';
+      laterBtn.className = 'py-2.5 px-space-sm rounded-lg font-label-lg text-label-lg text-text-muted transition-all flex flex-col items-center justify-center';
+      slotDetails.classList.add('opacity-40');
+    });
+
+    laterBtn.addEventListener('click', () => {
+      laterBtn.className = 'py-2.5 px-space-sm rounded-lg font-label-lg text-label-lg bg-primary-container text-white shadow-md transition-all flex flex-col items-center justify-center';
+      asapBtn.className = 'py-2.5 px-space-sm rounded-lg font-label-lg text-label-lg text-text-muted transition-all flex flex-col items-center justify-center';
+      slotDetails.classList.remove('opacity-40');
+    });
+
+    document.getElementById('placeOrderBtn').addEventListener('click', () => {
+      if (cartLines().length === 0) { showToast('Your cart is empty'); return; }
+      const order = placeOrder(currentTip);
+      if (order) window.location.href = 'orders.html';
+    });
+
+    document.addEventListener('DOMContentLoaded', renderCartPage);
+    renderCartPage();
+  })();
+</script><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}</script></main></body></html>

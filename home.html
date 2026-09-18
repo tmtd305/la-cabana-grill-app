@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/><link rel="manifest" href="manifest.json"/><meta name="theme-color" content="#131313"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#131313;color:#e5e2e1;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script src="data.js"></script><script src="cart.js"></script><script src="notifications.js"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "surface-variant": "#353534", "on-primary-container": "#4d1900", "on-tertiary-container": "#00226e", "on-secondary-container": "#5b3800", "outline-variant": "#594137", "surface-container-low": "#1c1b1b", "surface-tint": "#ffb596", "surface-dim": "#131313", "error-container": "#93000a", "on-surface-variant": "#e2bfb2", "on-secondary-fixed-variant": "#653e00", "secondary-fixed-dim": "#ffb95f", "flame-glow": "rgba(230, 90, 0, 0.24)", "on-secondary-fixed": "#2a1700", "surface-container-highest": "#353534", "on-tertiary-fixed": "#00164e", "tertiary-fixed": "#dce1ff", "on-error": "#690005", "colombian-red": "#DC2626", "on-primary-fixed-variant": "#7d2d00", "outline": "#a98a7e", "inverse-surface": "#e5e2e1", "secondary-fixed": "#ffddb8", "surface-container-lowest": "#0e0e0e", "text-secondary": "#9CA3AF", "text-primary": "#F9FAFB", "error": "#ffb4ab", "on-primary": "#581e00", "text-muted": "#6B7280", "surface-raised": "#242424", "tertiary-fixed-dim": "#b6c4ff", "background": "#131313", "on-background": "#e5e2e1", "primary": "#ffb596", "secondary-container": "#ee9800", "border-highlight": "rgba(230, 90, 0, 0.35)", "on-error-container": "#ffdad6", "border-subtle": "rgba(255, 255, 255, 0.08)", "surface": "#131313", "primary-fixed-dim": "#ffb596", "on-tertiary": "#05297a", "tertiary": "#b6c4ff", "colombian-blue": "#2563EB", "primary-container": "#f36310", "surface-bright": "#393939", "surface-container": "#201f1f", "surface-elevated": "#2E2E2E", "inverse-primary": "#a33e00", "secondary": "#ffb95f", "tertiary-container": "#748de1", "surface-container-high": "#2a2a2a", "on-surface": "#e5e2e1", "on-tertiary-fixed-variant": "#264191", "primary-fixed": "#ffdbcd", "colombian-yellow": "#FBBF24", "surface-charcoal": "#1A1A1A", "inverse-on-surface": "#313030", "on-primary-fixed": "#360f00", "on-secondary": "#472a00" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-xl": "2rem", "space-xs": "0.25rem", "gutter-tablet": "1.5rem", "space-sm": "0.5rem", "space-lg": "1.5rem", "gutter": "1rem", "space-2xl": "3rem", "margin-tablet": "2rem", "space-md": "1rem", "margin": "1rem" }, fontFamily: { "body-md": ["Manrope"], "headline-md": ["Outfit"], "label-lg": ["Manrope"], "display-lg-mobile": ["Outfit"], "body-lg": ["Manrope"], "headline-lg": ["Outfit"], "label-caps": ["Outfit"], "title-sm": ["Outfit"], "headline-xl": ["Outfit"], "body-sm": ["Manrope"], "label-md": ["Manrope"], "display-lg": ["Outfit"] }, fontSize: { "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }], "headline-md": ["18px", { lineHeight: "24px", fontWeight: "600" }], "label-lg": ["14px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "600" }], "display-lg-mobile": ["32px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700" }], "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }], "headline-lg": ["22px", { lineHeight: "28px", fontWeight: "600" }], "label-caps": ["11px", { lineHeight: "14px", letterSpacing: "0.08em", fontWeight: "700" }], "title-sm": ["16px", { lineHeight: "22px", fontWeight: "600" }], "headline-xl": ["28px", { lineHeight: "34px", letterSpacing: "-0.015em", fontWeight: "600" }], "body-sm": ["12px", { lineHeight: "16px", fontWeight: "400" }], "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }], "display-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.02em", fontWeight: "700" }] } } } };</script></head><body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen selection:bg-primary-container selection:text-white"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.45)]"><div class="h-20 px-gutter flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><img alt="Image from https://lacabanagrill.net/cdn/shop/files/La_cabana_logo_transparent.png?v=1753649726" class="h-8 w-auto object-contain shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5gyisworKjgP_IkZqsOdfA_PsuLIqwuySE3MjDCLMD9urOUsKMYXBpF0FGvY8tvbngHJNvjcGJ9rh4A6JLIAM58Kd3ME-84nN8Cb6S1S_Gf6RjZ5iovKW9MTuLMrj_oDDq6Ya8cYTLjbqO1eWrZZKp7Xl2fIxfXGByqt-lsQ0DPvAb-WMF_A2Lw2kubdkJ2nPCSC-jhIxSJms3NQiszAi8XlftDwYn6YJdHKoGBjd4LTFXU6tVio6"/><div class="flex flex-col min-w-0"><div class="flex items-center gap-1"><span class="font-headline-md text-headline-md text-text-primary truncate tracking-tight">La Cabaña</span><span class="hidden">Home</span></div><button class="flex items-center gap-1 text-primary hover:text-secondary transition-colors text-left"><span class="material-symbols-outlined text-[14px] text-primary-container shrink-0">location_on</span><span class="font-label-caps text-label-caps uppercase tracking-wider text-on-surface-variant truncate">Miami Beach • 15-25 min</span><span class="material-symbols-outlined text-[14px] text-on-surface-variant">expand_more</span></button></div></div><div class="flex items-center gap-1 shrink-0"><button aria-label="Search menu" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-text-primary hover:bg-surface-raised transition-all"><span class="material-symbols-outlined text-[22px]">search</span></button><button aria-label="Enable deal notifications" onclick="requestNotifications()" class="relative w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-text-primary hover:bg-surface-raised transition-all"><span class="material-symbols-outlined text-[22px]">notifications</span><span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-primary-container ring-2 ring-surface shadow-[0_0_8px_rgba(243,99,16,0.8)]"></span></button><div onclick="showToast('Account coming soon')" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 ml-1 cursor-pointer"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 w-full bg-surface pt-20 pb-28"><div class="flex flex-col w-full px-gutter space-y-space-lg">
+<!-- Pickup Toggle & Location Bar -->
+<section class="w-full bg-surface-charcoal rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs min-w-0">
+<span class="material-symbols-outlined text-primary-container text-[20px] shrink-0" style="font-variation-settings: 'FILL' 1;">storefront</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest">Pickup Location</span>
+<span class="font-title-sm text-title-sm text-text-primary truncate">Miami Beach • 743 Washington Ave</span>
+</div>
+</div>
+<button class="bg-surface-raised hover:bg-surface-elevated text-primary px-3 py-1.5 rounded-lg font-label-md text-label-md transition-all shrink-0">
+        Change
+      </button>
+</div>
+<!-- Fulfillment Mode Switcher -->
+<div class="bg-surface-container-lowest p-1 rounded-lg flex items-center gap-1">
+<button class="flex-1 py-1.5 rounded-md font-label-md text-label-md text-center transition-all bg-primary-container text-text-primary shadow-sm flex items-center justify-center gap-1" id="tab-asap" onclick="selectTiming('asap')">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+        ASAP (15–25 min)
+      </button>
+<button class="flex-1 py-1.5 rounded-md font-label-md text-label-md text-center transition-all text-text-secondary hover:text-text-primary flex items-center justify-center gap-1" id="tab-schedule" onclick="selectTiming('schedule')">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+        Schedule Time
+      </button>
+</div>
+</section>
+<!-- Hero Promo Banner Carousel Card -->
+<section class="relative w-full rounded-xl overflow-hidden bg-surface-charcoal shadow-xl">
+<div class="relative h-48 w-full overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Trio of fresh chilled tropical South American juices including passionfruit, guanabana, and golden mango in tall frosted glasses on a warm wooden bar with atmospheric ambient backlighting and palm shadows, authentic Miami Latin grill style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCYrm2O8vYjVkQHl3g15-uFTsxIsc55-wx_sYi7qnfOZKSb0rnO-dUn3Frl182vsMKjKHKDaQ6kSlKDKB42KXrSUBc-URZFSVdZxUptvOdPs3403nofUPJaNsb4YOP6PiyGXaYcD7ulyUuNOhZcezxCnqLPfRoWaaazKGSwNddvKUJykOO3MwBaIf7ThMUH6q5Q7N4VYq0tfOqu7WGm0e5utdGYZSQiHbyAWZ9aYyjJIMbYlx_kXktL')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-charcoal via-surface-charcoal/60 to-transparent"></div>
+<div class="absolute top-3 left-3 flex items-center gap-1.5 bg-primary-container/90 backdrop-blur-md px-2.5 py-1 rounded-full text-text-primary">
+<span class="material-symbols-outlined text-[14px]">local_offer</span>
+<span class="font-label-caps text-label-caps uppercase tracking-wider font-bold">Valid Today Only</span>
+</div>
+<div class="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
+<div class="max-w-[70%]">
+<span class="font-label-caps text-label-caps text-colombian-yellow uppercase tracking-wider block mb-0.5">La Cabaña Specialty</span>
+<h2 class="font-headline-md text-headline-md text-text-primary leading-tight">FREE Tropical Fruit Juice</h2>
+<p class="font-body-sm text-body-sm text-text-secondary line-clamp-1">With any signature Parrilla meal purchase</p>
+</div>
+<button onclick="document.getElementById('juices-section').scrollIntoView({behavior:'smooth'})" class="bg-primary-container hover:bg-secondary-container text-text-primary px-3.5 py-2 rounded-lg font-label-md text-label-md font-semibold transition-all shadow-md shrink-0 flex items-center gap-1 active:scale-95">
+<span>Claim</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Scrollable Categories -->
+<section class="w-full">
+<div class="flex items-center justify-between mb-space-sm">
+<h3 class="font-headline-md text-headline-md text-text-primary">Explore Menu</h3>
+<a href="menu.html" class="font-label-md text-label-md text-secondary hover:underline">View All</a>
+</div>
+<div class="flex items-center gap-2 overflow-x-auto pb-1 -mx-gutter px-gutter no-scrollbar">
+<a href="menu.html?cat=steak" class="shrink-0 bg-primary-container text-text-primary font-label-md text-label-md px-4 py-2 rounded-full shadow-sm flex items-center gap-1.5">
+<span>🔥</span>
+<span>Popular</span>
+</a>
+<a href="menu.html?cat=steak" class="shrink-0 bg-surface-charcoal text-text-secondary hover:text-text-primary font-label-md text-label-md px-4 py-2 rounded-full shadow-sm flex items-center gap-1.5 transition-colors">
+<span>🥩</span>
+<span>Steaks &amp; Parrilla</span>
+</a>
+<a href="menu.html?cat=chicken" class="shrink-0 bg-surface-charcoal text-text-secondary hover:text-text-primary font-label-md text-label-md px-4 py-2 rounded-full shadow-sm flex items-center gap-1.5 transition-colors">
+<span>🍗</span>
+<span>Pollo / Chicken</span>
+</a>
+<a href="menu.html?cat=seafood" class="shrink-0 bg-surface-charcoal text-text-secondary hover:text-text-primary font-label-md text-label-md px-4 py-2 rounded-full shadow-sm flex items-center gap-1.5 transition-colors">
+<span>🐟</span>
+<span>Seafood</span>
+</a>
+<a href="menu.html?cat=rice" class="shrink-0 bg-surface-charcoal text-text-secondary hover:text-text-primary font-label-md text-label-md px-4 py-2 rounded-full shadow-sm flex items-center gap-1.5 transition-colors">
+<span>🍚</span>
+<span>Arroces</span>
+</a>
+<a href="menu.html?cat=juice" class="shrink-0 bg-surface-charcoal text-text-secondary hover:text-text-primary font-label-md text-label-md px-4 py-2 rounded-full shadow-sm flex items-center gap-1.5 transition-colors">
+<span>🍹</span>
+<span>Fresh Juices</span>
+</a>
+<a href="menu.html?cat=streetfood" class="shrink-0 bg-surface-charcoal text-text-secondary hover:text-text-primary font-label-md text-label-md px-4 py-2 rounded-full shadow-sm flex items-center gap-1.5 transition-colors">
+<span>🍔</span>
+<span>Street Food</span>
+</a>
+</div>
+</section>
+<!-- Quick Re-order Drawer Card -->
+<section class="w-full bg-surface-container p-space-md rounded-xl shadow-md flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="w-12 h-12 rounded-lg bg-surface-raised flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary-container text-[24px]">history</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-label-caps text-label-caps uppercase text-secondary">Past Order</span>
+<span class="w-1 h-1 rounded-full bg-outline"></span>
+<span class="font-label-caps text-label-caps text-text-muted">Last Tuesday</span>
+</div>
+<span class="font-title-sm text-title-sm text-text-primary truncate">1x Bandeja Paisa Completa</span>
+<span class="font-body-sm text-body-sm text-text-secondary">$22.99 • Miami Beach pickup</span>
+</div>
+</div>
+<button onclick="addToCart('bandeja-paisa'); window.location.href='cart.html'" class="bg-surface-raised hover:bg-surface-elevated text-primary hover:text-primary-container px-3 py-2 rounded-lg font-label-md text-label-md shrink-0 flex items-center gap-1 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[16px]">replay</span>
+<span>Reorder</span>
+</button>
+</section>
+<!-- Featured Specialties Section -->
+<section class="w-full space-y-space-sm">
+<div class="flex items-baseline justify-between">
+<div>
+<h3 class="font-headline-lg text-headline-lg text-text-primary">Featured Specialties</h3>
+<p class="font-body-sm text-body-sm text-text-secondary">Authentic Colombian charcoal &amp; skillet craft</p>
+</div>
+<span class="font-label-caps text-label-caps text-colombian-yellow uppercase tracking-wider">A La Parrilla</span>
+</div>
+<!-- Dish Card 1: Bandeja Paisa -->
+<article class="bg-surface-charcoal rounded-xl overflow-hidden shadow-lg flex flex-col">
+<div class="relative h-44 w-full">
+<div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://lacabanagrill.net/cdn/shop/files/bandejapaisaedited.png?v=1753664504')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-charcoal via-transparent to-black/30"></div>
+<div class="absolute top-3 left-3 bg-secondary text-on-secondary font-label-caps text-label-caps px-2 py-0.5 rounded-full uppercase tracking-wider font-bold shadow-sm">
+          Chef Favorite
+        </div>
+<div class="absolute bottom-3 right-3 bg-surface-charcoal/90 backdrop-blur-md px-2.5 py-1 rounded-lg">
+<span class="font-headline-md text-headline-md text-colombian-yellow">$22.99</span>
+</div>
+</div>
+<div class="p-space-md flex flex-col gap-2">
+<div class="flex items-start justify-between gap-2">
+<h4 class="font-headline-md text-headline-md text-text-primary">Bandeja Paisa</h4>
+<div class="flex items-center gap-1 text-secondary shrink-0">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-text-primary">4.9</span>
+<span class="font-body-sm text-body-sm text-text-muted">(184)</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary leading-relaxed">
+          The ultimate Colombian platter: tender grilled skirt carne asada, crisp artisanal chicharrón, sunny egg, simmered red beans, rice, sweet maduro plantain, and sliced avocado.
+        </p>
+<div class="pt-2 flex items-center justify-between gap-2">
+<div class="flex items-center gap-1.5 text-text-muted font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-primary-container">local_fire_department</span>
+<span>Charcoal Finished</span>
+</div>
+<button class="bg-primary-container hover:bg-secondary-container text-text-primary px-4 py-2 rounded-lg font-label-md text-label-md flex items-center gap-1.5 transition-all active:scale-95 shadow-md" onclick="addToCart('bandeja-paisa')">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Add to Order</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Dish Card 2: Churrasco a la Parrilla -->
+<article class="bg-surface-charcoal rounded-xl overflow-hidden shadow-lg flex flex-col">
+<div class="relative h-44 w-full">
+<img alt="Churrasco a la Parrilla" class="w-full h-full object-cover" src="https://lacabanagrill.net/cdn/shop/files/churrascoedited.png?v=1753668510"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-charcoal via-transparent to-black/30"></div>
+<div class="absolute top-3 left-3 bg-colombian-yellow text-on-secondary font-label-caps text-label-caps px-2 py-0.5 rounded-full uppercase tracking-wider font-bold shadow-sm">
+          House Specialty
+        </div>
+<div class="absolute bottom-3 right-3 bg-surface-charcoal/90 backdrop-blur-md px-2.5 py-1 rounded-lg">
+<span class="font-headline-md text-headline-md text-colombian-yellow">$28.99</span>
+</div>
+</div>
+<div class="p-space-md flex flex-col gap-2">
+<div class="flex items-start justify-between gap-2">
+<h4 class="font-headline-md text-headline-md text-text-primary">Churrasco a la Parrilla</h4>
+<div class="flex items-center gap-1 text-secondary shrink-0">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-text-primary">4.8</span>
+<span class="font-body-sm text-body-sm text-text-muted">(92)</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-text-secondary leading-relaxed">
+          12oz flame-grilled skirt steak seared over natural lump charcoal, dressed with house-made garlicky chimichurri. Served with crispy golden fries, fresh salad &amp; white corn arepa.
+        </p>
+<div class="pt-2 flex items-center justify-between gap-2">
+<div class="flex items-center gap-1.5 text-text-muted font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-primary-container">timer</span>
+<span>15-20 min grill time</span>
+</div>
+<button class="bg-primary-container hover:bg-secondary-container text-text-primary px-4 py-2 rounded-lg font-label-md text-label-md flex items-center gap-1.5 transition-all active:scale-95 shadow-md" onclick="addToCart('churrasco-a-la-parrilla')">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Order Now</span>
+</button>
+</div>
+</div>
+</article>
+</section>
+<!-- Tropical Fruit Juices (Made Fresh) Horizontal Carousel -->
+<section id="juices-section" class="w-full space-y-space-sm pb-4">
+<div class="flex items-center justify-between">
+<div>
+<h3 class="font-headline-md text-headline-md text-text-primary">Tropical Fruit Juices</h3>
+<p class="font-body-sm text-body-sm text-text-secondary">Made fresh daily in water or rich milk</p>
+</div>
+<span class="font-label-md text-label-md text-primary">$6.50 ea</span>
+</div>
+<div class="flex items-center gap-3 overflow-x-auto pb-2 -mx-gutter px-gutter no-scrollbar">
+<!-- Juice 1: Lulo -->
+<div class="w-40 shrink-0 bg-surface-charcoal rounded-xl p-3 shadow-md flex flex-col justify-between space-y-2">
+<div class="relative w-full h-24 rounded-lg overflow-hidden bg-surface-container-high">
+<div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lacabanagrill.net/cdn/shop/files/lulo_juice.png?v=1760974553')"></div>
+<span class="absolute top-1.5 left-1.5 bg-surface-dim/80 backdrop-blur-sm text-colombian-yellow font-label-caps text-label-caps px-1.5 py-0.5 rounded">Iconic</span>
+</div>
+<div>
+<span class="font-title-sm text-title-sm text-text-primary block truncate">Jugo de Lulo</span>
+<span class="font-body-sm text-body-sm text-text-secondary">Citrusy &amp; tart</span>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="font-headline-md text-headline-md text-secondary">$6.50</span>
+<button class="w-8 h-8 rounded-lg bg-surface-raised hover:bg-primary-container text-text-primary flex items-center justify-center transition-colors" onclick="addToCart('jugo-de-lulo')">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+<!-- Juice 2: Guanábana -->
+<div class="w-40 shrink-0 bg-surface-charcoal rounded-xl p-3 shadow-md flex flex-col justify-between space-y-2">
+<div class="relative w-full h-24 rounded-lg overflow-hidden bg-surface-container-high">
+<div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lacabanagrill.net/cdn/shop/files/guanabana_juice.png?v=1760974330')"></div>
+<span class="absolute top-1.5 left-1.5 bg-surface-dim/80 backdrop-blur-sm text-text-primary font-label-caps text-label-caps px-1.5 py-0.5 rounded">Creamy</span>
+</div>
+<div>
+<span class="font-title-sm text-title-sm text-text-primary block truncate">Guanábana</span>
+<span class="font-body-sm text-body-sm text-text-secondary">Sweet soursop</span>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="font-headline-md text-headline-md text-secondary">$6.50</span>
+<button class="w-8 h-8 rounded-lg bg-surface-raised hover:bg-primary-container text-text-primary flex items-center justify-center transition-colors" onclick="addToCart('jugo-de-guanabana')">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+<!-- Juice 3: Mango -->
+<div class="w-40 shrink-0 bg-surface-charcoal rounded-xl p-3 shadow-md flex flex-col justify-between space-y-2">
+<div class="relative w-full h-24 rounded-lg overflow-hidden bg-surface-container-high">
+<div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lacabanagrill.net/cdn/shop/files/mango_juice_b5d0bf51-a7de-4467-b7ff-2a106b4d402c.png?v=1760974023')"></div>
+<span class="absolute top-1.5 left-1.5 bg-surface-dim/80 backdrop-blur-sm text-secondary font-label-caps text-label-caps px-1.5 py-0.5 rounded">Sweet</span>
+</div>
+<div>
+<span class="font-title-sm text-title-sm text-text-primary block truncate">Mango Fresco</span>
+<span class="font-body-sm text-body-sm text-text-secondary">Ripe tropical</span>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="font-headline-md text-headline-md text-secondary">$6.50</span>
+<button class="w-8 h-8 rounded-lg bg-surface-raised hover:bg-primary-container text-text-primary flex items-center justify-center transition-colors" onclick="addToCart('jugo-de-mango')">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+<!-- Juice 4: Piña -->
+<div class="w-40 shrink-0 bg-surface-charcoal rounded-xl p-3 shadow-md flex flex-col justify-between space-y-2">
+<div class="relative w-full h-24 rounded-lg overflow-hidden bg-surface-container-high">
+<div class="w-full h-full bg-cover bg-center" style="background-image: url('https://lacabanagrill.net/cdn/shop/files/pineapple_juice_420d89e9-2205-404b-b77a-0942ce2a4b22.png?v=1760974276')"></div>
+</div>
+<div>
+<span class="font-title-sm text-title-sm text-text-primary block truncate">Piña Natural</span>
+<span class="font-body-sm text-body-sm text-text-secondary">Crisp &amp; chilled</span>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="font-headline-md text-headline-md text-secondary">$6.50</span>
+<button class="w-8 h-8 rounded-lg bg-surface-raised hover:bg-primary-container text-text-primary flex items-center justify-center transition-colors" onclick="addToCart('jugo-de-pina')">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Live Cart Snackbar (populated by JS based on real cart state) -->
+<aside class="sticky bottom-2 w-full z-40 bg-surface-raised rounded-xl p-3 shadow-2xl items-center justify-between gap-3 hidden" id="cart-snackbar">
+<div class="flex items-center justify-between gap-3">
+<div class="flex items-center gap-3 min-w-0">
+<div class="relative w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary-container text-[22px]">shopping_bag</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-caps text-label-caps text-primary-container font-bold uppercase" id="cart-snackbar-count">0 items</span>
+<span class="font-title-sm text-title-sm text-text-primary truncate" id="cart-snackbar-total">$0.00</span>
+</div>
+</div>
+<a href="cart.html" class="bg-primary-container hover:bg-secondary-container text-text-primary px-3 py-1.5 rounded-lg font-label-md text-label-md font-semibold transition-all shrink-0 flex items-center gap-1">
+<span>View Cart</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</a>
+</div>
+</aside>
+</div>
+<script>
+  function renderCartSnackbar() {
+    const bar = document.getElementById('cart-snackbar');
+    const lines = cartLines();
+    if (lines.length === 0) { bar.classList.add('hidden'); bar.classList.remove('flex'); return; }
+    const totals = computeTotals(lines);
+    const count = lines.reduce((n, l) => n + l.qty, 0);
+    document.getElementById('cart-snackbar-count').textContent = count + (count === 1 ? ' item' : ' items');
+    document.getElementById('cart-snackbar-total').textContent = '$' + (totals.subtotal - totals.discount).toFixed(2);
+    bar.classList.remove('hidden');
+    bar.classList.add('flex');
+  }
+  document.addEventListener('DOMContentLoaded', renderCartSnackbar);
+  const _origSaveCart = saveCart;
+  saveCart = function(cart) { _origSaveCart(cart); renderCartSnackbar(); };
+</script>
+<script>
+  function selectTiming(mode) {
+    const asapBtn = document.getElementById('tab-asap');
+    const schedBtn = document.getElementById('tab-schedule');
+    if (mode === 'asap') {
+      asapBtn.className = 'flex-1 py-1.5 rounded-md font-label-md text-label-md text-center transition-all bg-primary-container text-text-primary shadow-sm flex items-center justify-center gap-1';
+      schedBtn.className = 'flex-1 py-1.5 rounded-md font-label-md text-label-md text-center transition-all text-text-secondary hover:text-text-primary flex items-center justify-center gap-1';
+    } else {
+      schedBtn.className = 'flex-1 py-1.5 rounded-md font-label-md text-label-md text-center transition-all bg-primary-container text-text-primary shadow-sm flex items-center justify-center gap-1';
+      asapBtn.className = 'flex-1 py-1.5 rounded-md font-label-md text-label-md text-center transition-all text-text-secondary hover:text-text-primary flex items-center justify-center gap-1';
+    }
+  }
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-8px_24px_rgba(0,0,0,0.55)]" data-active-classes="text-primary-container font-headline-md"><div class="h-16 px-gutter flex items-center justify-around"><a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 transition-colors text-primary-container font-headline-md" data-path="home" href="home.html"><span class="material-symbols-outlined text-[24px]">local_fire_department</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="menu" href="menu.html"><span class="material-symbols-outlined text-[24px]">restaurant_menu</span><span class="font-label-caps text-label-caps">Menu</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="orders" href="orders.html"><span class="material-symbols-outlined text-[24px]">receipt_long</span><span class="font-label-caps text-label-caps">Orders</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="favorites" href="#" onclick="event.preventDefault(); showToast('Favorites coming soon')"><span class="material-symbols-outlined text-[24px]">favorite</span><span class="font-label-caps text-label-caps">Favorites</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="account" href="#" onclick="event.preventDefault(); showToast('Account coming soon')"><span class="material-symbols-outlined text-[24px]">account_circle</span><span class="font-label-caps text-label-caps">Account</span></a></div></nav></body></html>
