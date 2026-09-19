@@ -179,7 +179,12 @@
     const cat = params.get('cat');
     if (cat && CATEGORIES.some((c) => c.id === cat)) activeCategory = cat;
     renderCategoryTabs();
-    renderDishFeed();
+    const quick = params.get('quick');
+    if (quick === 'specialty') {
+      setQuickFilter('specialty');
+    } else {
+      renderDishFeed();
+    }
   });
 
   function renderFloatingCartBar() {
