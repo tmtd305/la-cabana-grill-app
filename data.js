@@ -244,7 +244,8 @@ const CATEGORIES = [
 const ALL_ITEMS = MENU.concat(JUICES);
 const RESTAURANT = {
   name: "La Cabaña Grill",
-  address: "743 Washington Ave, Miami Beach, FL",
+  address: "6780 Collins Ave, Miami Beach, FL",
+  phone: "+17862547968",
   logo: "https://lacabanagrill.net/cdn/shop/files/La_cabana_logo_transparent.png?v=1753649726",
   taxRate: 0.079
 };
