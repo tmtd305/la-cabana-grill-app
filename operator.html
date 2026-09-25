@@ -84,15 +84,17 @@
     <span class="pill" id="duty"><i></i><span>Off duty</span></span>
   </header>
 
-  <!-- sign in -->
+  <!-- sign in / create staff login -->
   <div id="v-login" class="card hidden" style="max-width:420px;margin:30px auto;">
-    <h2 style="font-family:Outfit,sans-serif;margin:0 0 6px;">Staff sign in</h2>
-    <p class="muted" style="margin:0 0 14px;">Only approved La Cabaña staff emails can take voice orders.</p>
+    <h2 style="font-family:Outfit,sans-serif;margin:0 0 6px;" id="l-title">Staff sign in</h2>
+    <p class="muted" style="margin:0 0 14px;" id="l-sub">Only approved La Cabaña staff emails can take voice orders.</p>
     <input class="field" id="em" type="email" placeholder="Staff email" autocomplete="username" autocapitalize="none">
     <input class="field" id="pw" type="password" placeholder="Password" autocomplete="current-password" style="margin-top:10px;">
+    <input class="field hidden" id="pw2" type="password" placeholder="Confirm password" autocomplete="new-password" style="margin-top:10px;">
     <div id="lerr" class="muted" style="color:var(--rd);margin-top:10px;display:none;"></div>
     <button class="btn pri" id="bLogin" style="width:100%;margin-top:14px;">Sign in</button>
-    <button class="btn" id="bSignup" style="width:100%;margin-top:8px;">First time? Create staff login</button>
+    <button class="btn pri hidden" id="bSignup" style="width:100%;margin-top:14px;">Create staff login</button>
+    <button class="btn" id="bMode" style="width:100%;margin-top:8px;">New staff? Create a login</button>
   </div>
 
   <!-- not allowed -->
@@ -119,6 +121,13 @@
         <div class="card">
           <div class="sec">Paid voice orders today</div>
           <div id="paid"><div class="muted">Nothing yet today.</div></div>
+        </div>
+        <div class="card" style="margin-top:14px;">
+          <div class="sec">Staff</div>
+          <p class="muted" style="margin:0 0 10px;font-size:13px;">Add a staff email here, then they tap “New staff? Create a login” on this page with that email.</p>
+          <div style="display:flex;gap:8px;"><input class="field" id="st-em" type="email" placeholder="new.staff@email.com" autocapitalize="none" style="flex:1;min-width:0;"><button class="btn pri" id="bAddStaff">Add</button></div>
+          <div id="st-msg" class="muted" style="margin-top:8px;display:none;"></div>
+          <div id="staff" style="margin-top:6px;"></div>
         </div>
       </div>
 
@@ -174,21 +183,38 @@
   async function signOut(){ await goOffDuty(); await sb.auth.signOut(); location.reload(); }
 
   // ---------- auth ----------
+  function lmsg(t, ok){ $('lerr').style.color = ok ? 'var(--gr)' : 'var(--rd)'; $('lerr').textContent = t; $('lerr').style.display = t ? 'block' : 'none'; }
+  let createMode = false;
+  $('bMode').onclick = () => {
+    createMode = !createMode; lmsg('');
+    $('l-title').textContent = createMode ? 'Create staff login' : 'Staff sign in';
+    $('l-sub').textContent = createMode ? 'Use the email your manager added to the staff list. Pick a password (8+ characters).' : 'Only approved La Cabaña staff emails can take voice orders.';
+    $('pw').autocomplete = createMode ? 'new-password' : 'current-password';
+    $('pw2').classList.toggle('hidden', !createMode);
+    $('bLogin').classList.toggle('hidden', createMode);
+    $('bSignup').classList.toggle('hidden', !createMode);
+    $('bMode').textContent = createMode ? 'Already have a login? Sign in' : 'New staff? Create a login';
+  };
   $('bLogin').onclick = async () => {
     const email = $('em').value.trim(), password = $('pw').value;
-    $('lerr').style.display = 'none';
+    lmsg('');
     const { error } = await sb.auth.signInWithPassword({ email, password });
-    if(error){ $('lerr').textContent = /confirm/i.test(error.message) ? 'Confirm your email first — check your inbox.' : 'Wrong email or password.'; $('lerr').style.display = 'block'; return; }
+    if(error){ lmsg(/confirm/i.test(error.message) ? 'Confirm your email first — open the link we emailed you, then sign in.' : 'Wrong email or password.'); return; }
     boot();
   };
   $('bSignup').onclick = async () => {
     const email = $('em').value.trim(), password = $('pw').value;
-    $('lerr').style.display = 'none';
-    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || password.length < 8){ $('lerr').textContent = 'Enter your staff email and a password of 8+ characters.'; $('lerr').style.display = 'block'; return; }
+    lmsg('');
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ lmsg('Enter a valid email.'); return; }
+    if(password.length < 8){ lmsg('Password needs 8+ characters.'); return; }
+    if(password !== $('pw2').value){ lmsg('Passwords don\'t match.'); return; }
+    $('bSignup').disabled = true;
     const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: location.origin + '/operator.html' } });
-    if(error){ $('lerr').textContent = error.message; $('lerr').style.display = 'block'; return; }
+    $('bSignup').disabled = false;
+    if(error){ lmsg(/registered|exists/i.test(error.message) ? 'That email already has a login — sign in instead.' : error.message); return; }
+    if(data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0){ lmsg('That email already has a login — sign in instead (or check your inbox for the confirmation link).'); return; }
     if(data.session){ boot(); return; }
-    $('lerr').style.color = 'var(--gr)'; $('lerr').textContent = 'Check ' + email + ' for a confirmation link, then come back and sign in.'; $('lerr').style.display = 'block';
+    lmsg('Almost done! Open the confirmation link we sent to ' + email + ', then come back here and sign in.', true);
   };
 
   async function boot(){
@@ -198,7 +224,7 @@
     const { data: ok } = await sb.rpc('is_operator');
     if(!ok){ $('denied-email').textContent = me.email + ' isn\'t on the staff list.'; show('v-denied'); return; }
     show('v-app');
-    loadQueue(); loadPaid();
+    loadQueue(); loadPaid(); loadStaff();
     listenDb();
   }
 
@@ -391,6 +417,32 @@
   }
 
   window.addEventListener('beforeunload', e => { if(active){ e.preventDefault(); e.returnValue = ''; } });
+  // ---------- staff list ----------
+  function smsg(t, ok){ $('st-msg').style.color = ok ? 'var(--gr)' : 'var(--rd)'; $('st-msg').textContent = t; $('st-msg').style.display = t ? 'block' : 'none'; }
+  async function loadStaff(){
+    const { data, error } = await sb.rpc('list_operators');
+    if(error){ $('staff').innerHTML = '<div class="muted">Couldn\'t load staff.</div>'; return; }
+    const mine = (me.email || '').toLowerCase();
+    $('staff').innerHTML = (data || []).map(e => '<div class="po" style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;">' + esc(e) + (e === mine ? ' <span class="muted">(you)</span>' : '') + '</span>' +
+      (e === mine ? '' : '<button class="btn" style="padding:6px 12px;font-size:12.5px;" data-rm="' + esc(e) + '">Remove</button>') + '</div>').join('');
+  }
+  $('staff').addEventListener('click', async ev => {
+    const b = ev.target.closest('[data-rm]'); if(!b) return;
+    const e = b.getAttribute('data-rm');
+    if(!confirm('Remove ' + e + ' from staff? They won\'t be able to take voice orders.')) return;
+    const { error } = await sb.rpc('remove_operator', { p_email: e });
+    if(error){ smsg('Couldn\'t remove: ' + error.message); return; }
+    smsg(e + ' removed.', true); loadStaff();
+  });
+  $('bAddStaff').onclick = async () => {
+    const e = $('st-em').value.trim().toLowerCase();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){ smsg('Enter a valid email.'); return; }
+    const { error } = await sb.rpc('add_operator', { p_email: e });
+    if(error){ smsg('Couldn\'t add: ' + error.message); return; }
+    $('st-em').value = '';
+    smsg(e + ' added. Send them this page — they tap “New staff? Create a login”.', true); loadStaff();
+  };
+
   window.answer = answer; window.signOut = signOut;
   sb.auth.onAuthStateChange((ev) => { if(ev === 'SIGNED_OUT') show('v-login'); });
   boot();
