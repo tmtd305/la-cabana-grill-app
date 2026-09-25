@@ -1,4 +1,4 @@
-const CACHE = "lacabana-v6";
+const CACHE = "lacabana-v7";
 const CORE = ["./data.js", "./cart.js", "./notifications.js"];
 
 self.addEventListener("install", (event) => {

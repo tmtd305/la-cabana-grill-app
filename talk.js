@@ -420,13 +420,16 @@
   function orderHTML(o) {
     return '<div class="tk-order"><h4><span>Order #' + o.order_number + '</span><span style="color:#ffb596">' + money(o.total) + '</span></h4>' +
       (o.items || []).map(function (it) {
-        return '<div class="tk-line"><span>' + it.qty + '× ' + esc(it.name) + (it.note ? '<small>' + esc(it.note) + '</small>' : '') + '</span><span>' + money(it.price * it.qty) + '</span></div>';
+        var x = item(it.id);
+        return '<div class="tk-line" style="align-items:flex-start">' + (x ? '<img src="' + esc(x.img) + '" alt="" style="width:46px;height:46px;border-radius:10px;object-fit:cover;flex-shrink:0">' : '') +
+          '<span style="flex:1;min-width:0"><b style="font-weight:700">' + it.qty + '× ' + esc(it.name) + '</b>' + (it.note ? '<small>' + esc(it.note) + '</small>' : '') + '</span><span style="font-weight:700">' + money(it.price * it.qty) + '</span></div>';
       }).join('') +
       '<div class="tk-sum"><div><span>Subtotal</span><span>' + money(o.subtotal) + '</span></div><div><span>Tax</span><span>' + money(o.tax) + '</span></div><div class="t"><span>Total</span><span>' + money(o.total) + '</span></div></div></div>';
   }
   async function renderOrder(o) {
-    $('tk-panel').innerHTML = orderHTML(o) + '<div id="tk-card"></div><div class="tk-err" id="tk-perr" style="display:none"></div>' +
-      '<button class="tk-btn pri" id="tk-pay" style="display:block;width:100%;margin-top:12px;padding:15px 0;font-size:16px">Pay ' + money(o.total) + ' now</button>' +
+    $('tk-panel').innerHTML = '<div style="font-family:Outfit,sans-serif;font-size:20px;font-weight:700;margin:4px 0 8px">Your order is ready to pay</div>' + orderHTML(o) +
+      '<div id="tk-card"></div><div class="tk-err" id="tk-perr" style="display:none"></div>' +
+      '<button class="tk-btn pri" id="tk-pay" style="display:block;width:100%;margin-top:12px;padding:20px 0;font-size:19px;border-radius:18px;box-shadow:0 10px 30px rgba(243,99,16,.4)">Pay ' + money(o.total) + '</button>' +
       '<div style="text-align:center;color:#6B7280;font-size:12px;margin-top:8px">Secure card payment by Square. Something wrong? Just hold the button and tell us.</div>';
     $('tk-body').scrollTop = 1e6;
     $('tk-pay').onclick = pay;

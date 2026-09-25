@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="data.js"></script>
+<script src="dish.js"></script>
 <script src="talk-audio.js"></script>
 <style>
   :root{--bg:#111;--card:#1a1a1a;--card2:#222;--line:rgba(255,255,255,.08);--fg:#F9FAFB;--fg2:#9CA3AF;--or:#f36310;--or2:#ffb596;--gr:#22C55E;--rd:#f87171}
@@ -79,6 +80,33 @@
   .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:100px;background:var(--card2);color:var(--fg2);margin:4px 4px 0 0}
   .flash{animation:flash .6s 3}
   @keyframes flash{50%{background:rgba(243,99,16,.35)}}
+  .grid.incall #callbox{grid-column:1/-1;order:-1}
+  #in-call .menu{max-height:230px}
+  .callgrid{display:grid;grid-template-columns:minmax(260px,330px) 1fr;gap:20px;align-items:start}
+  @media (max-width:760px){.callgrid{grid-template-columns:1fr}}
+  .cust{position:sticky;top:10px}
+  .sbar{display:flex;align-items:center;gap:10px;height:56px;padding:0 16px;border-radius:16px;background:#141414;border:2px solid var(--or);color:var(--or2)}
+  .sbar input{all:unset;flex:1;color:#fff;font-size:17px;font-weight:600}
+  .sbar input::placeholder{color:#8a8a8a;font-weight:500}
+  .ol{background:var(--card2);border-radius:16px;padding:12px;margin-bottom:10px;border:1px solid transparent}
+  .ol.new{animation:olnew 1.6s}
+  @keyframes olnew{0%,40%{border-color:var(--or);box-shadow:0 0 0 4px rgba(243,99,16,.25)}}
+  .ol-top{display:flex;gap:12px;align-items:flex-start}
+  .ol-top img{width:64px;height:64px;border-radius:12px;object-fit:cover;background:#333;flex-shrink:0}
+  .ol-nm{font-weight:800;font-size:15.5px}
+  .ol-pr{color:var(--or2);font-weight:800;font-size:15px;white-space:nowrap}
+  .ol-sides{font-size:12px;color:var(--fg2);margin-top:3px}
+  .qs{display:flex;align-items:center;gap:8px;margin-top:8px}
+  .qs button{all:unset;cursor:pointer;width:32px;height:32px;border-radius:9px;background:#2e2e2e;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px}
+  .qs b{min-width:18px;text-align:center;font-size:16px}
+  .ol-lab{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#6B7280;margin:10px 0 5px}
+  .opts{display:flex;flex-wrap:wrap;gap:6px}
+  .opt{all:unset;cursor:pointer;font-size:12.5px;font-weight:700;padding:7px 11px;border-radius:100px;background:#2e2e2e;color:var(--fg2)}
+  .opt.on{background:var(--or);color:#fff}
+  .opt i{font-style:normal;background:rgba(0,0,0,.25);border-radius:100px;padding:1px 6px;margin-left:4px}
+  .ol input.nt{width:100%;height:36px;margin-top:10px;background:#161616;border:1px solid #2e2e2e;border-radius:9px;color:#fff;padding:0 10px;font-size:13.5px;font-family:inherit;outline:none}
+  .ticket{background:#fff;color:#111;border-radius:14px;padding:14px;margin-top:10px;font-size:14px}
+  .ticket b{font-size:15px}
   .log{max-height:130px;overflow-y:auto;font-size:12.5px;color:var(--fg2);margin-top:10px}
 </style>
 </head>
@@ -140,35 +168,44 @@
       <div class="card" id="callbox">
         <div id="no-call" class="muted" style="text-align:center;padding:40px 10px;">Calls connect automatically while you're on duty — your phone rings loud and beeps when a customer starts talking. Keep this screen open.</div>
         <div id="in-call" class="hidden">
-          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-            <div class="av" id="c-av"></div>
-            <div style="flex:1;min-width:0;">
-              <div style="font-family:Outfit,sans-serif;font-size:21px;font-weight:700;" id="c-name"></div>
-              <div class="muted" id="c-sub"></div>
-              <div id="c-tags"></div>
+          <div class="callgrid">
+            <!-- customer + walkie -->
+            <div class="cust">
+              <div style="display:flex;align-items:center;gap:14px;">
+                <div class="av" id="c-av"></div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-family:Outfit,sans-serif;font-size:21px;font-weight:700;" id="c-name"></div>
+                  <div class="muted" id="c-sub"></div>
+                  <div id="c-tags"></div>
+                </div>
+              </div>
+              <div class="who" id="who">Hold to talk</div>
+              <button class="ptt" id="ptt" aria-label="Hold to talk"><span class="rg" id="rg"></span><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V20H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-2.08A7 7 0 0 0 19 11z"/></svg>HOLD TO TALK</button>
+              <div class="muted" style="text-align:center;margin-top:8px;">On a computer you can also hold the <b>Space</b> bar.</div>
+              <div class="log" id="log"></div>
+              <button class="btn red" id="bHang" style="width:100%;margin-top:12px;">End call</button>
             </div>
-            <button class="btn red" id="bHang">End call</button>
-          </div>
-          <div class="who" id="who">Hold to talk</div>
-          <button class="ptt" id="ptt" aria-label="Hold to talk"><span class="rg" id="rg"></span><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V20H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-2.08A7 7 0 0 0 19 11z"/></svg>HOLD TO TALK</button>
-          <div class="muted" style="text-align:center;margin-top:8px;">On a computer you can also hold the <b>Space</b> bar.</div>
-          <div class="log" id="log"></div>
 
-          <div style="height:1px;background:var(--line);margin:16px 0;"></div>
-          <div class="sec">Build the order</div>
-          <input class="field" id="msearch" placeholder="Search the menu…" autocomplete="off">
-          <div class="chips" id="chips"></div>
-          <div class="menu" id="menu"></div>
-          <div style="display:flex;gap:8px;margin-top:10px;">
-            <input class="field" id="cname" placeholder="Custom item" style="flex:2;height:40px;font-size:14px;">
-            <input class="field" id="cprice" placeholder="$" inputmode="decimal" style="flex:1;height:40px;font-size:14px;">
-            <button class="btn" id="bCustom">Add</button>
+            <!-- live order -->
+            <div>
+              <div class="sbar">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input id="msearch" placeholder="Search the menu to add items…" autocomplete="off" enterkeyhint="done">
+              </div>
+              <div class="chips" id="chips"></div>
+              <div class="menu" id="menu"></div>
+              <div style="display:flex;gap:8px;margin-top:8px;">
+                <input class="field" id="cname" placeholder="Custom item" style="flex:2;height:40px;font-size:14px;">
+                <input class="field" id="cprice" placeholder="$" inputmode="decimal" style="flex:1;height:40px;font-size:14px;">
+                <button class="btn" id="bCustom">Add</button>
+              </div>
+              <div class="sec" style="margin-top:16px;display:flex;justify-content:space-between;"><span>Active order</span><span id="ocount"></span></div>
+              <div id="lines"></div>
+              <div class="tot" id="tot"></div>
+              <div id="order-state" style="margin-top:12px;"></div>
+              <button class="btn pri" id="bSend" style="width:100%;margin-top:12px;padding:17px 0;font-size:17px;" disabled>Send to customer</button>
+            </div>
           </div>
-
-          <div style="margin-top:14px;" id="lines"></div>
-          <div class="tot" id="tot"></div>
-          <div id="order-state" style="margin-top:12px;"></div>
-          <button class="btn pri" id="bSend" style="width:100%;margin-top:12px;padding:15px 0;font-size:16px;" disabled>Send order to customer</button>
         </div>
       </div>
     </div>
@@ -323,7 +360,8 @@
     showProfile({ name: c.customer_name, phone: c.customer_phone, dishName: c.dish_name });
     $('log').innerHTML = ''; log('Connected with ' + esc(c.customer_name) + ' — you\'ll hear them live as they talk.');
     $('callbox').classList.add('flash'); setTimeout(() => $('callbox').classList.remove('flash'), 2000);
-    if(c.dish_id){ const it = findItem(c.dish_id); if(it) addLine(it.id, it.name, it.price); }
+    document.querySelector('.grid').classList.add('incall');
+    if(c.dish_id && findItem(c.dish_id)){ addItem(c.dish_id); log('Customer started on <b>' + esc(findItem(c.dish_id).name) + '</b> — added to the order.'); }
     renderMenu(); renderLines(); renderOrderState(); renderQueue();
   }
   let profileSeen = false;
@@ -348,7 +386,7 @@
     if(p.state === 'start'){
       remoteT = Date.now(); TalkAudio.beep(); if(navigator.vibrate) navigator.vibrate(120);
       $('who').textContent = $('c-name').textContent + ' is talking…'; $('who').className = 'who live'; $('ptt').classList.add('listen'); $('c-av').classList.add('talk');
-      if(p.dish){ const it = findItem(p.dish); if(it) log('Talking about <b>' + esc(it.name) + '</b> <button class="btn" style="padding:3px 10px;font-size:12px" onclick="addLine(\'' + it.id + '\', ' + JSON.stringify(it.name).replace(/"/g, '&quot;') + ', ' + it.price + ')">+ Add</button>'); }
+      if(p.dish){ const it = findItem(p.dish); if(it){ if(!lines.some(l => l.id === it.id)){ addItem(it.id); log('Customer is holding <b>' + esc(it.name) + '</b> — added to the order.'); } else log('Customer is talking about <b>' + esc(it.name) + '</b>.'); } }
     }
     else { $('c-av').classList.remove('talk'); TalkAudio.remoteStop(); log(esc(active.customer_name) + ' talked ' + Math.max(1, Math.round((Date.now() - remoteT) / 1000)) + 's'); $('who').textContent = 'Hold to talk'; $('who').className = 'who'; $('ptt').classList.remove('listen'); $('rg').style.transform = ''; }
   }
@@ -393,6 +431,7 @@
     if(holding) pttUp();
     if(callChan){ sb.removeChannel(callChan); callChan = null; }
     active = null; lines = []; sentOrder = null;
+    document.querySelector('.grid').classList.remove('incall');
     $('in-call').classList.add('hidden'); $('no-call').classList.remove('hidden');
     $('no-call').textContent = (msg ? msg + ' ' : '') + 'The next call connects automatically.';
     loadQueue();
@@ -403,48 +442,118 @@
     const q = $('msearch').value.trim().toLowerCase();
     $('chips').innerHTML = [{ id: 'all', label: 'All' }].concat(CATEGORIES.map(c => ({ id: c.id, label: c.label }))).map(c => '<button class="' + (c.id === cat ? 'on' : '') + '" data-c="' + c.id + '">' + esc(c.label) + '</button>').join('');
     $('chips').querySelectorAll('button').forEach(b => b.onclick = () => { cat = b.dataset.c; renderMenu(); });
-    const items = ALL_ITEMS.filter(i => (cat === 'all' || i.category === cat) && (!q || i.name.toLowerCase().includes(q)));
+    const items = ALL_ITEMS.filter(i => (cat === 'all' || i.category === cat) && (!q || (i.name + ' ' + (i.desc || '')).toLowerCase().includes(q)));
     $('menu').innerHTML = items.map(i => '<div class="mi" data-id="' + i.id + '"><img src="' + esc(i.img) + '" alt="" loading="lazy"><div class="n">' + esc(i.name) + '</div><div class="p">' + money(i.price) + '</div><div class="plus">+</div></div>').join('') || '<div class="muted" style="padding:12px;">No items match.</div>';
-    $('menu').querySelectorAll('.mi').forEach(el => el.onclick = () => { const it = findItem(el.dataset.id); addLine(it.id, it.name, it.price); });
+    $('menu').querySelectorAll('.mi').forEach(el => el.onclick = () => { addItem(el.dataset.id); if($('msearch').value){ $('msearch').value = ''; renderMenu(); } });
   }
   $('msearch').addEventListener('input', renderMenu);
+  $('msearch').addEventListener('keydown', e => { if(e.key === 'Enter'){ const f = $('menu').querySelector('.mi'); if(f) f.click(); } });
   $('bCustom').onclick = () => {
     const n = $('cname').value.trim(), p = parseFloat($('cprice').value.replace('$', ''));
     if(!n || !(p >= 0)){ alert('Enter the custom item name and price.'); return; }
-    addLine('custom-' + Date.now(), n, Math.round(p * 100) / 100); $('cname').value = ''; $('cprice').value = '';
+    addCustom(n, Math.round(p * 100) / 100); $('cname').value = ''; $('cprice').value = '';
   };
-  function addLine(id, name, price){
-    const l = lines.find(x => x.id === id && !x.note);
-    if(l) l.qty++; else lines.push({ id, name, price, qty: 1, note: '' });
+  // ---------- active order (lines with modifiers) ----------
+  const OPT = window.DISH_OPTIONS || { SIDES: {}, DRINKS: [], MEAT_CHOICE: {} };
+  let lineSeq = 0;
+  const isDefault = l => !l.note.trim() && !Object.keys(l.addons).length && (!l.drink || l.drink === 'No Drink') && (!OPT.MEAT_CHOICE[l.id] || l.meat === OPT.MEAT_CHOICE[l.id][0]);
+  function addItem(id){
+    const it = findItem(id); if(!it) return;
+    const same = lines.find(l => l.id === id && isDefault(l));
+    if(same){ same.qty++; same.flash = true; renderLines(); return; }
+    const meats = OPT.MEAT_CHOICE[id];
+    lines.push({ key: ++lineSeq, id, name: it.name, price: it.price, img: it.img, qty: 1, meat: meats ? meats[0] : null, drink: it.category === 'juice' ? null : 'No Drink', addons: {}, note: '', flash: true });
     renderLines();
   }
+  function addCustom(name, price){ lines.push({ key: ++lineSeq, id: 'custom', name, price, img: '', qty: 1, meat: null, drink: null, addons: {}, note: '', custom: true, flash: true }); renderLines(); }
+  const addLine = id => addItem(id);
+  function unitOf(l){ return Math.round((l.price + Object.entries(l.addons).reduce((s, [j, n]) => { const x = findItem(j); return s + (x ? x.price * n : 0); }, 0)) * 100) / 100; }
+  function summary(l){
+    const p = [];
+    if(l.meat) p.push(l.meat);
+    if(l.drink && l.drink !== 'No Drink') p.push('Free drink: ' + l.drink);
+    Object.entries(l.addons).forEach(([j, n]) => { const x = findItem(j); if(x && n) p.push('+ ' + (n > 1 ? n + '× ' : '') + x.name); });
+    if(l.note.trim()) p.push(l.note.trim());
+    return p.join(' · ').slice(0, 200);
+  }
   function renderLines(){
-    $('lines').innerHTML = lines.map((l, i) => '<div class="ln"><div><div class="nm">' + esc(l.name) + '</div><div class="muted">' + money(l.price) + ' each</div></div>' +
-      '<div class="qty"><button data-i="' + i + '" data-d="-1">−</button><b>' + l.qty + '</b><button data-i="' + i + '" data-d="1">+</button></div>' +
-      '<input data-n="' + i + '" placeholder="Note (sides, no onions…)" value="' + esc(l.note) + '"></div>').join('') || '<div class="muted">Tap menu items to add them. The dish the customer tapped is added for you.</div>';
-    $('lines').querySelectorAll('button').forEach(b => b.onclick = () => { const l = lines[+b.dataset.i]; l.qty += +b.dataset.d; if(l.qty <= 0) lines.splice(+b.dataset.i, 1); renderLines(); });
-    $('lines').querySelectorAll('input').forEach(inp => inp.oninput = () => { lines[+inp.dataset.n].note = inp.value; });
-    const sub = lines.reduce((s, l) => s + l.price * l.qty, 0), tax = Math.round(sub * TAX * 100) / 100;
+    $('lines').innerHTML = lines.map(l => {
+      const meats = OPT.MEAT_CHOICE[l.id], sides = OPT.SIDES[l.id], u = unitOf(l);
+      return '<div class="ol' + (l.flash ? ' new' : '') + '" data-k="' + l.key + '">' +
+        '<div class="ol-top">' + (l.img ? '<img src="' + esc(l.img) + '" alt="">' : '') + '<div style="flex:1;min-width:0;">' +
+        '<div style="display:flex;justify-content:space-between;gap:8px;"><div class="ol-nm">' + esc(l.name) + '</div><div class="ol-pr">' + money(u * l.qty) + '</div></div>' +
+        '<div class="muted">' + money(u) + ' each</div>' + (sides ? '<div class="ol-sides">Comes with: ' + sides.map(esc).join(', ') + '</div>' : '') +
+        '<div class="qs"><button data-a="minus" aria-label="Less">−</button><b>' + l.qty + '</b><button data-a="plus" aria-label="More">+</button>' +
+        '<button data-a="del" style="margin-left:auto;width:auto;padding:0 12px;color:var(--rd);font-size:13px;">Remove</button></div></div></div>' +
+        (meats ? '<div class="ol-lab">Meat</div><div class="opts">' + meats.map(m => '<button class="opt' + (l.meat === m ? ' on' : '') + '" data-a="meat" data-v="' + esc(m) + '">' + esc(m) + '</button>').join('') + '</div>' : '') +
+        (l.drink !== null ? '<div class="ol-lab">Free drink</div><div class="opts">' + OPT.DRINKS.map(d => '<button class="opt' + (l.drink === d ? ' on' : '') + '" data-a="drink" data-v="' + esc(d) + '">' + esc(d) + '</button>').join('') + '</div>' : '') +
+        (!l.custom ? '<div class="ol-lab">Extras</div><div class="opts">' + JUICES.filter(j => j.id !== l.id).map(j => { const n = l.addons[j.id] || 0;
+          return '<button class="opt' + (n ? ' on' : '') + '" data-a="add" data-v="' + j.id + '">+ ' + esc(j.name) + ' ' + money(j.price) + (n ? '<i>' + n + '</i>' : '') + '</button>' + (n ? '<button class="opt" data-a="sub" data-v="' + j.id + '" aria-label="Remove one">−</button>' : ''); }).join('') + '</div>' : '') +
+        '<input class="nt" data-a="note" placeholder="Note for the kitchen (no onions, well done…)" value="' + esc(l.note) + '" maxlength="120">' +
+        '</div>';
+    }).join('') || '<div class="muted" style="padding:10px 0;">No items yet. The dish the customer is holding is added automatically — or search above.</div>';
+    lines.forEach(l => l.flash = false);
+    const n = lines.reduce((a, l) => a + l.qty, 0);
+    $('ocount').textContent = n ? n + ' item' + (n === 1 ? '' : 's') : '';
+    renderTotals();
+  }
+  function renderTotals(){
+    const sub = lines.reduce((s, l) => s + unitOf(l) * l.qty, 0), tax = Math.round(sub * TAX * 100) / 100;
     $('tot').innerHTML = lines.length ? '<div><span>Subtotal</span><span>' + money(sub) + '</span></div><div><span>Tax</span><span>' + money(tax) + '</span></div><div class="t"><span>Total</span><span>' + money(sub + tax) + '</span></div>' : '';
     $('bSend').disabled = !lines.length || (sentOrder && sentOrder.status === 'paid');
-    $('bSend').textContent = sentOrder && sentOrder.status === 'sent' ? 'Send updated order' : 'Send order to customer';
+    $('bSend').textContent = sentOrder && sentOrder.status === 'paid' ? 'Paid ✓' : (sentOrder && sentOrder.status === 'sent' ? 'Send updated order' : 'Send to customer') + (lines.length ? ' · ' + money(sub + tax) : '');
   }
+  $('lines').addEventListener('click', e => {
+    const b = e.target.closest('[data-a]'), card = e.target.closest('.ol'); if(!b || !card || b.tagName === 'INPUT') return;
+    const i = lines.findIndex(x => x.key === +card.dataset.k), l = lines[i]; if(!l) return;
+    const a = b.dataset.a, v = b.dataset.v;
+    if(a === 'plus') l.qty = Math.min(50, l.qty + 1);
+    else if(a === 'minus'){ l.qty--; if(l.qty <= 0) lines.splice(i, 1); }
+    else if(a === 'del') lines.splice(i, 1);
+    else if(a === 'meat') l.meat = v;
+    else if(a === 'drink') l.drink = v;
+    else if(a === 'add') l.addons[v] = Math.min(20, (l.addons[v] || 0) + 1);
+    else if(a === 'sub'){ l.addons[v] = (l.addons[v] || 0) - 1; if(l.addons[v] <= 0) delete l.addons[v]; }
+    renderLines();
+  });
+  $('lines').addEventListener('input', e => {
+    if(e.target.dataset.a !== 'note') return;
+    const l = lines.find(x => x.key === +e.target.closest('.ol').dataset.k); if(l) l.note = e.target.value;
+  });
   $('bSend').onclick = async () => {
     if(!active || !lines.length) return;
     $('bSend').disabled = true; $('bSend').textContent = 'Sending…';
-    const { data, error } = await sb.rpc('operator_send_order', { p_call: active.id, p_items: lines.map(l => ({ id: l.id, name: l.name, price: l.price, qty: l.qty, note: l.note })) });
+    const { data, error } = await sb.rpc('operator_send_order', { p_call: active.id, p_items: lines.map(l => ({ id: l.id, name: l.name, price: unitOf(l), qty: l.qty, note: summary(l) })) });
     if(error){ alert('Couldn\'t send: ' + error.message); renderLines(); return; }
     sentOrder = data;
     callChan.send({ type: 'broadcast', event: 'order', payload: { order_id: data.id } });
     log('Sent order #' + data.order_number + ' · ' + money(data.total));
     renderLines(); renderOrderState();
   };
+  // ---------- kitchen ticket ----------
+  const paidMap = new Map();
+  function ticketHTML(o){
+    return '<div class="ticket"><div style="display:flex;justify-content:space-between;"><b>#' + o.order_number + ' · ' + esc(o.customer_name || '') + '</b><b>' + money(o.total) + '</b></div>' +
+      '<div style="font-size:12px;color:#555;margin:2px 0 8px;">VOICE ORDER · PICKUP · paid ' + (o.paid_at ? new Date(o.paid_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '') + (o.customer_phone ? ' · ' + esc(o.customer_phone) : '') + '</div>' +
+      (o.items || []).map(i => '<div style="padding:5px 0;border-top:1px dashed #ccc;"><b>' + i.qty + '× ' + esc(i.name) + '</b>' + (i.note ? '<div style="font-size:13px;">' + esc(i.note) + '</div>' : '') + '</div>').join('') + '</div>';
+  }
+  function printTicket(id){
+    const o = paidMap.get(id) || sentOrder; if(!o) return;
+    const w = window.open('', '_blank', 'width=380,height=640');
+    if(!w){ alert('Allow pop-ups for this page to print tickets.'); return; }
+    w.document.write('<html><head><title>Order #' + o.order_number + '</title><style>body{font:15px/1.4 -apple-system,Arial,sans-serif;margin:12px}.ticket{padding:0}</style></head><body>' + ticketHTML(o) + '<scr' + 'ipt>setTimeout(function(){print()},200)</scr' + 'ipt></body></html>');
+    w.document.close();
+  }
+  window.printTicket = printTicket;
   async function refreshSent(){ if(!sentOrder) return; const { data } = await sb.from('talk_orders').select('*').eq('id', sentOrder.id).single(); if(data){ sentOrder = data; renderOrderState(); loadPaid(); } }
   function renderOrderState(){
     const el = $('order-state');
     if(!sentOrder){ el.innerHTML = ''; return; }
     if(sentOrder.status === 'paid'){
-      el.innerHTML = '<div class="banner paid">✓ PAID · Order #' + sentOrder.order_number + ' · ' + money(sentOrder.total) + '<span class="muted" style="margin-left:auto;color:inherit;opacity:.8;font-weight:600;">Square ' + esc((sentOrder.payment_id || '').slice(0, 10)) + '…</span></div>';
+      paidMap.set(sentOrder.id, sentOrder);
+      el.innerHTML = '<div class="banner paid" style="font-size:16px;">✓ PAID — order #' + sentOrder.order_number + ' confirmed · ready for the kitchen<span style="margin-left:auto;">' + money(sentOrder.total) + '</span></div>' +
+        ticketHTML(sentOrder) + '<button class="btn" style="width:100%;margin-top:8px;" onclick="printTicket(\'' + sentOrder.id + '\')">Print kitchen ticket</button>';
+      if(navigator.vibrate) navigator.vibrate([100, 60, 100]);
       log('Customer paid order #' + sentOrder.order_number + ' ✓');
       $('bSend').disabled = true;
     } else {
@@ -455,7 +564,8 @@
   async function loadPaid(){
     const start = new Date(); start.setHours(0, 0, 0, 0);
     const { data } = await sb.from('talk_orders').select('*').eq('status', 'paid').gte('paid_at', start.toISOString()).order('paid_at', { ascending: false });
-    $('paid').innerHTML = (data || []).length ? data.map(o => '<div class="po"><b>#' + o.order_number + ' · ' + esc(o.customer_name) + '</b> <span style="float:right;color:var(--gr);font-weight:800;">' + money(o.total) + '</span><div class="muted">' +
+    (data || []).forEach(o => paidMap.set(o.id, o));
+    $('paid').innerHTML = (data || []).length ? data.map(o => '<div class="po"><button class="btn" style="float:right;padding:5px 10px;font-size:12px;margin-left:8px;" onclick="printTicket(\'' + o.id + '\')">Print</button><b>#' + o.order_number + ' · ' + esc(o.customer_name) + '</b> <span style="float:right;color:var(--gr);font-weight:800;">' + money(o.total) + '</span><div class="muted">' +
       (o.items || []).map(i => i.qty + '× ' + esc(i.name) + (i.note ? ' (' + esc(i.note) + ')' : '')).join(', ') + '</div><div class="muted">Paid ' + new Date(o.paid_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + (o.customer_phone ? ' · ' + esc(o.customer_phone) : '') + '</div></div>').join('')
       : '<div class="muted">Nothing yet today.</div>';
   }

@@ -28,6 +28,9 @@
   var DRINKS = ["No Drink", "Pineapple Juice", "Mango Juice", "Mora Juice", "Lulo Juice", "Guanabana Juice", "Pepsi"];
   var MEAT_CHOICE = { "bandeja-paisa": ["Grilled meat", "Ground meat"] };
 
+  // shared with the staff screen so both sides offer the same choices
+  window.DISH_OPTIONS = { SIDES: SIDES, DRINKS: DRINKS, MEAT_CHOICE: MEAT_CHOICE };
+
   var state = null, pushed = false;
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
