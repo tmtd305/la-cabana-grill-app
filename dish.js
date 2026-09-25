@@ -83,6 +83,7 @@
       '<img src="' + esc(item.img) + '" alt="' + esc(item.name) + '" class="w-full h-full object-cover"/>' +
       '<div class="absolute inset-0 bg-gradient-to-t from-[#1A1A1A] via-transparent to-black/40"></div>' +
       '<button type="button" data-d="close" aria-label="Close" class="absolute top-3 left-3 w-10 h-10 rounded-full bg-black/55 backdrop-blur-md text-white flex items-center justify-center"><span class="material-symbols-outlined text-[22px]">close</span></button>' +
+      (window.holdButtonHTML ? '<div class="absolute bottom-8 right-4">' + holdButtonHTML(item.id) + '</div>' : '') +
       (item.badge ? '<span class="absolute top-4 right-3 bg-primary-container text-white font-label-caps text-label-caps uppercase px-2.5 py-1 rounded-full font-bold">' + esc(item.badge) + "</span>" : "") +
       "</div>";
 

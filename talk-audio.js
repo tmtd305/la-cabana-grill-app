@@ -50,13 +50,22 @@
   }
 
   // short two-tone chirp like a radio key-up
-  function chirp(up) {
+  function chirp(up, vol) {
     try {
       var c = ensureCtx(), o = c.createOscillator(), g = c.createGain(), t = c.currentTime;
-      o.type = 'sine'; o.frequency.setValueAtTime(up ? 880 : 1175, t); o.frequency.setValueAtTime(up ? 1175 : 880, t + 0.06);
-      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.18, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
+      o.type = vol ? 'square' : 'sine'; o.frequency.setValueAtTime(up ? 880 : 1175, t); o.frequency.setValueAtTime(up ? 1175 : 880, t + 0.06);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || 0.18, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
       o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + 0.15);
     } catch (e) {}
+  }
+
+  // loud trilling burst (incoming-call ring on the restaurant side)
+  function burst(c, start, dur, vol) {
+    var o = c.createOscillator(), g = c.createGain(); o.type = 'square';
+    for (var i = 0; i * 0.045 < dur; i++) o.frequency.setValueAtTime(i % 2 ? 1318 : 1760, start + i * 0.045);
+    g.gain.setValueAtTime(0.0001, start); g.gain.exponentialRampToValueAtTime(vol, start + 0.01);
+    g.gain.setValueAtTime(vol, start + dur - 0.03); g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+    o.connect(g); g.connect(c.destination); o.start(start); o.stop(start + dur + 0.02);
   }
 
   window.TalkAudio = {
@@ -102,6 +111,11 @@
       return Math.min(1, Math.sqrt(sum / n) * 4);
     },
     remoteStart: function () { chirp(true); },
+    // loud walkie-talkie key-up beep (someone is about to talk)
+    beep: function () { chirp(true, 0.5); },
+    // loud phone-style ring, ~1.2 s
+    ring: function () { try { var c = ensureCtx(), t = c.currentTime + 0.02; burst(c, t, 0.45, 0.45); burst(c, t + 0.6, 0.45, 0.45); } catch (e) {} },
+    hasMic: function () { return !!stream && stream.getAudioTracks().some(function (t) { return t.readyState === 'live'; }); },
     remoteStop: function () { setTimeout(function () { chirp(false); }, Math.max(0, (playHead - (ctx ? ctx.currentTime : 0)) * 1000)); },
     isTalking: function () { return sending; },
     context: function () { return ensureCtx(); }

@@ -133,6 +133,7 @@
         <img alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="${item.img}"/>
         <div class="absolute inset-0 bg-gradient-to-t from-surface-charcoal via-transparent to-black/30"></div>
         <div class="absolute top-3 left-3 flex gap-1.5">${badgesHTML}</div>
+        <div class="absolute bottom-3 left-3">${holdButtonHTML(item.id)}</div>
         <div class="absolute bottom-3 right-3 bg-surface-dim/90 backdrop-blur-md px-2.5 py-1 rounded-lg">
           <span class="font-headline-lg text-headline-lg text-primary font-bold tracking-tight">$${item.price.toFixed(2)}</span>
         </div>
@@ -146,9 +147,9 @@
         <div class="pt-2 flex items-center justify-between">
           <span class="font-label-caps text-label-caps text-text-muted uppercase">${item.specialty ? 'Qualifies for free juice' : ' '}</span>
           <div class="flex items-center gap-2">
-            <button onclick="openTalk('${item.id}')" aria-label="Talk to order" class="h-9 px-3 rounded-xl bg-surface-raised hover:bg-surface-elevated text-primary font-label-md text-label-md flex items-center gap-1.5 transition-colors">
+            <button type="button" data-hold-talk="${item.id}" aria-label="Hold to talk" class="h-9 px-3 rounded-xl bg-surface-raised hover:bg-surface-elevated text-primary font-label-md text-label-md flex items-center gap-1.5 transition-colors">
               <span class="material-symbols-outlined text-[18px]">mic</span>
-              Talk to order
+              Hold to talk
             </button>
             <button onclick="addToCart('${item.id}')" class="h-9 px-4 rounded-xl bg-surface-raised hover:bg-surface-elevated text-primary font-label-md text-label-md flex items-center gap-1.5 transition-colors">
               <span class="material-symbols-outlined text-[18px]">add_circle</span>

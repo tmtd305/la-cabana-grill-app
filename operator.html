@@ -73,6 +73,12 @@
   .po{padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
   .po b{font-size:14.5px}
   .hidden{display:none!important}
+  .av{width:72px;height:72px;border-radius:50%;background:#2a2a2a center/cover;display:flex;align-items:center;justify-content:center;font:800 26px Outfit,sans-serif;color:#9CA3AF;flex-shrink:0;box-shadow:0 0 0 3px #2a2a2a;transition:box-shadow .15s}
+  .av.talk{box-shadow:0 0 0 4px var(--gr),0 0 28px rgba(34,197,94,.55);animation:avp 1s infinite}
+  @keyframes avp{50%{box-shadow:0 0 0 7px rgba(34,197,94,.35),0 0 34px rgba(34,197,94,.35)}}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:100px;background:var(--card2);color:var(--fg2);margin:4px 4px 0 0}
+  .flash{animation:flash .6s 3}
+  @keyframes flash{50%{background:rgba(243,99,16,.35)}}
   .log{max-height:130px;overflow-y:auto;font-size:12.5px;color:var(--fg2);margin-top:10px}
 </style>
 </head>
@@ -132,12 +138,14 @@
       </div>
 
       <div class="card" id="callbox">
-        <div id="no-call" class="muted" style="text-align:center;padding:40px 10px;">Answer a call to start taking an order.</div>
+        <div id="no-call" class="muted" style="text-align:center;padding:40px 10px;">Calls connect automatically while you're on duty — your phone rings loud and beeps when a customer starts talking. Keep this screen open.</div>
         <div id="in-call" class="hidden">
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+            <div class="av" id="c-av"></div>
             <div style="flex:1;min-width:0;">
-              <div style="font-family:Outfit,sans-serif;font-size:20px;font-weight:700;" id="c-name"></div>
+              <div style="font-family:Outfit,sans-serif;font-size:21px;font-weight:700;" id="c-name"></div>
               <div class="muted" id="c-sub"></div>
+              <div id="c-tags"></div>
             </div>
             <button class="btn red" id="bHang">End call</button>
           </div>
@@ -236,12 +244,18 @@
     opsChan = sb.channel('lc-ops', { config: { presence: { key: 'operator-' + me.id } } });
     opsChan.subscribe(async s => { if(s === 'SUBSCRIBED'){ await opsChan.track({ email: me.email, at: Date.now() }); } });
     onDuty = true;
+    keepAwake();
     $('duty').className = 'pill on'; $('duty').querySelector('span').textContent = 'On duty';
     $('start-box').innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;"><span class="muted">You\'re on duty. New calls ring here.</span><button class="btn" id="bOff">Go off duty</button></div>';
     $('bOff').onclick = goOffDuty;
     renderQueue();
   };
+  // keep the screen on while on duty so calls can ring
+  let wakeLock = null;
+  async function keepAwake(){ try { if('wakeLock' in navigator && onDuty) wakeLock = await navigator.wakeLock.request('screen'); } catch(e){} }
+  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && onDuty) keepAwake(); });
   async function goOffDuty(){
+    try { wakeLock && wakeLock.release(); } catch(e){} wakeLock = null;
     if(opsChan){ try { await opsChan.untrack(); } catch(e){} sb.removeChannel(opsChan); opsChan = null; }
     onDuty = false;
     $('duty').className = 'pill'; $('duty').querySelector('span').textContent = 'Off duty';
@@ -264,14 +278,14 @@
   setInterval(renderQueue, 10000);
 
   let ringTimer = null;
-  function ring(){ if(!onDuty || active) return; try { TalkAudio.remoteStart(); setTimeout(() => TalkAudio.remoteStart(), 250); } catch(e){} if(navigator.vibrate) navigator.vibrate([200, 100, 200]); }
+  function ring(){ if(!onDuty) return; try { TalkAudio.ring(); } catch(e){} if(navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]); }
 
   function listenDb(){
     dbChan = sb.channel('ops-db')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'calls' }, p => {
         const c = p.new; if(!c || !c.id) return;
         if(c.status === 'waiting' || c.status === 'live') queue.set(c.id, c); else queue.delete(c.id);
-        if(p.eventType === 'INSERT') ring();
+        if(p.eventType === 'INSERT' && c.status === 'waiting'){ ring(); if(onDuty && !active) answer(c.id, true); }
         if(active && c.id === active.id && (c.status === 'ended' || c.status === 'missed')) endLocal('Customer hung up.');
         renderQueue();
       })
@@ -280,34 +294,63 @@
         if(o.status === 'paid'){ loadPaid(); if(sentOrder && o.id === sentOrder.id){ sentOrder = o; renderOrderState(); } }
       })
       .subscribe();
-    clearInterval(ringTimer); ringTimer = setInterval(() => { if([...queue.values()].some(c => c.status === 'waiting')) ring(); }, 6000);
+    clearInterval(ringTimer); ringTimer = setInterval(() => {
+      const w = [...queue.values()].filter(c => c.status === 'waiting');
+      if(!w.length || !onDuty) return;
+      if(!active) answer(w[0].id, true); else ring();
+    }, 5000);
   }
 
   // ---------- call ----------
-  async function answer(id){
-    const c = queue.get(id); if(!c || active) return;
+  let answering = false;
+  async function answer(id, auto){
+    const c = queue.get(id); if(!c || active || answering) return;
+    answering = true;
     const { data, error } = await sb.from('calls').update({ status: 'live', operator_email: me.email, answered_at: new Date().toISOString() }).eq('id', id).eq('status', 'waiting').select().single();
-    if(error || !data){ alert('Someone else already took this call.'); loadQueue(); return; }
-    active = data; lines = []; sentOrder = null;
+    answering = false;
+    if(error || !data){ if(!auto) alert('Someone else already took this call.'); loadQueue(); return; }
+    active = data; lines = []; sentOrder = null; profileSeen = false;
+    const sendAnswered = () => callChan && callChan.send({ type: 'broadcast', event: 'answered', payload: { name: (me.email || '').split('@')[0] } });
     callChan = sb.channel('call-' + id, { config: { broadcast: { self: false, ack: false } } });
     callChan.on('broadcast', { event: 'ptt' }, m => onRemotePtt(m.payload))
       .on('broadcast', { event: 'audio' }, m => { const l = TalkAudio.play(m.payload); $('rg').style.transform = 'scale(' + (1 + l * .2) + ')'; })
       .on('broadcast', { event: 'hangup' }, () => endLocal('Customer hung up.'))
       .on('broadcast', { event: 'paid' }, () => refreshSent())
-      .subscribe(s => { if(s === 'SUBSCRIBED') callChan.send({ type: 'broadcast', event: 'answered', payload: { name: (me.email || '').split('@')[0] } }); });
+      .on('broadcast', { event: 'knock' }, () => sendAnswered())
+      .on('broadcast', { event: 'hello' }, m => showProfile(m.payload))
+      .subscribe(s => { if(s === 'SUBSCRIBED') sendAnswered(); });
     $('no-call').classList.add('hidden'); $('in-call').classList.remove('hidden');
-    $('c-name').textContent = c.customer_name;
-    $('c-sub').innerHTML = (c.customer_phone ? '<a href="tel:' + esc(c.customer_phone) + '" style="color:var(--or2)">' + esc(c.customer_phone) + '</a> · ' : '') + (c.dish_name ? 'Tapped: ' + esc(c.dish_name) : 'Voice order');
-    $('log').innerHTML = ''; log('Connected with ' + esc(c.customer_name) + '. Say hi!');
+    showProfile({ name: c.customer_name, phone: c.customer_phone, dishName: c.dish_name });
+    $('log').innerHTML = ''; log('Connected with ' + esc(c.customer_name) + ' — you\'ll hear them live as they talk.');
+    $('callbox').classList.add('flash'); setTimeout(() => $('callbox').classList.remove('flash'), 2000);
     if(c.dish_id){ const it = findItem(c.dish_id); if(it) addLine(it.id, it.name, it.price); }
     renderMenu(); renderLines(); renderOrderState(); renderQueue();
+  }
+  let profileSeen = false;
+  function showProfile(p){
+    if(!active || !p) return;
+    const name = p.name || active.customer_name, phone = p.phone || active.customer_phone;
+    $('c-name').textContent = name;
+    const av = $('c-av');
+    if(p.photo && /^data:image\/(jpeg|png|webp);base64,/.test(p.photo)){ av.style.backgroundImage = 'url(' + p.photo + ')'; av.textContent = ''; }
+    else if(!av.style.backgroundImage){ av.textContent = String(name || '?').trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase(); }
+    $('c-sub').innerHTML = (phone ? '<a href="tel:' + esc(phone) + '" style="color:var(--or2)">' + esc(phone) + '</a>' : 'No phone given') + (p.email ? ' · ' + esc(p.email) : '');
+    const tags = [];
+    if(p.dishName || active.dish_name) tags.push('Tapped: ' + esc(p.dishName || active.dish_name));
+    if(typeof p.orders === 'number') tags.push(p.orders ? p.orders + ' past order' + (p.orders === 1 ? '' : 's') + ' on this phone' : 'First order');
+    $('c-tags').innerHTML = tags.map(t => '<span class="tag">' + t + '</span>').join('');
+    if(p.photo || p.email || typeof p.orders === 'number') profileSeen = true;
   }
   function log(t){ const d = document.createElement('div'); d.innerHTML = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + ' · ' + t; $('log').appendChild(d); $('log').scrollTop = 1e6; }
 
   let remoteT = 0;
   function onRemotePtt(p){
-    if(p.state === 'start'){ remoteT = Date.now(); TalkAudio.remoteStart(); $('who').textContent = active.customer_name + ' is talking…'; $('who').className = 'who live'; $('ptt').classList.add('listen'); }
-    else { TalkAudio.remoteStop(); log(esc(active.customer_name) + ' talked ' + Math.max(1, Math.round((Date.now() - remoteT) / 1000)) + 's'); $('who').textContent = 'Hold to talk'; $('who').className = 'who'; $('ptt').classList.remove('listen'); $('rg').style.transform = ''; }
+    if(p.state === 'start'){
+      remoteT = Date.now(); TalkAudio.beep(); if(navigator.vibrate) navigator.vibrate(120);
+      $('who').textContent = $('c-name').textContent + ' is talking…'; $('who').className = 'who live'; $('ptt').classList.add('listen'); $('c-av').classList.add('talk');
+      if(p.dish){ const it = findItem(p.dish); if(it) log('Talking about <b>' + esc(it.name) + '</b> <button class="btn" style="padding:3px 10px;font-size:12px" onclick="addLine(\'' + it.id + '\', ' + JSON.stringify(it.name).replace(/"/g, '&quot;') + ', ' + it.price + ')">+ Add</button>'); }
+    }
+    else { $('c-av').classList.remove('talk'); TalkAudio.remoteStop(); log(esc(active.customer_name) + ' talked ' + Math.max(1, Math.round((Date.now() - remoteT) / 1000)) + 's'); $('who').textContent = 'Hold to talk'; $('who').className = 'who'; $('ptt').classList.remove('listen'); $('rg').style.transform = ''; }
   }
 
   let myT = 0;
@@ -346,11 +389,12 @@
   };
   function endLocal(msg){
     if(!active) return;
+    $('c-av').classList.remove('talk'); $('c-av').style.backgroundImage = ''; $('c-av').textContent = '';
     if(holding) pttUp();
     if(callChan){ sb.removeChannel(callChan); callChan = null; }
     active = null; lines = []; sentOrder = null;
     $('in-call').classList.add('hidden'); $('no-call').classList.remove('hidden');
-    $('no-call').textContent = msg ? msg + ' Answer another call to take an order.' : 'Answer a call to start taking an order.';
+    $('no-call').textContent = (msg ? msg + ' ' : '') + 'The next call connects automatically.';
     loadQueue();
   }
 
@@ -443,7 +487,7 @@
     smsg(e + ' added. Send them this page — they tap “New staff? Create a login”.', true); loadStaff();
   };
 
-  window.answer = answer; window.signOut = signOut;
+  window.answer = answer; window.addLine = addLine; window.signOut = signOut;
   sb.auth.onAuthStateChange((ev) => { if(ev === 'SIGNED_OUT') show('v-login'); });
   boot();
 </script>
