@@ -26,12 +26,30 @@
   var item = function (id) { return (id && window.findItem) ? findItem(id) : null; };
 
   // ---------- customer profile (shown to the restaurant while you talk) ----------
+  // Account profile (account.html) wins; otherwise the voice profile; otherwise (testing) a made-up profile
+  // with a generated avatar, so pressing talk always goes straight to live.
   function profile() {
     var p = {}; try { p = JSON.parse(localStorage.getItem(PROFILE_KEY)) || {}; } catch (e) {}
     var a = (window.getAccount && getAccount()) || {};
-    return { name: p.name || a.name || localStorage.getItem('lc_talk_name') || '', phone: p.phone || a.phone || localStorage.getItem('lc_talk_phone') || '', email: a.email || '', photo: p.photo || '' };
+    if (a.name) return { name: a.name, phone: a.phone || '', email: a.email || '', address: a.address || '', photo: a.photo || p.photo || '', test: false };
+    if (!p.name) { p = testProfile(); saveProfile(p); }
+    return { name: p.name, phone: p.phone || '', email: p.email || '', address: '', photo: p.photo || '', test: !!p.test };
   }
-  function saveProfile(p) { try { localStorage.setItem(PROFILE_KEY, JSON.stringify({ name: p.name, phone: p.phone, photo: p.photo })); } catch (e) {} }
+  function saveProfile(p) { try { localStorage.setItem(PROFILE_KEY, JSON.stringify({ name: p.name, phone: p.phone, email: p.email, photo: p.photo, test: !!p.test })); } catch (e) {} }
+  var TEST_FIRST = ['Sofia', 'Mateo', 'Valentina', 'Santiago', 'Camila', 'Andres', 'Isabella', 'Julian', 'Lucia', 'Diego', 'Mariana', 'Tomas'];
+  var TEST_LAST = ['Restrepo', 'Ocampo', 'Salazar', 'Cardona', 'Zuluaga', 'Arango', 'Montoya', 'Echeverri', 'Villegas', 'Mejia'];
+  var TEST_COLORS = [['#f36310', '#ffb596'], ['#2563EB', '#93c5fd'], ['#16a34a', '#86efac'], ['#9333ea', '#d8b4fe'], ['#db2777', '#f9a8d4'], ['#0891b2', '#67e8f9']];
+  function testProfile() {
+    var pick = function (a) { return a[Math.floor(Math.random() * a.length)]; };
+    var first = pick(TEST_FIRST), last = pick(TEST_LAST), col = pick(TEST_COLORS);
+    var c = document.createElement('canvas'); c.width = c.height = 160; var g = c.getContext('2d');
+    var grd = g.createLinearGradient(0, 0, 160, 160); grd.addColorStop(0, col[0]); grd.addColorStop(1, col[1]);
+    g.fillStyle = grd; g.fillRect(0, 0, 160, 160);
+    g.fillStyle = 'rgba(255,255,255,.18)'; g.beginPath(); g.arc(80, 176, 70, 0, Math.PI * 2); g.fill(); g.beginPath(); g.arc(80, 62, 32, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#fff'; g.font = '700 54px Outfit, Manrope, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(first[0] + last[0], 80, 84);
+    return { name: first + ' ' + last + ' (test)', phone: '', email: first.toLowerCase() + '.' + last.toLowerCase() + '@example.com', photo: c.toDataURL('image/jpeg', 0.85), test: true };
+  }
   function shrinkPhoto(file) {
     return new Promise(function (res, rej) {
       var img = new Image(), url = URL.createObjectURL(file);
@@ -189,13 +207,12 @@
     $('tk-log').innerHTML = '';
     $('tk-foot').innerHTML = '';
     $('tk-panel').innerHTML = '<div style="text-align:center;padding:4px 4px 0"><div style="font-family:Outfit,sans-serif;font-size:21px;font-weight:700">Order by voice</div>' +
-      '<p style="color:#9CA3AF;font-size:14px;line-height:1.5;margin:6px 0 14px">One time only — so La Cabaña knows who\'s talking.</p>' +
+      '<p style="color:#9CA3AF;font-size:14px;line-height:1.5;margin:6px 0 14px">Just your name, one time — then you\'re straight to live.</p>' +
       '<label class="tk-av' + (p.photo ? ' has' : '') + '" id="tk-av" style="' + (p.photo ? 'background-image:url(' + p.photo + ')' : '') + '">' + (p.photo ? '' : initials(p.name || '+')) + '<small>' + (p.photo ? 'Change' : 'Add photo') + '</small>' +
       '<input type="file" accept="image/*" id="tk-file" style="display:none"></label></div>' +
       '<input class="tk-field" id="tk-name" placeholder="Your name" autocomplete="name" value="' + esc(p.name) + '" style="margin-top:14px">' +
-      '<input class="tk-field" id="tk-phone" placeholder="Phone (optional)" inputmode="tel" autocomplete="tel" value="' + esc(p.phone) + '">' +
       '<div class="tk-err" id="tk-err" style="display:none"></div>' +
-      '<button class="tk-btn pri" id="tk-save" style="display:block;width:100%;margin-top:14px;padding:15px 0;font-size:16px">Save</button>';
+      '<button class="tk-btn pri" id="tk-save" style="display:block;width:100%;margin-top:14px;padding:15px 0;font-size:16px">Continue</button>';
     var photo = p.photo;
     $('tk-file').onchange = async function (e) {
       var f = e.target.files && e.target.files[0]; if (!f) return;
@@ -205,7 +222,7 @@
     $('tk-save').onclick = function () {
       var name = $('tk-name').value.trim();
       if (!name) { $('tk-err').textContent = 'Please add your name.'; $('tk-err').style.display = 'block'; return; }
-      saveProfile({ name: name.slice(0, 60), phone: $('tk-phone').value.trim().slice(0, 30), photo: photo });
+      saveProfile({ name: name.slice(0, 60), phone: p.phone, email: p.test ? '' : p.email, photo: photo, test: false });
       screenReady();
       who('All set — now hold the button and talk');
     };
@@ -263,7 +280,6 @@
     if (dishId === '') dishId = dish ? dish.id : null;
     if (!TalkAudio.supported()) { openSheet(dishId); screenMsg('Voice ordering isn\'t available here', 'This browser doesn\'t allow the microphone. Open the app in Safari or Chrome.'); $('tk-foot').innerHTML = ''; return; }
     if (state === 'paid' || state === 'ended') resetCall();
-    if (!profile().name) { openSheet(dishId); screenProfile(); return; }
     openSheet(dishId);
     if (!call && opsOnline === false) { screenOffline(); return; }
     if (!$('tk-ptt')) screenReady();
@@ -328,7 +344,8 @@
     setStatus('Ringing La Cabaña…', 'wait');
     await client();
     var p = profile(), d = item(pressDish) || dish;
-    var r = await sb.rpc('start_call', { p_name: p.name, p_phone: p.phone || null, p_dish_id: d ? d.id : null, p_dish_name: d ? d.name : null });
+    var r = await sb.rpc('start_call', { p_name: p.name, p_phone: p.phone || null, p_dish_id: d ? d.id : null, p_dish_name: d ? d.name : null,
+      p_email: p.email || null, p_address: p.address || null, p_photo: p.photo || null });
     creating = false;
     if (r.error || !r.data || !r.data[0]) {
       state = 'ready'; outQ = [];
@@ -365,7 +382,7 @@
     setStatus('Live with La Cabaña', 'on');
     log('sys', (p && p.name ? esc(p.name) + ' at ' : '') + 'La Cabaña is on the line' + (outQ.some(function (e) { return e[0] === 'audio'; }) ? ' and hearing you now.' : '. Hold the button and talk.'));
     var pr = profile(), d = item(pressDish) || dish;
-    chan.send({ type: 'broadcast', event: 'hello', payload: { name: pr.name, phone: pr.phone, email: pr.email, photo: pr.photo, dish: d ? d.id : null, dishName: d ? d.name : null, orders: pastOrders() } });
+    chan.send({ type: 'broadcast', event: 'hello', payload: { name: pr.name, phone: pr.phone, email: pr.email, address: pr.address, photo: pr.photo, test: pr.test, dish: d ? d.id : null, dishName: d ? d.name : null, orders: pastOrders() } });
     drain();
     if (!holding) who('Hold to talk');
     if (navigator.vibrate) navigator.vibrate(30);
@@ -424,7 +441,8 @@
         return '<div class="tk-line" style="align-items:flex-start">' + (x ? '<img src="' + esc(x.img) + '" alt="" style="width:46px;height:46px;border-radius:10px;object-fit:cover;flex-shrink:0">' : '') +
           '<span style="flex:1;min-width:0"><b style="font-weight:700">' + it.qty + '× ' + esc(it.name) + '</b>' + (it.note ? '<small>' + esc(it.note) + '</small>' : '') + '</span><span style="font-weight:700">' + money(it.price * it.qty) + '</span></div>';
       }).join('') +
-      '<div class="tk-sum"><div><span>Subtotal</span><span>' + money(o.subtotal) + '</span></div><div><span>Tax</span><span>' + money(o.tax) + '</span></div><div class="t"><span>Total</span><span>' + money(o.total) + '</span></div></div></div>';
+      '<div class="tk-sum"><div><span>Subtotal</span><span>' + money(o.subtotal) + '</span></div><div><span>Tax</span><span>' + money(o.tax) + '</span></div>' +
+      (Number(o.delivery_fee) > 0 ? '<div><span>Delivery fee</span><span>' + money(o.delivery_fee) + '</span></div>' : '') + '<div class="t"><span>Total</span><span>' + money(o.total) + '</span></div></div></div>';
   }
   async function renderOrder(o) {
     $('tk-panel').innerHTML = '<div style="font-family:Outfit,sans-serif;font-size:20px;font-weight:700;margin:4px 0 8px">Your order is ready to pay</div>' + orderHTML(o) +
@@ -466,7 +484,7 @@
       var key = window.ORDERS_KEY || 'lacabana_orders', list = JSON.parse(localStorage.getItem(key) || '[]');
       if (list.some(function (x) { return x.id === 'LC-' + o.order_number; })) return;
       list.unshift({ id: 'LC-' + o.order_number, placedAt: new Date().toISOString(), lines: (o.items || []).map(function (it) { return { id: it.id, name: it.name, qty: it.qty, price: it.price }; }),
-        subtotal: Number(o.subtotal), discount: 0, taxes: Number(o.tax), tip: 0, total: Number(o.total), status: 'queued', via: 'voice', paymentId: paymentId });
+        subtotal: Number(o.subtotal), discount: 0, taxes: Number(o.tax), deliveryFee: Number(o.delivery_fee || 0), tip: 0, total: Number(o.total), status: 'queued', via: 'voice', paymentId: paymentId });
       localStorage.setItem(key, JSON.stringify(list));
     } catch (e) {}
   }
@@ -522,7 +540,6 @@
     openSheet();
     if (!TalkAudio.supported()) { screenMsg('Voice ordering isn\'t available here', 'This browser doesn\'t allow the microphone. Open the app in Safari or Chrome.'); return; }
     if (call) return;
-    if (!profile().name) { screenProfile(); return; }
     screenReady();
     await watchOps();
     if (!call && opsOnline === false) screenOffline(); else statusIdle();

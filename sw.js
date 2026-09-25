@@ -1,4 +1,4 @@
-const CACHE = "lacabana-v7";
+const CACHE = "lacabana-v8";
 const CORE = ["./data.js", "./cart.js", "./notifications.js"];
 
 self.addEventListener("install", (event) => {
@@ -18,7 +18,10 @@ self.addEventListener("fetch", (event) => {
 
   // HTML pages: network-first, so users always get the latest markup;
   // fall back to cache only when offline.
-  if (event.request.mode === "navigate" || event.request.destination === "document") {
+  // HTML and our own scripts: network-first, so every update reaches phones right away.
+  const url = new URL(event.request.url);
+  const ownScript = url.origin === self.location.origin && /\.js$/.test(url.pathname);
+  if (event.request.mode === "navigate" || event.request.destination === "document" || ownScript) {
     event.respondWith(
       fetch(event.request)
         .then((res) => {

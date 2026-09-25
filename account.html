@@ -4,7 +4,7 @@
 
 <div id="account-view" class="hidden flex-col gap-space-lg">
 <div class="bg-surface-container rounded-xl p-space-lg flex items-center gap-space-sm">
-<div class="w-14 h-14 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[26px]">person</span></div>
+<label class="relative w-16 h-16 rounded-full bg-primary bg-cover bg-center flex items-center justify-center shrink-0 cursor-pointer" id="view-photo" title="Change photo"><span class="material-symbols-outlined text-on-primary text-[28px]" id="view-photo-icon">person</span><span class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary-container flex items-center justify-center shadow"><span class="material-symbols-outlined text-white text-[14px]">photo_camera</span></span><input type="file" accept="image/*" class="hidden" id="view-photo-input"></label>
 <div class="min-w-0">
 <p id="view-name" class="font-headline-md text-headline-md text-text-primary truncate"></p>
 <p id="view-email" class="font-body-sm text-body-sm text-text-muted truncate"></p>
@@ -25,6 +25,10 @@
 <p class="font-body-sm text-body-sm text-text-muted mt-1">Save your info for faster checkout and order updates.</p>
 </div>
 <div class="flex flex-col gap-space-sm">
+<div class="flex items-center gap-space-md">
+<label class="relative w-20 h-20 rounded-full bg-surface-container-low bg-cover bg-center flex items-center justify-center shrink-0 cursor-pointer border-2 border-dashed border-outline-variant" id="f-photo-prev"><span class="material-symbols-outlined text-text-muted text-[30px]" id="f-photo-icon">add_a_photo</span><input type="file" accept="image/*" class="hidden" id="f-photo"></label>
+<div><p class="font-label-lg text-label-lg text-text-primary">Profile photo</p><p class="font-body-sm text-body-sm text-text-muted">So our team knows who they're talking to when you order by voice.</p></div>
+</div>
 <label class="flex flex-col gap-1">
 <span class="font-label-md text-label-md text-on-surface-variant">Full Name</span>
 <input id="f-name" required type="text" placeholder="Jane Rodriguez" class="h-12 rounded-xl bg-surface-container-low px-4 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
@@ -64,6 +68,7 @@ function renderAccount() {
     document.getElementById("view-phone").textContent = account.phone;
     document.getElementById("view-address").textContent = account.address;
     document.getElementById("view-sms").textContent = account.sms ? "SMS marketing: On" : "SMS marketing: Off";
+    setPhoto("view-photo", "view-photo-icon", account.photo);
   } else {
     formEl.classList.remove("hidden");
     viewEl.classList.add("hidden");
@@ -79,11 +84,28 @@ function editAccount() {
     document.getElementById("f-email").value = account.email;
     document.getElementById("f-address").value = account.address;
     document.getElementById("f-sms").checked = account.sms;
+    formPhoto = account.photo || "";
+    setPhoto("f-photo-prev", "f-photo-icon", formPhoto);
   }
   document.getElementById("account-view").classList.add("hidden");
   document.getElementById("account-view").classList.remove("flex");
   document.getElementById("account-form").classList.remove("hidden");
 }
+
+var formPhoto = "";
+function setPhoto(boxId, iconId, photo) {
+  var box = document.getElementById(boxId), icon = document.getElementById(iconId);
+  box.style.backgroundImage = photo ? "url(" + photo + ")" : "";
+  icon.style.display = photo ? "none" : "";
+}
+document.getElementById("f-photo").addEventListener("change", async function (e) {
+  var f = e.target.files && e.target.files[0]; if (!f) return;
+  try { formPhoto = await shrinkPhoto(f); setPhoto("f-photo-prev", "f-photo-icon", formPhoto); } catch (err) { showToast(err.message); }
+});
+document.getElementById("view-photo-input").addEventListener("change", async function (e) {
+  var f = e.target.files && e.target.files[0]; if (!f) return;
+  try { var a = getAccount(); a.photo = await shrinkPhoto(f); saveAccount(a); renderAccount(); showToast("Photo updated"); } catch (err) { showToast(err.message); }
+});
 
 function signOutAccount() {
   clearAccount();
@@ -98,7 +120,8 @@ document.getElementById("account-form").addEventListener("submit", function (e) 
     phone: document.getElementById("f-phone").value.trim(),
     email: document.getElementById("f-email").value.trim(),
     address: document.getElementById("f-address").value.trim(),
-    sms: document.getElementById("f-sms").checked
+    sms: document.getElementById("f-sms").checked,
+    photo: formPhoto
   });
   showToast("Account created");
   renderAccount();

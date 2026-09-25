@@ -21,7 +21,8 @@
   .wrap{max-width:1200px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 24px)}
   header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
   header img{height:34px}
-  header h1{font-family:Outfit,sans-serif;font-size:20px;margin:0;flex:1}
+  header h1{font-family:Outfit,sans-serif;font-size:20px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  @media (max-width:420px){header h1{font-size:17px} header img{height:28px} header .pill{padding:6px 9px}}
   .pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:100px;background:var(--card2);color:var(--fg2)}
   .pill i{width:8px;height:8px;border-radius:50%;background:#6B7280}
   .pill.on{color:var(--gr)} .pill.on i{background:var(--gr);box-shadow:0 0 0 3px rgba(34,197,94,.2)}
@@ -80,14 +81,51 @@
   .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:100px;background:var(--card2);color:var(--fg2);margin:4px 4px 0 0}
   .flash{animation:flash .6s 3}
   @keyframes flash{50%{background:rgba(243,99,16,.35)}}
-  .grid.incall #callbox{grid-column:1/-1;order:-1}
-  #in-call .menu{max-height:230px}
-  .callgrid{display:grid;grid-template-columns:minmax(260px,330px) 1fr;gap:20px;align-items:start}
-  @media (max-width:760px){.callgrid{grid-template-columns:1fr}}
-  .cust{position:sticky;top:10px}
-  .sbar{display:flex;align-items:center;gap:10px;height:56px;padding:0 16px;border-radius:16px;background:#141414;border:2px solid var(--or);color:var(--or2)}
-  .sbar input{all:unset;flex:1;color:#fff;font-size:17px;font-weight:600}
+  .grid.incall #callbox{grid-column:1/-1;order:-1;background:none;border:0;padding:0}
+  .grid.incall > div:not(#callbox){display:none}
+  body.incall .wrap{padding-bottom:calc(env(safe-area-inset-bottom) + 120px)}
+  body.incall #start-box{display:none}
+  .cg{display:grid;grid-template-columns:1fr;gap:14px}
+  @media (min-width:900px){.cg{grid-template-columns:340px 1fr;align-items:start}}
+  .col{display:flex;flex-direction:column;gap:14px;min-width:0}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;min-width:0}
+  .rowsec{display:flex;justify-content:space-between}
+  .custrow{display:flex;align-items:center;gap:14px;min-width:0}
+  .custinfo{flex:1;min-width:0}
+  .cname{font-family:Outfit,sans-serif;font-size:20px;font-weight:700;line-height:1.2;overflow-wrap:anywhere}
+  .csub{margin-top:4px;line-height:1.5;overflow-wrap:anywhere}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .tags:empty{display:none}
+  .tag{margin:0!important}
+  #in-call .log{max-height:160px;margin-top:0;display:flex;flex-direction:column;gap:6px;line-height:1.45}
+  #in-call .log:empty:before{content:'Talk activity shows here.';color:#6B7280}
+  .sbar{display:flex;align-items:center;gap:10px;height:52px;padding:0 14px;border-radius:14px;background:#141414;border:2px solid var(--or);color:var(--or2)}
+  .sbar input{all:unset;flex:1;min-width:0;color:#fff;font-size:16px;font-weight:600}
   .sbar input::placeholder{color:#8a8a8a;font-weight:500}
+  #in-call .chips{margin-top:12px;padding-bottom:2px}
+  #in-call .menu{max-height:280px;margin-top:10px;border:1px solid var(--line);border-radius:14px}
+  #in-call .mi{padding:10px 12px}
+  .custom{display:flex;gap:8px;margin-top:12px}
+  .custom .field{height:42px;font-size:14px;min-width:0}
+  .custom #cname{flex:2} .custom #cprice{flex:1}
+  #in-call .tot{margin-top:6px}
+  .fulfil{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:6px 0 12px;padding-top:12px;border-top:1px solid var(--line)}
+  .seg{display:inline-flex;background:#141414;border:1px solid #2e2e2e;border-radius:12px;padding:3px}
+  .seg button{all:unset;cursor:pointer;padding:9px 16px;border-radius:9px;font-weight:700;font-size:14px;color:var(--fg2)}
+  .seg button.on{background:var(--or);color:#fff}
+  .feebox{display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px;color:var(--fg2)}
+  .feein{display:flex;align-items:center;gap:4px;height:42px;padding:0 12px;border-radius:12px;background:#141414;border:2px solid var(--or);color:#fff;font-size:16px}
+  .feein input{all:unset;width:70px;font-size:16px;font-weight:700;color:#fff}
+  #in-call #order-state:empty{display:none}
+  #in-call #order-state{margin-top:12px}
+  .dock{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(17,17,17,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+  .dock-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px}
+  .dock .ptt{width:76px;height:76px;margin:0;font-size:12px;flex-shrink:0;box-shadow:0 8px 22px rgba(243,99,16,.4)}
+  .dock .ptt svg{width:26px;height:26px;margin-bottom:2px}
+  .dock .ptt .rg{inset:-6px}
+  .dock-r{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+  .dock .who{margin:0;text-align:left;min-height:18px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #bSend{width:100%;padding:15px 0;font-size:16px}
   .ol{background:var(--card2);border-radius:16px;padding:12px;margin-bottom:10px;border:1px solid transparent}
   .ol.new{animation:olnew 1.6s}
   @keyframes olnew{0%,40%{border-color:var(--or);box-shadow:0 0 0 4px rgba(243,99,16,.25)}}
@@ -116,7 +154,9 @@
     <img id="logo" alt="">
     <h1>Voice Orders</h1>
     <span class="pill" id="duty"><i></i><span>Off duty</span></span>
+    <button class="btn" id="bDutyHdr" style="padding:8px 12px;font-size:12.5px;display:none;">Go off duty</button>
   </header>
+  <div id="sound-tip" class="hidden" style="background:rgba(251,191,36,.12);color:#FBBF24;border-radius:12px;padding:10px 14px;font-weight:700;font-size:13.5px;margin-bottom:12px;">Tap anywhere to turn on the ringer and sound.</div>
 
   <!-- sign in / create staff login -->
   <div id="v-login" class="card hidden" style="max-width:420px;margin:30px auto;">
@@ -168,42 +208,59 @@
       <div class="card" id="callbox">
         <div id="no-call" class="muted" style="text-align:center;padding:40px 10px;">Calls connect automatically while you're on duty — your phone rings loud and beeps when a customer starts talking. Keep this screen open.</div>
         <div id="in-call" class="hidden">
-          <div class="callgrid">
-            <!-- customer + walkie -->
-            <div class="cust">
-              <div style="display:flex;align-items:center;gap:14px;">
-                <div class="av" id="c-av"></div>
-                <div style="flex:1;min-width:0;">
-                  <div style="font-family:Outfit,sans-serif;font-size:21px;font-weight:700;" id="c-name"></div>
-                  <div class="muted" id="c-sub"></div>
-                  <div id="c-tags"></div>
+          <div class="cg">
+            <div class="col">
+              <section class="box">
+                <div class="sec">Customer</div>
+                <div class="custrow">
+                  <div class="av" id="c-av"></div>
+                  <div class="custinfo">
+                    <div class="cname" id="c-name"></div>
+                    <div class="muted csub" id="c-sub"></div>
+                  </div>
                 </div>
-              </div>
-              <div class="who" id="who">Hold to talk</div>
-              <button class="ptt" id="ptt" aria-label="Hold to talk"><span class="rg" id="rg"></span><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V20H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-2.08A7 7 0 0 0 19 11z"/></svg>HOLD TO TALK</button>
-              <div class="muted" style="text-align:center;margin-top:8px;">On a computer you can also hold the <b>Space</b> bar.</div>
-              <div class="log" id="log"></div>
-              <button class="btn red" id="bHang" style="width:100%;margin-top:12px;">End call</button>
+                <div id="c-tags" class="tags"></div>
+              </section>
+              <section class="box">
+                <div class="sec">Live talk</div>
+                <div class="log" id="log"></div>
+              </section>
             </div>
-
-            <!-- live order -->
-            <div>
-              <div class="sbar">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                <input id="msearch" placeholder="Search the menu to add items…" autocomplete="off" enterkeyhint="done">
+            <div class="col">
+              <section class="box">
+                <div class="sec rowsec"><span>Current order <span id="ocount" style="color:var(--fg2)"></span></span><button class="btn" id="bJump" style="padding:6px 12px;font-size:12px;letter-spacing:0;text-transform:none;">+ Add items</button></div>
+                <div id="lines"></div>
+                <div class="fulfil">
+                  <div class="seg" id="fseg"><button type="button" data-f="pickup" class="on">Pickup</button><button type="button" data-f="delivery">Delivery</button></div>
+                  <label class="feebox hidden" id="feebox"><span>Delivery fee</span><span class="feein">$<input id="fee" inputmode="decimal" placeholder="0.00" autocomplete="off"></span></label>
+                </div>
+                <div class="tot" id="tot"></div>
+                <div id="order-state"></div>
+              </section>
+              <section class="box">
+                <div class="sec">Add items</div>
+                <div class="sbar">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                  <input id="msearch" placeholder="Search the menu…" autocomplete="off" enterkeyhint="done">
+                </div>
+                <div class="chips" id="chips"></div>
+                <div class="menu" id="menu"></div>
+                <div class="custom">
+                  <input class="field" id="cname" placeholder="Custom item">
+                  <input class="field" id="cprice" placeholder="$0.00" inputmode="decimal">
+                  <button class="btn" id="bCustom">Add</button>
+                </div>
+              </section>
+              <button class="btn red" id="bHang" style="width:100%;">End call</button>
+            </div>
+          </div>
+          <div class="dock">
+            <div class="dock-in">
+              <button class="ptt" id="ptt" aria-label="Hold to talk" title="Hold to talk (or hold the Space bar)"><span class="rg" id="rg"></span><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V20H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-2.08A7 7 0 0 0 19 11z"/></svg>HOLD</button>
+              <div class="dock-r">
+                <div class="who" id="who">Hold to talk</div>
+                <button class="btn pri" id="bSend" disabled>Send to customer</button>
               </div>
-              <div class="chips" id="chips"></div>
-              <div class="menu" id="menu"></div>
-              <div style="display:flex;gap:8px;margin-top:8px;">
-                <input class="field" id="cname" placeholder="Custom item" style="flex:2;height:40px;font-size:14px;">
-                <input class="field" id="cprice" placeholder="$" inputmode="decimal" style="flex:1;height:40px;font-size:14px;">
-                <button class="btn" id="bCustom">Add</button>
-              </div>
-              <div class="sec" style="margin-top:16px;display:flex;justify-content:space-between;"><span>Active order</span><span id="ocount"></span></div>
-              <div id="lines"></div>
-              <div class="tot" id="tot"></div>
-              <div id="order-state" style="margin-top:12px;"></div>
-              <button class="btn pri" id="bSend" style="width:100%;margin-top:12px;padding:17px 0;font-size:17px;" disabled>Send to customer</button>
             </div>
           </div>
         </div>
@@ -271,32 +328,61 @@
     show('v-app');
     loadQueue(); loadPaid(); loadStaff();
     listenDb();
+    if(localStorage.getItem('lc_duty') !== 'off') startDuty(false);
   }
 
   // ---------- duty (presence tells customers someone is on the line) ----------
-  $('bStart').onclick = async () => {
+  // Staff stay on duty until they press "Go off duty" (on by default). The line reconnects by itself.
+  let dutyBeat = null;
+  async function startDuty(fromTap){
+    if(onDuty) return;
+    localStorage.setItem('lc_duty', 'on');
     TalkAudio.unlock();
-    const ok = await TalkAudio.prepareMic();
-    if(!ok){ alert('Allow microphone access for this page to take voice orders.'); return; }
-    opsChan = sb.channel('lc-ops', { config: { presence: { key: 'operator-' + me.id } } });
-    opsChan.subscribe(async s => { if(s === 'SUBSCRIBED'){ await opsChan.track({ email: me.email, at: Date.now() }); } });
+    TalkAudio.prepareMic().then(ok => { if(!ok && fromTap) alert('Allow microphone access for this page so customers can hear you.'); });
     onDuty = true;
+    joinOps();
     keepAwake();
+    clearInterval(dutyBeat); dutyBeat = setInterval(() => { if(onDuty) trackOps(); }, 30000);
     $('duty').className = 'pill on'; $('duty').querySelector('span').textContent = 'On duty';
-    $('start-box').innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;"><span class="muted">You\'re on duty. New calls ring here.</span><button class="btn" id="bOff">Go off duty</button></div>';
-    $('bOff').onclick = goOffDuty;
+    $('start-box').classList.add('hidden');
+    $('bDutyHdr').style.display = ''; $('bDutyHdr').textContent = 'Go off duty';
+    checkSound();
     renderQueue();
+  }
+  function joinOps(){
+    if(opsChan){ try { sb.removeChannel(opsChan); } catch(e){} opsChan = null; }
+    opsChan = sb.channel('lc-ops', { config: { presence: { key: 'operator-' + me.id } } });
+    opsChan.subscribe(s => {
+      if(s === 'SUBSCRIBED') trackOps();
+      else if(onDuty && (s === 'CHANNEL_ERROR' || s === 'TIMED_OUT' || s === 'CLOSED')) setTimeout(() => { if(onDuty) joinOps(); }, 3000);
+    });
+  }
+  function trackOps(){ try { opsChan && opsChan.track({ email: me.email, at: Date.now() }); } catch(e){} }
+  function checkSound(){
+    const ctx = TalkAudio.context();
+    $('sound-tip').classList.toggle('hidden', ctx.state === 'running');
+  }
+  document.addEventListener('pointerdown', () => { TalkAudio.unlock(); setTimeout(checkSound, 300); }, true);
+  $('bStart').onclick = () => startDuty(true);
+  $('bDutyHdr').onclick = () => {
+    if(onDuty){ if(!confirm('Go off duty? Customers will see that no one is on the line.')) return; localStorage.setItem('lc_duty', 'off'); goOffDuty(); }
+    else startDuty(true);
   };
   // keep the screen on while on duty so calls can ring
   let wakeLock = null;
   async function keepAwake(){ try { if('wakeLock' in navigator && onDuty) wakeLock = await navigator.wakeLock.request('screen'); } catch(e){} }
-  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && onDuty) keepAwake(); });
+  document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible' && onDuty){ keepAwake(); trackOps(); loadQueue(); checkSound(); } });
+  window.addEventListener('online', () => { if(onDuty) joinOps(); });
   async function goOffDuty(){
+    clearInterval(dutyBeat);
     try { wakeLock && wakeLock.release(); } catch(e){} wakeLock = null;
     if(opsChan){ try { await opsChan.untrack(); } catch(e){} sb.removeChannel(opsChan); opsChan = null; }
     onDuty = false;
     $('duty').className = 'pill'; $('duty').querySelector('span').textContent = 'Off duty';
-    $('start-box').innerHTML = '<div style="font-family:Outfit,sans-serif;font-size:18px;font-weight:700;">You\'re off duty</div><p class="muted">Customers see that no one is on the line.</p><button class="btn pri" onclick="location.reload()">Go on duty</button>';
+    $('bDutyHdr').style.display = ''; $('bDutyHdr').textContent = 'Go on duty';
+    $('sound-tip').classList.add('hidden');
+    $('start-box').classList.remove('hidden');
+    renderQueue();
   }
 
   // ---------- queue ----------
@@ -307,7 +393,7 @@
   function ago(t){ const s = Math.round((Date.now() - new Date(t)) / 1000); return s < 60 ? s + 's' : Math.round(s / 60) + 'm'; }
   function renderQueue(){
     const waiting = [...queue.values()].filter(c => c.status === 'waiting');
-    $('queue').innerHTML = waiting.length ? waiting.map(c => '<div class="q ring"><div class="t"><b>' + esc(c.customer_name) + '</b><span>' + (c.dish_name ? 'About ' + esc(c.dish_name) + ' · ' : '') + (c.customer_phone ? esc(c.customer_phone) + ' · ' : '') + 'waiting ' + ago(c.created_at) + '</span></div>' +
+    $('queue').innerHTML = waiting.length ? waiting.map(c => '<div class="q ring"><div class="av" style="width:44px;height:44px;font-size:16px;' + (c.customer_photo && /^data:image\//.test(c.customer_photo) ? 'background-image:url(' + c.customer_photo + ')' : '') + '">' + (c.customer_photo ? '' : esc(String(c.customer_name || '?').slice(0, 1))) + '</div><div class="t"><b>' + esc(c.customer_name) + '</b><span>' + (c.dish_name ? 'About ' + esc(c.dish_name) + ' · ' : '') + (c.customer_phone ? esc(c.customer_phone) + ' · ' : '') + 'waiting ' + ago(c.created_at) + '</span></div>' +
       '<button class="btn gr" onclick="answer(\'' + c.id + '\')"' + (onDuty && !active ? '' : ' disabled') + '>Answer</button></div>').join('') + (!onDuty ? '<div class="muted">Go on duty to answer.</div>' : '')
       : '<div class="muted">No one is waiting.</div>';
     document.title = (waiting.length ? '(' + waiting.length + ') ' : '') + 'La Cabaña — Voice Orders';
@@ -346,7 +432,7 @@
     const { data, error } = await sb.from('calls').update({ status: 'live', operator_email: me.email, answered_at: new Date().toISOString() }).eq('id', id).eq('status', 'waiting').select().single();
     answering = false;
     if(error || !data){ if(!auto) alert('Someone else already took this call.'); loadQueue(); return; }
-    active = data; lines = []; sentOrder = null; profileSeen = false;
+    active = data; lines = []; sentOrder = null; profileSeen = false; $('fee').value = ''; setFulfil(false);
     const sendAnswered = () => callChan && callChan.send({ type: 'broadcast', event: 'answered', payload: { name: (me.email || '').split('@')[0] } });
     callChan = sb.channel('call-' + id, { config: { broadcast: { self: false, ack: false } } });
     callChan.on('broadcast', { event: 'ptt' }, m => onRemotePtt(m.payload))
@@ -357,10 +443,10 @@
       .on('broadcast', { event: 'hello' }, m => showProfile(m.payload))
       .subscribe(s => { if(s === 'SUBSCRIBED') sendAnswered(); });
     $('no-call').classList.add('hidden'); $('in-call').classList.remove('hidden');
-    showProfile({ name: c.customer_name, phone: c.customer_phone, dishName: c.dish_name });
+    showProfile({ name: c.customer_name, phone: c.customer_phone, email: c.customer_email, address: c.customer_address, photo: c.customer_photo, dishName: c.dish_name });
     $('log').innerHTML = ''; log('Connected with ' + esc(c.customer_name) + ' — you\'ll hear them live as they talk.');
     $('callbox').classList.add('flash'); setTimeout(() => $('callbox').classList.remove('flash'), 2000);
-    document.querySelector('.grid').classList.add('incall');
+    document.querySelector('.grid').classList.add('incall'); document.body.classList.add('incall'); window.scrollTo(0, 0);
     if(c.dish_id && findItem(c.dish_id)){ addItem(c.dish_id); log('Customer started on <b>' + esc(findItem(c.dish_id).name) + '</b> — added to the order.'); }
     renderMenu(); renderLines(); renderOrderState(); renderQueue();
   }
@@ -372,9 +458,11 @@
     const av = $('c-av');
     if(p.photo && /^data:image\/(jpeg|png|webp);base64,/.test(p.photo)){ av.style.backgroundImage = 'url(' + p.photo + ')'; av.textContent = ''; }
     else if(!av.style.backgroundImage){ av.textContent = String(name || '?').trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase(); }
-    $('c-sub').innerHTML = (phone ? '<a href="tel:' + esc(phone) + '" style="color:var(--or2)">' + esc(phone) + '</a>' : 'No phone given') + (p.email ? ' · ' + esc(p.email) : '');
+    const email = p.email || active.customer_email, addr = p.address || active.customer_address;
+    $('c-sub').innerHTML = (phone ? '<div><a href="tel:' + esc(phone) + '" style="color:var(--or2)">' + esc(phone) + '</a></div>' : '') + (email ? '<div>' + esc(email) + '</div>' : '') + (addr ? '<div>' + esc(addr) + '</div>' : '') || 'No contact info';
     const tags = [];
     if(p.dishName || active.dish_name) tags.push('Tapped: ' + esc(p.dishName || active.dish_name));
+    if(p.test) tags.push('Test profile');
     if(typeof p.orders === 'number') tags.push(p.orders ? p.orders + ' past order' + (p.orders === 1 ? '' : 's') + ' on this phone' : 'First order');
     $('c-tags').innerHTML = tags.map(t => '<span class="tag">' + t + '</span>').join('');
     if(p.photo || p.email || typeof p.orders === 'number') profileSeen = true;
@@ -431,7 +519,7 @@
     if(holding) pttUp();
     if(callChan){ sb.removeChannel(callChan); callChan = null; }
     active = null; lines = []; sentOrder = null;
-    document.querySelector('.grid').classList.remove('incall');
+    document.querySelector('.grid').classList.remove('incall'); document.body.classList.remove('incall');
     $('in-call').classList.add('hidden'); $('no-call').classList.remove('hidden');
     $('no-call').textContent = (msg ? msg + ' ' : '') + 'The next call connects automatically.';
     loadQueue();
@@ -447,6 +535,7 @@
     $('menu').querySelectorAll('.mi').forEach(el => el.onclick = () => { addItem(el.dataset.id); if($('msearch').value){ $('msearch').value = ''; renderMenu(); } });
   }
   $('msearch').addEventListener('input', renderMenu);
+  $('bJump').onclick = () => { $('msearch').scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => $('msearch').focus(), 350); };
   $('msearch').addEventListener('keydown', e => { if(e.key === 'Enter'){ const f = $('menu').querySelector('.mi'); if(f) f.click(); } });
   $('bCustom').onclick = () => {
     const n = $('cname').value.trim(), p = parseFloat($('cprice').value.replace('$', ''));
@@ -494,14 +583,27 @@
     }).join('') || '<div class="muted" style="padding:10px 0;">No items yet. The dish the customer is holding is added automatically — or search above.</div>';
     lines.forEach(l => l.flash = false);
     const n = lines.reduce((a, l) => a + l.qty, 0);
-    $('ocount').textContent = n ? n + ' item' + (n === 1 ? '' : 's') : '';
+    $('ocount').textContent = n ? '· ' + n + ' item' + (n === 1 ? '' : 's') : '';
     renderTotals();
   }
+  let delivery = false;
+  function feeAmt(){ if(!delivery) return 0; const v = parseFloat(($('fee').value || '').replace(/[^0-9.]/g, '')); return v > 0 ? Math.min(200, Math.round(v * 100) / 100) : 0; }
+  function setFulfil(d){
+    delivery = d;
+    $('fseg').querySelectorAll('button').forEach(b => b.classList.toggle('on', (b.dataset.f === 'delivery') === d));
+    $('feebox').classList.toggle('hidden', !d);
+    if(d) setTimeout(() => $('fee').focus(), 50);
+    renderTotals();
+  }
+  $('fseg').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if(b) setFulfil(b.dataset.f === 'delivery'); });
+  $('fee').addEventListener('input', renderTotals);
   function renderTotals(){
-    const sub = lines.reduce((s, l) => s + unitOf(l) * l.qty, 0), tax = Math.round(sub * TAX * 100) / 100;
-    $('tot').innerHTML = lines.length ? '<div><span>Subtotal</span><span>' + money(sub) + '</span></div><div><span>Tax</span><span>' + money(tax) + '</span></div><div class="t"><span>Total</span><span>' + money(sub + tax) + '</span></div>' : '';
+    const sub = lines.reduce((s, l) => s + unitOf(l) * l.qty, 0), tax = Math.round(sub * TAX * 100) / 100, fee = feeAmt();
+    const total = Math.round((sub + tax + fee) * 100) / 100;
+    $('tot').innerHTML = lines.length ? '<div><span>Subtotal</span><span>' + money(sub) + '</span></div><div><span>Tax</span><span>' + money(tax) + '</span></div>' +
+      (delivery ? '<div><span>Delivery fee</span><span>' + money(fee) + '</span></div>' : '') + '<div class="t"><span>Total</span><span>' + money(total) + '</span></div>' : '';
     $('bSend').disabled = !lines.length || (sentOrder && sentOrder.status === 'paid');
-    $('bSend').textContent = sentOrder && sentOrder.status === 'paid' ? 'Paid ✓' : (sentOrder && sentOrder.status === 'sent' ? 'Send updated order' : 'Send to customer') + (lines.length ? ' · ' + money(sub + tax) : '');
+    $('bSend').textContent = sentOrder && sentOrder.status === 'paid' ? 'Paid ✓' : (sentOrder && sentOrder.status === 'sent' ? 'Send updated order' : 'Send to customer') + (lines.length ? ' · ' + money(total) : '');
   }
   $('lines').addEventListener('click', e => {
     const b = e.target.closest('[data-a]'), card = e.target.closest('.ol'); if(!b || !card || b.tagName === 'INPUT') return;
@@ -522,8 +624,9 @@
   });
   $('bSend').onclick = async () => {
     if(!active || !lines.length) return;
+    if(delivery && !feeAmt() && !confirm('Delivery is on but the fee is $0.00. Send anyway?')) return;
     $('bSend').disabled = true; $('bSend').textContent = 'Sending…';
-    const { data, error } = await sb.rpc('operator_send_order', { p_call: active.id, p_items: lines.map(l => ({ id: l.id, name: l.name, price: unitOf(l), qty: l.qty, note: summary(l) })) });
+    const { data, error } = await sb.rpc('operator_send_order', { p_call: active.id, p_items: lines.map(l => ({ id: l.id, name: l.name, price: unitOf(l), qty: l.qty, note: summary(l) })), p_delivery_fee: feeAmt() });
     if(error){ alert('Couldn\'t send: ' + error.message); renderLines(); return; }
     sentOrder = data;
     callChan.send({ type: 'broadcast', event: 'order', payload: { order_id: data.id } });
@@ -534,7 +637,7 @@
   const paidMap = new Map();
   function ticketHTML(o){
     return '<div class="ticket"><div style="display:flex;justify-content:space-between;"><b>#' + o.order_number + ' · ' + esc(o.customer_name || '') + '</b><b>' + money(o.total) + '</b></div>' +
-      '<div style="font-size:12px;color:#555;margin:2px 0 8px;">VOICE ORDER · PICKUP · paid ' + (o.paid_at ? new Date(o.paid_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '') + (o.customer_phone ? ' · ' + esc(o.customer_phone) : '') + '</div>' +
+      '<div style="font-size:12px;color:#555;margin:2px 0 8px;">VOICE ORDER · ' + (Number(o.delivery_fee) > 0 ? 'DELIVERY (fee ' + money(o.delivery_fee) + ')' : 'PICKUP') + ' · paid ' + (o.paid_at ? new Date(o.paid_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '') + (o.customer_phone ? ' · ' + esc(o.customer_phone) : '') + '</div>' +
       (o.items || []).map(i => '<div style="padding:5px 0;border-top:1px dashed #ccc;"><b>' + i.qty + '× ' + esc(i.name) + '</b>' + (i.note ? '<div style="font-size:13px;">' + esc(i.note) + '</div>' : '') + '</div>').join('') + '</div>';
   }
   function printTicket(id){
