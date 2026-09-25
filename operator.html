@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<title>La Cabaña — Voice Orders (Staff)</title>
+<meta name="theme-color" content="#131313"/>
+<meta name="robots" content="noindex"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="data.js"></script>
+<script src="talk-audio.js"></script>
+<style>
+  :root{--bg:#111;--card:#1a1a1a;--card2:#222;--line:rgba(255,255,255,.08);--fg:#F9FAFB;--fg2:#9CA3AF;--or:#f36310;--or2:#ffb596;--gr:#22C55E;--rd:#f87171}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--fg);font-family:Manrope,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit}
+  .wrap{max-width:1200px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 24px)}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  header img{height:34px}
+  header h1{font-family:Outfit,sans-serif;font-size:20px;margin:0;flex:1}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:100px;background:var(--card2);color:var(--fg2)}
+  .pill i{width:8px;height:8px;border-radius:50%;background:#6B7280}
+  .pill.on{color:var(--gr)} .pill.on i{background:var(--gr);box-shadow:0 0 0 3px rgba(34,197,94,.2)}
+  .btn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:12px;font-weight:700;font-size:14px;background:var(--card2);color:var(--fg)}
+  .btn.pri{background:var(--or);color:#fff}
+  .btn.gr{background:var(--gr);color:#06200f}
+  .btn.red{background:rgba(220,38,38,.15);color:var(--rd)}
+  .btn[disabled]{opacity:.45;pointer-events:none}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+  .muted{color:var(--fg2);font-size:13px}
+  input,textarea{font-family:inherit}
+  .field{width:100%;height:46px;background:#141414;border:1px solid #2e2e2e;border-radius:12px;padding:0 14px;color:#fff;font-size:16px;outline:none}
+  .field:focus{border-color:var(--or)}
+  .grid{display:grid;grid-template-columns:320px 1fr;gap:14px}
+  @media (max-width:860px){.grid{grid-template-columns:1fr}}
+  .sec{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#6B7280;margin:0 0 10px}
+  .q{display:flex;align-items:center;gap:10px;padding:12px;border-radius:14px;background:var(--card2);margin-bottom:8px}
+  .q.ring{animation:ring 1s infinite;border:1px solid var(--or)}
+  @keyframes ring{50%{box-shadow:0 0 0 6px rgba(243,99,16,.18)}}
+  .q .t{flex:1;min-width:0}
+  .q b{display:block;font-size:15px}
+  .q span{font-size:12.5px;color:var(--fg2)}
+  .ptt{all:unset;position:relative;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8a3d,#f36310 55%,#c24a06);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:Outfit,sans-serif;font-weight:700;cursor:pointer;box-shadow:0 14px 40px rgba(243,99,16,.4);-webkit-user-select:none;user-select:none;touch-action:none;transition:transform .12s;margin:0 auto}
+  .ptt .rg{position:absolute;inset:-10px;border-radius:50%;border:3px solid rgba(243,99,16,.5);transition:transform .08s}
+  .ptt.down{transform:scale(.94)} .ptt.down .rg{border-color:var(--gr)}
+  .ptt.listen{background:radial-gradient(circle at 35% 30%,#3a3a3a,#262626 60%,#1a1a1a);box-shadow:none}
+  .ptt svg{width:42px;height:42px;margin-bottom:4px}
+  .who{text-align:center;font-weight:700;font-size:14px;color:var(--fg2);margin:12px 0 4px;min-height:20px}
+  .who.live{color:var(--gr)}
+  .menu{max-height:360px;overflow-y:auto;margin-top:10px;border-radius:12px}
+  .mi{display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid var(--line);cursor:pointer}
+  .mi:active{background:rgba(255,255,255,.04)}
+  .mi img{width:40px;height:40px;border-radius:9px;object-fit:cover;background:#222}
+  .mi .n{flex:1;min-width:0;font-size:14px;font-weight:600}
+  .mi .p{font-size:13px;color:var(--or2);font-weight:700}
+  .mi .plus{width:30px;height:30px;border-radius:50%;background:var(--or);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800}
+  .chips{display:flex;gap:6px;overflow-x:auto;margin-top:10px;scrollbar-width:none}
+  .chips button{all:unset;cursor:pointer;flex-shrink:0;font-size:12.5px;font-weight:700;padding:6px 11px;border-radius:100px;background:var(--card2);color:var(--fg2)}
+  .chips button.on{background:var(--fg);color:#111}
+  .ln{display:grid;grid-template-columns:1fr auto;gap:6px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .ln .nm{font-weight:700;font-size:14.5px}
+  .ln .qty{display:flex;align-items:center;gap:8px}
+  .ln .qty button{all:unset;cursor:pointer;width:28px;height:28px;border-radius:8px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-weight:800}
+  .ln input{grid-column:1/-1;height:34px;background:#141414;border:1px solid #2a2a2a;border-radius:9px;color:#fff;padding:0 10px;font-size:13px}
+  .tot div{display:flex;justify-content:space-between;padding:3px 0;font-size:14px;color:var(--fg2)}
+  .tot .t{color:#fff;font-weight:800;font-size:18px}
+  .banner{border-radius:14px;padding:14px;font-weight:700;display:flex;align-items:center;gap:10px}
+  .banner.wait{background:rgba(251,191,36,.12);color:#FBBF24}
+  .banner.paid{background:rgba(34,197,94,.14);color:var(--gr)}
+  .po{padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .po b{font-size:14.5px}
+  .hidden{display:none!important}
+  .log{max-height:130px;overflow-y:auto;font-size:12.5px;color:var(--fg2);margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img id="logo" alt="">
+    <h1>Voice Orders</h1>
+    <span class="pill" id="duty"><i></i><span>Off duty</span></span>
+  </header>
+
+  <!-- sign in -->
+  <div id="v-login" class="card hidden" style="max-width:420px;margin:30px auto;">
+    <h2 style="font-family:Outfit,sans-serif;margin:0 0 6px;">Staff sign in</h2>
+    <p class="muted" style="margin:0 0 14px;">Only approved La Cabaña staff emails can take voice orders.</p>
+    <input class="field" id="em" type="email" placeholder="Staff email" autocomplete="username" autocapitalize="none">
+    <input class="field" id="pw" type="password" placeholder="Password" autocomplete="current-password" style="margin-top:10px;">
+    <div id="lerr" class="muted" style="color:var(--rd);margin-top:10px;display:none;"></div>
+    <button class="btn pri" id="bLogin" style="width:100%;margin-top:14px;">Sign in</button>
+    <button class="btn" id="bSignup" style="width:100%;margin-top:8px;">First time? Create staff login</button>
+  </div>
+
+  <!-- not allowed -->
+  <div id="v-denied" class="card hidden" style="max-width:420px;margin:30px auto;text-align:center;">
+    <h2 style="font-family:Outfit,sans-serif;margin:0 0 6px;">Not a staff account</h2>
+    <p class="muted" id="denied-email"></p>
+    <button class="btn" onclick="signOut()">Sign out</button>
+  </div>
+
+  <!-- console -->
+  <div id="v-app" class="hidden">
+    <div id="start-box" class="card" style="text-align:center;margin-bottom:14px;">
+      <div style="font-family:Outfit,sans-serif;font-size:18px;font-weight:700;">Ready to take calls?</div>
+      <p class="muted">Going on duty tells customers someone is on the line and turns on your speaker and microphone.</p>
+      <button class="btn pri" id="bStart" style="padding:14px 28px;font-size:16px;">Go on duty</button>
+    </div>
+
+    <div class="grid">
+      <div>
+        <div class="card" style="margin-bottom:14px;">
+          <div class="sec">Incoming calls</div>
+          <div id="queue"><div class="muted">No one is waiting.</div></div>
+        </div>
+        <div class="card">
+          <div class="sec">Paid voice orders today</div>
+          <div id="paid"><div class="muted">Nothing yet today.</div></div>
+        </div>
+      </div>
+
+      <div class="card" id="callbox">
+        <div id="no-call" class="muted" style="text-align:center;padding:40px 10px;">Answer a call to start taking an order.</div>
+        <div id="in-call" class="hidden">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-family:Outfit,sans-serif;font-size:20px;font-weight:700;" id="c-name"></div>
+              <div class="muted" id="c-sub"></div>
+            </div>
+            <button class="btn red" id="bHang">End call</button>
+          </div>
+          <div class="who" id="who">Hold to talk</div>
+          <button class="ptt" id="ptt" aria-label="Hold to talk"><span class="rg" id="rg"></span><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V20H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-2.08A7 7 0 0 0 19 11z"/></svg>HOLD TO TALK</button>
+          <div class="muted" style="text-align:center;margin-top:8px;">On a computer you can also hold the <b>Space</b> bar.</div>
+          <div class="log" id="log"></div>
+
+          <div style="height:1px;background:var(--line);margin:16px 0;"></div>
+          <div class="sec">Build the order</div>
+          <input class="field" id="msearch" placeholder="Search the menu…" autocomplete="off">
+          <div class="chips" id="chips"></div>
+          <div class="menu" id="menu"></div>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <input class="field" id="cname" placeholder="Custom item" style="flex:2;height:40px;font-size:14px;">
+            <input class="field" id="cprice" placeholder="$" inputmode="decimal" style="flex:1;height:40px;font-size:14px;">
+            <button class="btn" id="bCustom">Add</button>
+          </div>
+
+          <div style="margin-top:14px;" id="lines"></div>
+          <div class="tot" id="tot"></div>
+          <div id="order-state" style="margin-top:12px;"></div>
+          <button class="btn pri" id="bSend" style="width:100%;margin-top:12px;padding:15px 0;font-size:16px;" disabled>Send order to customer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SB_URL = 'https://qzluvwpjtgeccfojutbt.supabase.co', SB_KEY = 'sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ';
+  const sb = supabase.createClient(SB_URL, SB_KEY);
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const money = n => '$' + Number(n || 0).toFixed(2);
+  const TAX = RESTAURANT.taxRate;
+  $('logo').src = RESTAURANT.logo;
+
+  let me = null, onDuty = false, opsChan = null, dbChan = null, active = null, callChan = null, lines = [], sentOrder = null, holding = false, cat = 'all';
+  const queue = new Map();
+
+  function show(v){ ['v-login','v-denied','v-app'].forEach(x => $(x).classList.toggle('hidden', x !== v)); }
+  async function signOut(){ await goOffDuty(); await sb.auth.signOut(); location.reload(); }
+
+  // ---------- auth ----------
+  $('bLogin').onclick = async () => {
+    const email = $('em').value.trim(), password = $('pw').value;
+    $('lerr').style.display = 'none';
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if(error){ $('lerr').textContent = /confirm/i.test(error.message) ? 'Confirm your email first — check your inbox.' : 'Wrong email or password.'; $('lerr').style.display = 'block'; return; }
+    boot();
+  };
+  $('bSignup').onclick = async () => {
+    const email = $('em').value.trim(), password = $('pw').value;
+    $('lerr').style.display = 'none';
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || password.length < 8){ $('lerr').textContent = 'Enter your staff email and a password of 8+ characters.'; $('lerr').style.display = 'block'; return; }
+    const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: location.origin + '/operator.html' } });
+    if(error){ $('lerr').textContent = error.message; $('lerr').style.display = 'block'; return; }
+    if(data.session){ boot(); return; }
+    $('lerr').style.color = 'var(--gr)'; $('lerr').textContent = 'Check ' + email + ' for a confirmation link, then come back and sign in.'; $('lerr').style.display = 'block';
+  };
+
+  async function boot(){
+    const { data: { session } } = await sb.auth.getSession();
+    if(!session){ show('v-login'); return; }
+    me = session.user;
+    const { data: ok } = await sb.rpc('is_operator');
+    if(!ok){ $('denied-email').textContent = me.email + ' isn\'t on the staff list.'; show('v-denied'); return; }
+    show('v-app');
+    loadQueue(); loadPaid();
+    listenDb();
+  }
+
+  // ---------- duty (presence tells customers someone is on the line) ----------
+  $('bStart').onclick = async () => {
+    TalkAudio.unlock();
+    const ok = await TalkAudio.prepareMic();
+    if(!ok){ alert('Allow microphone access for this page to take voice orders.'); return; }
+    opsChan = sb.channel('lc-ops', { config: { presence: { key: 'operator-' + me.id } } });
+    opsChan.subscribe(async s => { if(s === 'SUBSCRIBED'){ await opsChan.track({ email: me.email, at: Date.now() }); } });
+    onDuty = true;
+    $('duty').className = 'pill on'; $('duty').querySelector('span').textContent = 'On duty';
+    $('start-box').innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;"><span class="muted">You\'re on duty. New calls ring here.</span><button class="btn" id="bOff">Go off duty</button></div>';
+    $('bOff').onclick = goOffDuty;
+    renderQueue();
+  };
+  async function goOffDuty(){
+    if(opsChan){ try { await opsChan.untrack(); } catch(e){} sb.removeChannel(opsChan); opsChan = null; }
+    onDuty = false;
+    $('duty').className = 'pill'; $('duty').querySelector('span').textContent = 'Off duty';
+    $('start-box').innerHTML = '<div style="font-family:Outfit,sans-serif;font-size:18px;font-weight:700;">You\'re off duty</div><p class="muted">Customers see that no one is on the line.</p><button class="btn pri" onclick="location.reload()">Go on duty</button>';
+  }
+
+  // ---------- queue ----------
+  async function loadQueue(){
+    const { data } = await sb.from('calls').select('*').in('status', ['waiting', 'live']).gte('created_at', new Date(Date.now() - 3 * 3600e3).toISOString()).order('created_at');
+    queue.clear(); (data || []).forEach(c => queue.set(c.id, c)); renderQueue();
+  }
+  function ago(t){ const s = Math.round((Date.now() - new Date(t)) / 1000); return s < 60 ? s + 's' : Math.round(s / 60) + 'm'; }
+  function renderQueue(){
+    const waiting = [...queue.values()].filter(c => c.status === 'waiting');
+    $('queue').innerHTML = waiting.length ? waiting.map(c => '<div class="q ring"><div class="t"><b>' + esc(c.customer_name) + '</b><span>' + (c.dish_name ? 'About ' + esc(c.dish_name) + ' · ' : '') + (c.customer_phone ? esc(c.customer_phone) + ' · ' : '') + 'waiting ' + ago(c.created_at) + '</span></div>' +
+      '<button class="btn gr" onclick="answer(\'' + c.id + '\')"' + (onDuty && !active ? '' : ' disabled') + '>Answer</button></div>').join('') + (!onDuty ? '<div class="muted">Go on duty to answer.</div>' : '')
+      : '<div class="muted">No one is waiting.</div>';
+    document.title = (waiting.length ? '(' + waiting.length + ') ' : '') + 'La Cabaña — Voice Orders';
+  }
+  setInterval(renderQueue, 10000);
+
+  let ringTimer = null;
+  function ring(){ if(!onDuty || active) return; try { TalkAudio.remoteStart(); setTimeout(() => TalkAudio.remoteStart(), 250); } catch(e){} if(navigator.vibrate) navigator.vibrate([200, 100, 200]); }
+
+  function listenDb(){
+    dbChan = sb.channel('ops-db')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'calls' }, p => {
+        const c = p.new; if(!c || !c.id) return;
+        if(c.status === 'waiting' || c.status === 'live') queue.set(c.id, c); else queue.delete(c.id);
+        if(p.eventType === 'INSERT') ring();
+        if(active && c.id === active.id && (c.status === 'ended' || c.status === 'missed')) endLocal('Customer hung up.');
+        renderQueue();
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'talk_orders' }, p => {
+        const o = p.new;
+        if(o.status === 'paid'){ loadPaid(); if(sentOrder && o.id === sentOrder.id){ sentOrder = o; renderOrderState(); } }
+      })
+      .subscribe();
+    clearInterval(ringTimer); ringTimer = setInterval(() => { if([...queue.values()].some(c => c.status === 'waiting')) ring(); }, 6000);
+  }
+
+  // ---------- call ----------
+  async function answer(id){
+    const c = queue.get(id); if(!c || active) return;
+    const { data, error } = await sb.from('calls').update({ status: 'live', operator_email: me.email, answered_at: new Date().toISOString() }).eq('id', id).eq('status', 'waiting').select().single();
+    if(error || !data){ alert('Someone else already took this call.'); loadQueue(); return; }
+    active = data; lines = []; sentOrder = null;
+    callChan = sb.channel('call-' + id, { config: { broadcast: { self: false, ack: false } } });
+    callChan.on('broadcast', { event: 'ptt' }, m => onRemotePtt(m.payload))
+      .on('broadcast', { event: 'audio' }, m => { const l = TalkAudio.play(m.payload); $('rg').style.transform = 'scale(' + (1 + l * .2) + ')'; })
+      .on('broadcast', { event: 'hangup' }, () => endLocal('Customer hung up.'))
+      .on('broadcast', { event: 'paid' }, () => refreshSent())
+      .subscribe(s => { if(s === 'SUBSCRIBED') callChan.send({ type: 'broadcast', event: 'answered', payload: { name: (me.email || '').split('@')[0] } }); });
+    $('no-call').classList.add('hidden'); $('in-call').classList.remove('hidden');
+    $('c-name').textContent = c.customer_name;
+    $('c-sub').innerHTML = (c.customer_phone ? '<a href="tel:' + esc(c.customer_phone) + '" style="color:var(--or2)">' + esc(c.customer_phone) + '</a> · ' : '') + (c.dish_name ? 'Tapped: ' + esc(c.dish_name) : 'Voice order');
+    $('log').innerHTML = ''; log('Connected with ' + esc(c.customer_name) + '. Say hi!');
+    if(c.dish_id){ const it = findItem(c.dish_id); if(it) addLine(it.id, it.name, it.price); }
+    renderMenu(); renderLines(); renderOrderState(); renderQueue();
+  }
+  function log(t){ const d = document.createElement('div'); d.innerHTML = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + ' · ' + t; $('log').appendChild(d); $('log').scrollTop = 1e6; }
+
+  let remoteT = 0;
+  function onRemotePtt(p){
+    if(p.state === 'start'){ remoteT = Date.now(); TalkAudio.remoteStart(); $('who').textContent = active.customer_name + ' is talking…'; $('who').className = 'who live'; $('ptt').classList.add('listen'); }
+    else { TalkAudio.remoteStop(); log(esc(active.customer_name) + ' talked ' + Math.max(1, Math.round((Date.now() - remoteT) / 1000)) + 's'); $('who').textContent = 'Hold to talk'; $('who').className = 'who'; $('ptt').classList.remove('listen'); $('rg').style.transform = ''; }
+  }
+
+  let myT = 0;
+  async function pttDown(){
+    if(!active || holding || $('ptt').classList.contains('listen')) return;
+    holding = true; myT = Date.now();
+    $('ptt').classList.add('down'); $('who').textContent = 'You\'re live — release to send'; $('who').className = 'who live';
+    callChan.send({ type: 'broadcast', event: 'ptt', payload: { from: 'operator', state: 'start' } });
+    try {
+      await TalkAudio.startTalk(f => callChan.send({ type: 'broadcast', event: 'audio', payload: f }), l => { $('rg').style.transform = 'scale(' + (1 + l * .25) + ')'; });
+      if(!holding) finishTalk();
+    } catch(e){ holding = false; $('ptt').classList.remove('down'); $('who').textContent = 'Microphone unavailable'; }
+  }
+  function pttUp(){ if(!holding) return; holding = false; if(TalkAudio.isTalking()) finishTalk(); }
+  function finishTalk(){
+    TalkAudio.stopTalk();
+    $('ptt').classList.remove('down'); $('rg').style.transform = '';
+    callChan.send({ type: 'broadcast', event: 'ptt', payload: { from: 'operator', state: 'stop' } });
+    log('You talked ' + Math.max(1, Math.round((Date.now() - myT) / 1000)) + 's');
+    $('who').textContent = 'Hold to talk'; $('who').className = 'who';
+  }
+  const pb = $('ptt');
+  pb.addEventListener('pointerdown', e => { e.preventDefault(); pttDown(); });
+  ['pointerup', 'pointercancel'].forEach(ev => pb.addEventListener(ev, e => { e.preventDefault(); pttUp(); }));
+  pb.addEventListener('pointerleave', () => { if(holding) pttUp(); });
+  pb.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => { if(e.code === 'Space' && !e.repeat && active && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)){ e.preventDefault(); pttDown(); } });
+  document.addEventListener('keyup', e => { if(e.code === 'Space' && active){ e.preventDefault(); pttUp(); } });
+
+  $('bHang').onclick = async () => {
+    if(!active) return;
+    if(sentOrder && sentOrder.status === 'sent' && !confirm('The customer hasn\'t paid yet. End the call anyway? They can still pay from their screen.')) return;
+    try { callChan.send({ type: 'broadcast', event: 'hangup', payload: { from: 'operator' } }); } catch(e){}
+    await sb.from('calls').update({ status: 'ended', ended_at: new Date().toISOString() }).eq('id', active.id);
+    endLocal();
+  };
+  function endLocal(msg){
+    if(!active) return;
+    if(holding) pttUp();
+    if(callChan){ sb.removeChannel(callChan); callChan = null; }
+    active = null; lines = []; sentOrder = null;
+    $('in-call').classList.add('hidden'); $('no-call').classList.remove('hidden');
+    $('no-call').textContent = msg ? msg + ' Answer another call to take an order.' : 'Answer a call to start taking an order.';
+    loadQueue();
+  }
+
+  // ---------- order builder ----------
+  function renderMenu(){
+    const q = $('msearch').value.trim().toLowerCase();
+    $('chips').innerHTML = [{ id: 'all', label: 'All' }].concat(CATEGORIES.map(c => ({ id: c.id, label: c.label }))).map(c => '<button class="' + (c.id === cat ? 'on' : '') + '" data-c="' + c.id + '">' + esc(c.label) + '</button>').join('');
+    $('chips').querySelectorAll('button').forEach(b => b.onclick = () => { cat = b.dataset.c; renderMenu(); });
+    const items = ALL_ITEMS.filter(i => (cat === 'all' || i.category === cat) && (!q || i.name.toLowerCase().includes(q)));
+    $('menu').innerHTML = items.map(i => '<div class="mi" data-id="' + i.id + '"><img src="' + esc(i.img) + '" alt="" loading="lazy"><div class="n">' + esc(i.name) + '</div><div class="p">' + money(i.price) + '</div><div class="plus">+</div></div>').join('') || '<div class="muted" style="padding:12px;">No items match.</div>';
+    $('menu').querySelectorAll('.mi').forEach(el => el.onclick = () => { const it = findItem(el.dataset.id); addLine(it.id, it.name, it.price); });
+  }
+  $('msearch').addEventListener('input', renderMenu);
+  $('bCustom').onclick = () => {
+    const n = $('cname').value.trim(), p = parseFloat($('cprice').value.replace('$', ''));
+    if(!n || !(p >= 0)){ alert('Enter the custom item name and price.'); return; }
+    addLine('custom-' + Date.now(), n, Math.round(p * 100) / 100); $('cname').value = ''; $('cprice').value = '';
+  };
+  function addLine(id, name, price){
+    const l = lines.find(x => x.id === id && !x.note);
+    if(l) l.qty++; else lines.push({ id, name, price, qty: 1, note: '' });
+    renderLines();
+  }
+  function renderLines(){
+    $('lines').innerHTML = lines.map((l, i) => '<div class="ln"><div><div class="nm">' + esc(l.name) + '</div><div class="muted">' + money(l.price) + ' each</div></div>' +
+      '<div class="qty"><button data-i="' + i + '" data-d="-1">−</button><b>' + l.qty + '</b><button data-i="' + i + '" data-d="1">+</button></div>' +
+      '<input data-n="' + i + '" placeholder="Note (sides, no onions…)" value="' + esc(l.note) + '"></div>').join('') || '<div class="muted">Tap menu items to add them. The dish the customer tapped is added for you.</div>';
+    $('lines').querySelectorAll('button').forEach(b => b.onclick = () => { const l = lines[+b.dataset.i]; l.qty += +b.dataset.d; if(l.qty <= 0) lines.splice(+b.dataset.i, 1); renderLines(); });
+    $('lines').querySelectorAll('input').forEach(inp => inp.oninput = () => { lines[+inp.dataset.n].note = inp.value; });
+    const sub = lines.reduce((s, l) => s + l.price * l.qty, 0), tax = Math.round(sub * TAX * 100) / 100;
+    $('tot').innerHTML = lines.length ? '<div><span>Subtotal</span><span>' + money(sub) + '</span></div><div><span>Tax</span><span>' + money(tax) + '</span></div><div class="t"><span>Total</span><span>' + money(sub + tax) + '</span></div>' : '';
+    $('bSend').disabled = !lines.length || (sentOrder && sentOrder.status === 'paid');
+    $('bSend').textContent = sentOrder && sentOrder.status === 'sent' ? 'Send updated order' : 'Send order to customer';
+  }
+  $('bSend').onclick = async () => {
+    if(!active || !lines.length) return;
+    $('bSend').disabled = true; $('bSend').textContent = 'Sending…';
+    const { data, error } = await sb.rpc('operator_send_order', { p_call: active.id, p_items: lines.map(l => ({ id: l.id, name: l.name, price: l.price, qty: l.qty, note: l.note })) });
+    if(error){ alert('Couldn\'t send: ' + error.message); renderLines(); return; }
+    sentOrder = data;
+    callChan.send({ type: 'broadcast', event: 'order', payload: { order_id: data.id } });
+    log('Sent order #' + data.order_number + ' · ' + money(data.total));
+    renderLines(); renderOrderState();
+  };
+  async function refreshSent(){ if(!sentOrder) return; const { data } = await sb.from('talk_orders').select('*').eq('id', sentOrder.id).single(); if(data){ sentOrder = data; renderOrderState(); loadPaid(); } }
+  function renderOrderState(){
+    const el = $('order-state');
+    if(!sentOrder){ el.innerHTML = ''; return; }
+    if(sentOrder.status === 'paid'){
+      el.innerHTML = '<div class="banner paid">✓ PAID · Order #' + sentOrder.order_number + ' · ' + money(sentOrder.total) + '<span class="muted" style="margin-left:auto;color:inherit;opacity:.8;font-weight:600;">Square ' + esc((sentOrder.payment_id || '').slice(0, 10)) + '…</span></div>';
+      log('Customer paid order #' + sentOrder.order_number + ' ✓');
+      $('bSend').disabled = true;
+    } else {
+      el.innerHTML = '<div class="banner wait">Order #' + sentOrder.order_number + ' sent · ' + money(sentOrder.total) + ' — waiting for the customer to pay</div>';
+    }
+  }
+
+  async function loadPaid(){
+    const start = new Date(); start.setHours(0, 0, 0, 0);
+    const { data } = await sb.from('talk_orders').select('*').eq('status', 'paid').gte('paid_at', start.toISOString()).order('paid_at', { ascending: false });
+    $('paid').innerHTML = (data || []).length ? data.map(o => '<div class="po"><b>#' + o.order_number + ' · ' + esc(o.customer_name) + '</b> <span style="float:right;color:var(--gr);font-weight:800;">' + money(o.total) + '</span><div class="muted">' +
+      (o.items || []).map(i => i.qty + '× ' + esc(i.name) + (i.note ? ' (' + esc(i.note) + ')' : '')).join(', ') + '</div><div class="muted">Paid ' + new Date(o.paid_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + (o.customer_phone ? ' · ' + esc(o.customer_phone) : '') + '</div></div>').join('')
+      : '<div class="muted">Nothing yet today.</div>';
+  }
+
+  window.addEventListener('beforeunload', e => { if(active){ e.preventDefault(); e.returnValue = ''; } });
+  window.answer = answer; window.signOut = signOut;
+  sb.auth.onAuthStateChange((ev) => { if(ev === 'SIGNED_OUT') show('v-login'); });
+  boot();
+</script>
+</body>
+</html>
