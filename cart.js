@@ -3,9 +3,21 @@ const CART_KEY = "lacabana_cart";
 const ORDERS_KEY = "lacabana_orders";
 const FREE_JUICE_PROMO = "FREEJUICE";
 
+// A cart line is { key, id, qty, opts }. opts holds the choices made on the dish screen
+// (free drink, meat, add-ons, note); lines with different choices stay separate.
+// key is attribute-safe (id + short hash) so it can go straight into onclick handlers.
+function lineKey(id, opts) {
+  if (!opts) return id;
+  const str = JSON.stringify(opts);
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) h = ((h * 33) ^ str.charCodeAt(i)) >>> 0;
+  return id + "~" + h.toString(36);
+}
+
 function getCart() {
   try {
-    return JSON.parse(localStorage.getItem(CART_KEY)) || [];
+    const raw = JSON.parse(localStorage.getItem(CART_KEY)) || [];
+    return raw.map((c) => ({ key: c.key || c.id, id: c.id, qty: c.qty, opts: c.opts || null }));
   } catch {
     return [];
   }
@@ -16,30 +28,33 @@ function saveCart(cart) {
   updateCartBadge();
 }
 
-function addToCart(id, qty = 1) {
+// addToCart(id) = quick add; addToCart(id, qty, opts) = from the dish screen
+function addToCart(id, qty = 1, opts = null) {
   const item = findItem(id);
   if (!item) return;
+  const o = opts && Object.keys(opts).length ? opts : null;
+  const key = lineKey(id, o);
   const cart = getCart();
-  const existing = cart.find((c) => c.id === id);
+  const existing = cart.find((c) => c.key === key);
   if (existing) {
     existing.qty += qty;
   } else {
-    cart.push({ id, qty });
+    cart.push({ key, id, qty, opts: o });
   }
   saveCart(cart);
-  showToast(`Added ${item.name} ($${item.price.toFixed(2)})`);
+  showToast(`Added ${qty > 1 ? qty + "× " : ""}${item.name} ($${(unitPrice(item, o) * qty).toFixed(2)})`);
 }
 
-function removeFromCart(id) {
-  saveCart(getCart().filter((c) => c.id !== id));
+function removeFromCart(key) {
+  saveCart(getCart().filter((c) => c.key !== key));
 }
 
-function setQty(id, qty) {
+function setQty(key, qty) {
   const cart = getCart();
-  const line = cart.find((c) => c.id === id);
+  const line = cart.find((c) => c.key === key);
   if (!line) return;
   if (qty <= 0) {
-    removeFromCart(id);
+    removeFromCart(key);
     return;
   }
   line.qty = qty;
@@ -50,10 +65,30 @@ function clearCart() {
   saveCart([]);
 }
 
+// item price + paid add-ons
+function unitPrice(item, opts) {
+  const addons = (opts && opts.addons) || [];
+  return +(item.price + addons.reduce((s, a) => s + a.price * (a.qty || 1), 0)).toFixed(2);
+}
+
+// e.g. "Grilled meat · Free drink: Mango Juice · + Lulo Juice · Note: no onions"
+function optsSummary(opts) {
+  if (!opts) return "";
+  const parts = [];
+  if (opts.meat) parts.push(opts.meat);
+  if (opts.drink && opts.drink !== "No Drink") parts.push("Free drink: " + opts.drink);
+  (opts.addons || []).forEach((a) => parts.push("+ " + (a.qty > 1 ? a.qty + "× " : "") + a.name));
+  if (opts.note) parts.push("Note: " + opts.note);
+  return parts.join(" · ");
+}
+
 function cartLines() {
   return getCart()
-    .map((c) => ({ ...c, item: findItem(c.id) }))
-    .filter((l) => l.item);
+    .map((c) => {
+      const item = findItem(c.id);
+      return item ? { ...c, item, unit: unitPrice(item, c.opts) } : null;
+    })
+    .filter(Boolean);
 }
 
 function hasFreeJuicePromo(lines) {
@@ -68,10 +103,10 @@ function computeTotals(lines) {
   let cheapestJuiceId = null;
   if (promoActive) {
     const cheapest = juiceLines.reduce((a, b) => (a.item.price <= b.item.price ? a : b));
-    cheapestJuiceId = cheapest.id;
+    cheapestJuiceId = cheapest.key;
     discount = cheapest.item.price;
   }
-  const subtotal = lines.reduce((sum, l) => sum + l.item.price * l.qty, 0);
+  const subtotal = lines.reduce((sum, l) => sum + l.unit * l.qty, 0);
   const taxes = +((subtotal - discount) * RESTAURANT.taxRate).toFixed(2);
   return { subtotal, discount, taxes, cheapestJuiceId, promoActive };
 }
@@ -87,7 +122,7 @@ function updateCartBadge() {
 function showToast(message) {
   const toast = document.createElement("div");
   toast.className =
-    "fixed top-24 left-1/2 -translate-x-1/2 bg-surface-elevated text-text-primary px-4 py-2.5 rounded-full shadow-2xl z-50 flex items-center gap-2 border border-border-subtle transition-all duration-300";
+    "fixed top-24 left-1/2 -translate-x-1/2 bg-surface-elevated text-text-primary px-4 py-2.5 rounded-full shadow-2xl z-[90] flex items-center gap-2 border border-border-subtle transition-all duration-300";
   toast.innerHTML = `<span class="material-symbols-outlined text-primary-container text-[18px]">check_circle</span><span class="font-label-md text-label-md">${message}</span>`;
   document.body.appendChild(toast);
   setTimeout(() => {
@@ -104,7 +139,7 @@ function placeOrder(tipAmount) {
   const order = {
     id: "LC-" + Math.floor(1000 + Math.random() * 9000),
     placedAt: new Date().toISOString(),
-    lines: lines.map((l) => ({ id: l.id, name: l.item.name, qty: l.qty, price: l.item.price })),
+    lines: lines.map((l) => ({ id: l.id, name: l.item.name, qty: l.qty, price: l.unit, options: optsSummary(l.opts), opts: l.opts })),
     subtotal: totals.subtotal,
     discount: totals.discount,
     taxes: totals.taxes,
