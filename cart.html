@@ -478,7 +478,12 @@
       const res = await fetch('/api/process-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sourceId: tokenResult.token, amount: total })
+        body: JSON.stringify({ sourceId: tokenResult.token, amount: total, order: {
+          lines: lines.map(l => ({ name: l.item.name, qty: l.qty, price: l.unit, note: optsSummary(l.opts) })),
+          discount: totals.discount, tip: currentTip, deliveryFee: deliveryFee(), fulfillment,
+          name: fulfillment === 'delivery' ? val('d-name') : ((typeof getAccount === 'function' && getAccount() || {}).name || ''),
+          phone: fulfillment === 'delivery' ? val('d-phone') : ((typeof getAccount === 'function' && getAccount() || {}).phone || ''),
+          address: fulfillment === 'delivery' ? deliveryAddress() : null, notes: fulfillment === 'delivery' ? val('d-notes') : '' } })
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
