@@ -201,7 +201,7 @@ const JUICES = [
     category: "juice",
     tag: "Iconic",
     desc: "Citrusy & tart",
-    img: "https://lacabanagrill.net/cdn/shop/files/lulo_juice.png?v=1760974553"
+    img: "images/juice-lulo.jpg"
   },
   {
     id: "jugo-de-guanabana",
@@ -210,7 +210,7 @@ const JUICES = [
     category: "juice",
     tag: "Creamy",
     desc: "Sweet soursop",
-    img: "https://lacabanagrill.net/cdn/shop/files/guanabana_juice.png?v=1760974330"
+    img: "images/juice-guanabana.jpg"
   },
   {
     id: "jugo-de-mango",
@@ -219,7 +219,7 @@ const JUICES = [
     category: "juice",
     tag: "Sweet",
     desc: "Ripe tropical",
-    img: "https://lacabanagrill.net/cdn/shop/files/mango_juice_b5d0bf51-a7de-4467-b7ff-2a106b4d402c.png?v=1760974023"
+    img: "images/juice-mango.jpg"
   },
   {
     id: "jugo-de-pina",
@@ -228,7 +228,7 @@ const JUICES = [
     category: "juice",
     tag: "Crisp & chilled",
     desc: "Crisp & chilled",
-    img: "https://lacabanagrill.net/cdn/shop/files/pineapple_juice_420d89e9-2205-404b-b77a-0942ce2a4b22.png?v=1760974276"
+    img: "images/juice-pina.jpg"
   }
 ];
 
