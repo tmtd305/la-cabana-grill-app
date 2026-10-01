@@ -80,12 +80,11 @@ const MENU = [
   },
   {
     id: "pollo-asado-la-cabana",
-    name: "Rotisserie Chicken (Whole)",
+    name: "Pollo Asado Entero",
     price: 32.0,
-    category: "rotisserie",
-    desc: "Whole chicken slow-turned on our rotisserie until golden and juicy, La Cabaña style. Feeds the family.",
-    img: "images/rotisserie-chicken.jpg",
-    badge: "Hot & fresh",
+    category: "chicken",
+    desc: "Whole family-style roasted chicken, La Cabaña style.",
+    img: "https://lacabanagrill.net/cdn/shop/files/Pollo_Asado_Entero_La_Cabana_Family_Plate_WEBSITE_resized_-6_grande.jpg?v=1753656803",
     specialty: false
   },
   // Seafood
@@ -234,7 +233,6 @@ const JUICES = [
 ];
 
 const CATEGORIES = [
-  { id: "rotisserie", label: "Rotisserie Chicken" },
   { id: "steak", label: "Steak & Parrilla", emoji: "🥩" },
   { id: "chicken", label: "Chicken", emoji: "🍗" },
   { id: "seafood", label: "Seafood", emoji: "🐟" },
@@ -261,13 +259,6 @@ const SIDES_MENU = [
 ];
 CATEGORIES.push({ id: "sides", label: "Sides & Extras" });
 
-// Rotisserie chicken line. PRICES ARE PLACEHOLDERS: confirm with the restaurant. Photos: swap in real half/quarter shots when we have them.
-MENU.push(
-  { id: "rotisserie-half", name: "Rotisserie Chicken (Half)", price: 17.99, category: "rotisserie", desc: "Half a golden rotisserie chicken with rice, salad and arepitas.", img: "images/rotisserie-chicken.jpg", specialty: false },
-  { id: "rotisserie-quarter", name: "Rotisserie Chicken (Quarter)", price: 11.99, category: "rotisserie", desc: "A quarter rotisserie chicken (leg and thigh) with rice and salad. Perfect for lunch.", img: "images/rotisserie-chicken.jpg", specialty: false },
-  { id: "rotisserie-family", name: "Rotisserie Family Combo", price: 44.99, category: "rotisserie", desc: "Whole rotisserie chicken, 2 large sides, arepitas and 2 natural juices. Feeds 4.", img: "images/rotisserie-chicken.jpg", badge: "Best value", specialty: false }
-);
-
 // SAMPLE SALES FOR TESTING (replace with real sales before launch).
 // was = regular price shown crossed out; deal = a special the dish qualifies for.
 const DEMO_SALES = {
@@ -275,9 +266,7 @@ const DEMO_SALES = {
   "churrasco-a-la-parrilla": { was: 34.99 },
   "carne-asada": { was: 24.99 },
   "jalea-mixta": { deal: "Buy 2, get 1 free" },
-  "pollo-asado-la-cabana": { was: 36.99 },
-  "rotisserie-half": { deal: "Lunch special" },
-  "rotisserie-family": { was: 52.99 },
+  "pollo-asado-la-cabana": { deal: "Family deal" },
   "camaron-al-ajillo": { was: 25.99 },
   "jugo-de-mango": { deal: "2 for $11" }
 };

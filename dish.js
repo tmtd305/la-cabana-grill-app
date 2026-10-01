@@ -13,9 +13,6 @@
     "pollo-con-champinones": ["Fresh vegetables", "Homemade potatoes"],
     "chicken-waffle": ["Waffle", "Syrup"],
     "pollo-asado-la-cabana": ["Salted potatoes", "Fresh salad", "Rice", "Arepitas"],
-    "rotisserie-half": ["Rice", "Fresh salad", "Arepitas"],
-    "rotisserie-quarter": ["Rice", "Fresh salad"],
-    "rotisserie-family": ["2 large sides", "Arepitas", "2 natural juices"],
     "jalea-mixta": ["Purple onions", "Lime", "Cilantro"],
     "mojarra-frita": ["Fresh salad", "Rice", "Fried plantains"],
     "pescado-en-salsa-de-mariscos": ["Fresh salad", "Steamed rice", "Fried plantains"],
@@ -215,7 +212,7 @@
   }
 
   // Recommendations: pair each dish with what people usually add (street food, juices, other plates). Sale items first; skip what's already in the bag.
-  var PAIRS = { rotisserie: ["streetfood", "juice", "steak"], steak: ["streetfood", "juice", "seafood"], seafood: ["juice", "streetfood", "rice"], chicken: ["juice", "streetfood", "steak"],
+  var PAIRS = { steak: ["streetfood", "juice", "seafood"], seafood: ["juice", "streetfood", "rice"], chicken: ["juice", "streetfood", "steak"],
     rice: ["juice", "streetfood", "chicken"], streetfood: ["steak", "juice", "chicken"], juice: ["steak", "streetfood", "chicken"], sides: ["juice", "steak", "streetfood"] };
   function recommendFor(id, n) {
     var item = findItem(id); if (!item) return [];
