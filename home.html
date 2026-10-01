@@ -27,6 +27,12 @@
 <div class="flex items-baseline justify-between mb-2"><h3 class="lc-promo-h"><span class="material-symbols-outlined">sell</span>Promotions</h3><span class="lc-promo-n" id="lc-promo-n"></span></div>
 <div class="lc-promo-row" id="lc-promo-row"></div>
 </section>
+<!-- Reels: short kitchen videos, play as you scroll -->
+<section id="lc-reels" class="w-full lc-reveal">
+<h3 class="lc-promo-h"><span class="material-symbols-outlined">play_circle</span>Watch it made</h3>
+<p class="lc-picks-sub">Straight from our kitchen. Tap for sound.</p>
+<div class="lc-reel-row" id="lc-reel-row"></div>
+</section>
 <!-- Picks that change with the time of day -->
 <section id="lc-picks" class="w-full lc-reveal">
 <h3 class="lc-promo-h"><span class="material-symbols-outlined" id="lc-picks-ic">wb_sunny</span><span id="lc-picks-t">Picks for you</span></h3>
@@ -120,6 +126,16 @@
   .lc-mb h4{font:800 17px/1.2 Outfit,sans-serif;color:#fff;margin:2px 0;}
   .lc-mb p{font:500 12.5px/1.35 Manrope,sans-serif;color:#9CA3AF;}
   .lc-mb a{flex-shrink:0;padding:10px 14px;border-radius:14px;background:#4cc417;color:#0b1a00;font:800 13px Manrope,sans-serif;text-decoration:none;}
+  .lc-reel-row{display:flex;gap:12px;overflow-x:auto;margin:0 -16px;padding:0 16px 4px;scroll-padding:0 16px;scroll-snap-type:x mandatory;scrollbar-width:none;}
+  .lc-reel-row::-webkit-scrollbar{display:none;}
+  .lc-reel{position:relative;flex:0 0 62%;aspect-ratio:9/16;border-radius:22px;overflow:hidden;background:#1c1b1b;scroll-snap-align:start;box-shadow:0 14px 30px rgba(0,0,0,.5);}
+  .lc-reel video{width:100%;height:100%;object-fit:cover;display:block;}
+  .lc-reel::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top,rgba(10,10,10,.85) 0%,rgba(10,10,10,0) 38%);}
+  .lc-reel-snd{position:absolute;top:10px;right:10px;z-index:2;width:34px;height:34px;border-radius:50%;background:rgba(12,12,12,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);color:#fff;display:flex;align-items:center;justify-content:center;}
+  .lc-reel-snd .material-symbols-outlined{font-size:18px;}
+  .lc-reel-body{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;}
+  .lc-reel-body b{display:block;font:800 16px/1.2 Outfit,sans-serif;color:#fff;margin-bottom:8px;}
+  .lc-reel-body .lc-order{display:block;width:100%;box-sizing:border-box;padding:10px 0;font-size:13px;}
   .lc-promo-h{display:flex;align-items:center;gap:6px;font:800 22px Outfit,sans-serif;color:#F9FAFB;}
   .lc-promo-h .material-symbols-outlined{color:#4cc417;font-size:24px;}
   .lc-promo-n{font:700 12px Manrope,sans-serif;color:#9CA3AF;}
@@ -292,6 +308,30 @@
       n.innerHTML = '<span class="lc-timer"><span class="material-symbols-outlined">timer</span>Ends in ' + p(Math.floor(t / 3600)) + ':' + p(Math.floor(t / 60) % 60) + ':' + p(t % 60) + '</span>';
     };
     tick(); setInterval(tick, 1000);
+  }
+
+
+  // Reels: the one on screen plays (muted), tap the speaker for sound
+  {
+    const REELS = [
+      { src: 'videos/reel-pescado.mp4', poster: 'videos/reel-pescado.jpg', name: 'Mojarra Frita Costeña', id: 'mojarra-frita' },
+      { src: 'videos/reel-grill.mp4', poster: 'videos/reel-grill.jpg', name: 'Fresh off the grill' },
+      { src: 'videos/reel-arepa.mp4', poster: 'videos/reel-arepa.jpg', name: 'Made to order, every time' }
+    ];
+    const row = document.getElementById('lc-reel-row');
+    row.innerHTML = REELS.map(r => '<div class="lc-reel"><video src="' + r.src + '" poster="' + r.poster + '" muted loop playsinline preload="none"></video>' +
+      '<button type="button" class="lc-reel-snd" aria-label="Sound"><span class="material-symbols-outlined">volume_off</span></button>' +
+      '<div class="lc-reel-body"><b>' + esc(r.name) + '</b>' + (r.id && findItem(r.id) ? '<button class="lc-order" data-order="' + r.id + '">Order now</button>' : '<button class="lc-order" onclick="document.getElementById(\'lc-menu-wrap\').scrollIntoView({behavior:\'smooth\'})">See the menu</button>') + '</div></div>').join('');
+    const vids = [...row.querySelectorAll('video')];
+    const io = new IntersectionObserver(es => es.forEach(e => { const v = e.target; if (e.isIntersecting && e.intersectionRatio > 0.6) { v.play().catch(() => {}); } else { v.pause(); } }), { threshold: [0, 0.6, 1] });
+    vids.forEach(v => io.observe(v));
+    row.querySelectorAll('.lc-reel-snd').forEach((b, i) => b.onclick = e => {
+      e.stopPropagation();
+      const v = vids[i], on = v.muted;
+      vids.forEach((x, j) => { x.muted = true; row.querySelectorAll('.lc-reel-snd span')[j].textContent = 'volume_off'; });
+      v.muted = !on; b.querySelector('span').textContent = on ? 'volume_up' : 'volume_off';
+      if (on) v.play().catch(() => {});
+    });
   }
 
   // Picks that change with the time of day

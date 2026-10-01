@@ -1,4 +1,4 @@
-const CACHE = "lacabana-v29";
+const CACHE = "lacabana-v30";
 const CORE = ["./data.js", "./cart.js", "./notifications.js"];
 
 self.addEventListener("install", (event) => {
@@ -20,6 +20,8 @@ self.addEventListener("fetch", (event) => {
   // fall back to cache only when offline.
   // HTML and our own scripts: network-first, so every update reaches phones right away.
   const url = new URL(event.request.url);
+  // videos stream straight from the network (iPhone needs range requests; don't cache them)
+  if (/\.(mp4|mov|webm)$/i.test(url.pathname) || event.request.headers.has("range")) return;
   const ownScript = url.origin === self.location.origin && /\.js$/.test(url.pathname);
   if (event.request.mode === "navigate" || event.request.destination === "document" || ownScript) {
     event.respondWith(
