@@ -99,7 +99,7 @@
     html += '<div class="px-5 pb-6 -mt-6 relative">' +
       '<div class="flex items-start justify-between gap-3"><h3 class="font-headline-xl text-headline-xl text-text-primary">' + esc(item.name) + "</h3>" +
       '<span class="shrink-0 pt-1 text-right"><span class="font-headline-lg text-headline-lg text-primary font-bold block">' + money(item.price) + "</span>" +
-        (item.was && item.was > item.price ? '<span class="block font-label-md text-label-md text-text-muted line-through">' + money(item.was) + '</span><span class="inline-block mt-1 px-2 py-0.5 rounded-md bg-colombian-red text-white font-label-caps text-label-caps font-bold">' + Math.round((1 - item.price / item.was) * 100) + '% OFF</span>' : "") +
+        (item.was && item.was > item.price ? '<span class="block font-label-md text-label-md text-text-muted line-through">' + money(item.was) + '</span>' : "") +
       "</span></div>" +
       (item.deal ? '<div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-colombian-yellow/15 text-colombian-yellow font-label-md text-label-md font-bold"><span class="material-symbols-outlined text-[16px]">sell</span>' + esc(item.deal) + "</div>" : "") +
       (item.rating ? '<div class="flex items-center gap-1 mt-1 text-secondary font-label-md text-label-md"><span class="material-symbols-outlined text-[16px] text-colombian-yellow" style="font-variation-settings:\'FILL\' 1">star</span>' + esc(item.rating) + "</div>" : "") +
