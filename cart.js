@@ -92,7 +92,8 @@ function cartLines() {
 }
 
 function hasFreeJuicePromo(lines) {
-  // dishes already on sale or on a deal don't earn the free juice
+  // members only; dishes already on sale or on a deal don't earn the free juice
+  if (typeof hasAccount === "function" && !hasAccount()) return false;
   return lines.some((l) => l.item.specialty && !(l.item.was > l.item.price) && !l.item.deal);
 }
 

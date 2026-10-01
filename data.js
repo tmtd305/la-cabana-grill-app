@@ -249,7 +249,7 @@ const SIDES_MENU = [
   { id: "side-maduros", name: "Maduros", price: 4.5, category: "sides", desc: "Sweet fried plantains" },
   { id: "side-tostones", name: "Tostones", price: 4.5, category: "sides", desc: "Crispy green plantains" },
   { id: "side-yuca", name: "Yuca Frita", price: 4.99, category: "sides", desc: "Golden fried yuca" },
-  { id: "side-empanadas", name: "Empanadas (3)", price: 6.99, category: "sides", desc: "Crispy beef empanadas with ají" },
+  { id: "side-empanadas", name: "Empanadas (3)", price: 9.39, category: "sides", desc: "Crispy beef empanadas with ají" },
   { id: "side-arepa", name: "Arepa con Queso", price: 4.5, category: "sides", desc: "Warm arepa with melted cheese" },
   { id: "side-fries", name: "French Fries", price: 4.0, category: "sides", desc: "Crispy and salted" },
   { id: "side-salad", name: "House Salad", price: 4.5, category: "sides", desc: "Fresh greens, tomato, onion" },

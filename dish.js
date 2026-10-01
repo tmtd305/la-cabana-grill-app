@@ -124,7 +124,12 @@
     }
 
     var onSale = (item.was && item.was > item.price) || item.deal;   // sale items don't come with the free juice
-    if (!isJuice && !onSale) {
+    var member = typeof hasAccount !== "function" || hasAccount();   // staff screens have no account.js: always allowed
+    if (!isJuice && !onSale && !member) {
+      html += sectionTitle("Free juice for members", "<span style=\"color:#4cc417\">Free</span>") +
+        '<a href="account.html?join=1" class="d-opt" style="text-decoration:none"><span class="flex items-center gap-3"><span class="material-symbols-outlined" style="color:#4cc417">local_drink</span><span><span class="font-body-md text-body-md text-text-primary block">Join free to get a juice with this meal</span><span class="font-label-md text-label-md text-text-muted">Lulo, guanábana, mango or piña</span></span></span><span class="material-symbols-outlined text-text-muted">chevron_right</span></a>';
+    }
+    if (!isJuice && !onSale && member) {
       html += sectionTitle("Add your free drink", "<span style=\"color:#4cc417\">Free</span>") + DRINKS.map(function (d) {
         return '<div class="d-opt' + (state.drink === d ? " sel" : "") + '" data-d="drink" data-v="' + esc(d) + '"><span class="font-body-md text-body-md text-text-primary">' + esc(d) + '</span><span class="flex items-center gap-3"><span class="font-label-md text-label-md font-bold" style="color:#4cc417">' + (d === "No Drink" ? "" : "Free") + '</span><span class="d-radio"></span></span></div>';
       }).join("");

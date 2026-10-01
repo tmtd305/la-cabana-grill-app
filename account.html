@@ -123,8 +123,10 @@ document.getElementById("account-form").addEventListener("submit", function (e) 
     sms: document.getElementById("f-sms").checked,
     photo: formPhoto
   });
-  showToast("Account created");
+  var joined = /[?&]join=1/.test(location.search);
+  showToast(joined ? "Welcome. Your free juice comes with every meal" : "Account created");
   renderAccount();
+  if (joined) setTimeout(function () { location.href = "home.html"; }, 1400);   // came from "Join free": back to ordering
 });
 
 document.addEventListener("DOMContentLoaded", renderAccount);
