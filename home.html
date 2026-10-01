@@ -17,21 +17,21 @@
 <h1>La Cabaña Grill</h1>
 <p>Authentic Colombian grill, made fresh in Miami Beach.</p>
 <div class="lc-wel-chips"><span><span class="material-symbols-outlined">outdoor_grill</span>Colombian parrilla</span><span><span class="material-symbols-outlined">schedule</span>15–25 min</span></div>
+<div class="lc-mode lc-wel-mode" id="lc-mode"><button class="on" data-m="pickup"><span class="material-symbols-outlined">storefront</span>Pickup</button><button data-m="delivery"><span class="material-symbols-outlined">two_wheeler</span>Delivery<small>Soon</small></button></div>
 <div class="lc-wel-btns"><button type="button" class="lc-wel-go" onclick="document.getElementById('lc-menu-wrap').scrollIntoView({behavior:'smooth'})">Order now<span class="material-symbols-outlined">arrow_downward</span></button><button type="button" class="lc-wel-deals" onclick="document.getElementById('lc-promos').scrollIntoView({behavior:'smooth',block:'center'})"><span class="material-symbols-outlined">sell</span>Deals</button></div>
-<div class="lc-wel-avail"><span><span class="material-symbols-outlined">storefront</span>Pickup</span><i></i><span><span class="material-symbols-outlined">two_wheeler</span>Delivery</span><i></i><span>Available now</span></div>
 <div class="lc-wel-dots" id="lc-wel-dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
 </div>
+</section>
+<!-- Reels: short kitchen videos, play as you scroll -->
+<section id="lc-reels" class="w-full lc-reveal">
+<h3 class="lc-promo-h"><span class="material-symbols-outlined">local_fire_department</span>Fresh from the kitchen</h3>
+<p class="lc-picks-sub">Made to order, every time.</p>
+<div class="lc-reel-row" id="lc-reel-row"></div>
 </section>
 <!-- Promotions: swipe through today's sales -->
 <section id="lc-promos" class="w-full lc-reveal">
 <div class="flex items-baseline justify-between mb-2"><h3 class="lc-promo-h"><span class="material-symbols-outlined">sell</span>Promotions</h3><span class="lc-promo-n" id="lc-promo-n"></span></div>
 <div class="lc-promo-row" id="lc-promo-row"></div>
-</section>
-<!-- Reels: short kitchen videos, play as you scroll -->
-<section id="lc-reels" class="w-full lc-reveal">
-<h3 class="lc-promo-h"><span class="material-symbols-outlined">play_circle</span>Watch it made</h3>
-<p class="lc-picks-sub">Straight from our kitchen. Tap for sound.</p>
-<div class="lc-reel-row" id="lc-reel-row"></div>
 </section>
 <!-- Picks that change with the time of day -->
 <section id="lc-picks" class="w-full lc-reveal">
@@ -43,7 +43,6 @@
 <section id="lc-member" class="w-full lc-reveal"></section>
 <!-- Pickup Toggle & Location Bar -->
 <section class="w-full bg-surface-charcoal rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
-<div class="lc-mode" id="lc-mode"><button class="on" data-m="pickup"><span class="material-symbols-outlined">storefront</span>Pickup</button><button data-m="delivery"><span class="material-symbols-outlined">delivery_dining</span>Delivery</button></div>
 <div class="flex items-center justify-between">
 <div class="flex items-center gap-space-xs min-w-0">
 <span class="material-symbols-outlined text-primary-container text-[20px] shrink-0" style="font-variation-settings: 'FILL' 1;">storefront</span>
@@ -131,11 +130,14 @@
   .lc-reel{position:relative;flex:0 0 62%;aspect-ratio:9/16;border-radius:22px;overflow:hidden;background:#1c1b1b;scroll-snap-align:start;box-shadow:0 14px 30px rgba(0,0,0,.5);}
   .lc-reel video{width:100%;height:100%;object-fit:cover;display:block;}
   .lc-reel::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top,rgba(10,10,10,.85) 0%,rgba(10,10,10,0) 38%);}
-  .lc-reel-snd{position:absolute;top:10px;right:10px;z-index:2;width:34px;height:34px;border-radius:50%;background:rgba(12,12,12,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);color:#fff;display:flex;align-items:center;justify-content:center;}
-  .lc-reel-snd .material-symbols-outlined{font-size:18px;}
   .lc-reel-body{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;}
   .lc-reel-body b{display:block;font:800 16px/1.2 Outfit,sans-serif;color:#fff;margin-bottom:8px;}
   .lc-reel-body .lc-order{display:block;width:100%;box-sizing:border-box;padding:10px 0;font-size:13px;}
+  .lc-wel-mode{margin:16px 0 0;background:rgba(14,14,14,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.12);}
+  .lc-wel-mode button small{font:800 9.5px Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:999px;background:rgba(255,255,255,.12);color:#D1D5DB;margin-left:2px;}
+  .lc-wel-mode + .lc-wel-btns{margin-top:10px;}
+  .lc-toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;z-index:90;padding:11px 16px;border-radius:14px;background:#242424;color:#fff;font:600 13px Manrope,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);transition:all .25s;white-space:nowrap;}
+  .lc-toast.on{opacity:1;transform:translate(-50%,0);}
   .lc-promo-h{display:flex;align-items:center;gap:6px;font:800 22px Outfit,sans-serif;color:#F9FAFB;}
   .lc-promo-h .material-symbols-outlined{color:#4cc417;font-size:24px;}
   .lc-promo-n{font:700 12px Manrope,sans-serif;color:#9CA3AF;}
@@ -262,10 +264,12 @@
   }, true);
 
   // Pickup / Delivery
-  const mode = localStorage.getItem('lacabana_mode') || 'pickup';
+  // Pickup only for now; delivery (Uber Direct / DoorDash Drive) is coming
+  const toast = t => { let el = document.querySelector('.lc-toast'); if (!el) { el = document.createElement('div'); el.className = 'lc-toast'; document.body.appendChild(el); } el.textContent = t; el.classList.add('on'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 2400); };
+  localStorage.setItem('lacabana_mode', 'pickup');
   document.querySelectorAll('#lc-mode button').forEach(b => {
-    b.classList.toggle('on', b.dataset.m === mode);
-    b.onclick = () => { localStorage.setItem('lacabana_mode', b.dataset.m); document.querySelectorAll('#lc-mode button').forEach(x => x.classList.toggle('on', x === b)); };
+    b.classList.toggle('on', b.dataset.m === 'pickup');
+    b.onclick = () => { if (b.dataset.m === 'delivery') { toast('Delivery is coming soon. Pickup is ready now.'); return; } };
   });
 
 
@@ -315,22 +319,14 @@
   {
     const REELS = [
       { src: 'videos/reel-pescado.mp4', poster: 'videos/reel-pescado.jpg', name: 'Mojarra Frita Costeña', id: 'mojarra-frita' },
-      { src: 'videos/reel-arepa.mp4', poster: 'videos/reel-arepa.jpg', name: 'Made to order, every time' }
+      { src: 'videos/reel-arepa.mp4', poster: 'videos/reel-arepa.jpg', name: 'La Cabaña street food' }
     ];
     const row = document.getElementById('lc-reel-row');
     row.innerHTML = REELS.map(r => '<div class="lc-reel"><video src="' + r.src + '" poster="' + r.poster + '" muted loop playsinline preload="none"></video>' +
-      '<button type="button" class="lc-reel-snd" aria-label="Sound"><span class="material-symbols-outlined">volume_off</span></button>' +
       '<div class="lc-reel-body"><b>' + esc(r.name) + '</b>' + (r.id && findItem(r.id) ? '<button class="lc-order" data-order="' + r.id + '">Order now</button>' : '<button class="lc-order" onclick="document.getElementById(\'lc-menu-wrap\').scrollIntoView({behavior:\'smooth\'})">See the menu</button>') + '</div></div>').join('');
     const vids = [...row.querySelectorAll('video')];
     const io = new IntersectionObserver(es => es.forEach(e => { const v = e.target; if (e.isIntersecting && e.intersectionRatio > 0.6) { v.play().catch(() => {}); } else { v.pause(); } }), { threshold: [0, 0.6, 1] });
     vids.forEach(v => io.observe(v));
-    row.querySelectorAll('.lc-reel-snd').forEach((b, i) => b.onclick = e => {
-      e.stopPropagation();
-      const v = vids[i], on = v.muted;
-      vids.forEach((x, j) => { x.muted = true; row.querySelectorAll('.lc-reel-snd span')[j].textContent = 'volume_off'; });
-      v.muted = !on; b.querySelector('span').textContent = on ? 'volume_up' : 'volume_off';
-      if (on) v.play().catch(() => {});
-    });
   }
 
   // Picks that change with the time of day
