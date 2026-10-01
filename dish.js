@@ -55,6 +55,7 @@
       "#dish .d-radio{width:20px;height:20px;border-radius:50%;border:2px solid #6B7280;flex-shrink:0;display:flex;align-items:center;justify-content:center}" +
       "#dish .d-opt.sel .d-radio{border-color:#f36310}#dish .d-opt.sel .d-radio:after{content:'';width:10px;height:10px;border-radius:50%;background:#f36310}" +
       "#dish .d-step{display:flex;align-items:center;gap:10px}" +
+      "#dish .d-fav{position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;display:flex;align-items:center;justify-content:center}#dish .d-fav.on{color:#f36310}#dish .d-fav.on .material-symbols-outlined{font-variation-settings:'FILL' 1}" +
       "#dish .d-step button{width:32px;height:32px;border-radius:10px;background:#242424;color:#F9FAFB;display:flex;align-items:center;justify-content:center}" +
       "#dish .d-step button:disabled{opacity:.35}" +
       "#dish textarea{width:100%;background:#242424;border:1px solid rgba(255,255,255,.08);border-radius:12px;color:#F9FAFB;padding:12px;font-size:16px;resize:none}" +
@@ -97,7 +98,8 @@
       '<div class="absolute inset-0 bg-gradient-to-t from-[#1A1A1A] via-transparent to-black/40"></div>' +
       '<button type="button" data-d="close" aria-label="Close" class="absolute top-3 left-3 w-10 h-10 rounded-full bg-black/55 backdrop-blur-md text-white flex items-center justify-center"><span class="material-symbols-outlined text-[22px]">close</span></button>' +
       (window.holdButtonHTML ? '<div class="absolute bottom-8 right-4">' + holdButtonHTML(item.id) + '</div>' : '') +
-      (item.badge ? '<span class="absolute top-4 right-3 bg-primary-container text-white font-label-caps text-label-caps uppercase px-2.5 py-1 rounded-full font-bold">' + esc(item.badge) + "</span>" : "") +
+      (typeof isFav === "function" ? '<button type="button" data-fav="' + item.id + '" aria-label="Favorite" class="d-fav' + (isFav(item.id) ? ' on' : '') + '"><span class="material-symbols-outlined">favorite</span></button>' : '') +
+      (item.badge ? '<span class="absolute top-16 right-3 bg-primary-container text-white font-label-caps text-label-caps uppercase px-2.5 py-1 rounded-full font-bold">' + esc(item.badge) + "</span>" : "") +
       "</div>";
 
     html += '<div class="px-5 pb-6 -mt-6 relative">' +
@@ -187,6 +189,8 @@
     document.body.appendChild(el);
 
     el.addEventListener("click", function (e) {
+      var fv = e.target.closest("[data-fav]");
+      if (fv && typeof toggleFav === "function") { var on = toggleFav(fv.getAttribute("data-fav")); fv.classList.toggle("on", on); return; }
       var t = e.target.closest("[data-d]");
       if (!t) return;
       var a = t.getAttribute("data-d"), v = t.getAttribute("data-v");

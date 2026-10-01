@@ -168,3 +168,15 @@ function getOrders() {
 }
 
 document.addEventListener("DOMContentLoaded", updateCartBadge);
+
+// Favorites: hearts on dishes, kept on this device
+const FAVS_KEY = "lacabana_favs";
+function getFavs() { try { return JSON.parse(localStorage.getItem(FAVS_KEY)) || []; } catch (e) { return []; } }
+function isFav(id) { return getFavs().includes(id); }
+function toggleFav(id) {
+  const f = getFavs(), i = f.indexOf(id);
+  if (i >= 0) f.splice(i, 1); else f.unshift(id);
+  try { localStorage.setItem(FAVS_KEY, JSON.stringify(f)); } catch (e) {}
+  document.dispatchEvent(new CustomEvent("lc-favs", { detail: { id, on: i < 0 } }));
+  return i < 0;
+}

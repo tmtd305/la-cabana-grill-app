@@ -26,11 +26,11 @@
 <div class="w-full bg-surface-charcoal p-1 rounded-xl flex items-center shadow-inner">
 <button class="flex-1 py-2 rounded-lg bg-surface-raised text-primary font-label-lg text-label-lg text-center transition-all shadow-md flex items-center justify-center gap-1.5" id="tab-active" onclick="switchOrdersTab('active')">
 <span>Active Order</span>
-<span class="w-5 h-5 rounded-full bg-primary-container text-on-primary font-label-caps text-label-caps flex items-center justify-center">1</span>
+<span id="active-count" class="w-5 h-5 rounded-full bg-primary-container text-on-primary font-label-caps text-label-caps flex items-center justify-center" style="display:none">1</span>
 </button>
 <button class="flex-1 py-2 rounded-lg text-text-secondary font-label-lg text-label-lg text-center transition-all hover:text-text-primary flex items-center justify-center gap-1.5" id="tab-past" onclick="switchOrdersTab('past')">
 <span>Past Orders</span>
-<span class="font-body-sm text-body-sm text-text-muted">(2)</span>
+<span class="font-body-sm text-body-sm text-text-muted" id="past-count"></span>
 </button>
 </div>
 <!-- ACTIVE ORDER VIEW -->
@@ -166,110 +166,14 @@
 </div>
 </div>
 </div>
-<!-- Live Grill Cook Cam Teaser Card -->
-<div class="relative rounded-xl overflow-hidden bg-surface-charcoal p-space-md flex items-center justify-between shadow-md">
-<div class="flex items-center gap-space-sm min-w-0">
-<div class="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
-<img class="w-full h-full object-cover" data-alt="Close up shot of open flame grill fire glowing orange under prime cut beef steaks grilling with smoke curling up in a professional Latin restaurant kitchen." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2njbpkWhJiLq0LuHgyuvLBBsfgHiBZ68t7aYAUhXw2ho-GkQRt-F6_J-Q2aRgG5blbgzJMKM9vbFclUglJLsGR3oqsjemfMQ7OSQDIixv9LqZonMCigqM4-OuJkg30TOKq9cJ2_-p58gUyApHmRmp49Jw63uZieqvDjpMU2vVH0uFw4jRdHuV_avr3cpnOW12LrDRlt-X_Facacd7sWZE1WKpk6HIsn6B0MovtlLD-YqZdMqU0KJP"/>
-<div class="absolute inset-0 bg-primary-container/20 mix-blend-overlay"></div>
-<span class="absolute bottom-1 right-1 w-2 h-2 rounded-full bg-colombian-red animate-ping"></span>
-</div>
-<div class="flex flex-col min-w-0">
-<div class="flex items-center gap-1.5">
-<span class="font-headline-md text-title-sm text-text-primary truncate">Parrilla Live Cam</span>
-<span class="px-1.5 py-0.2 bg-colombian-red/20 text-colombian-red font-label-caps text-label-caps uppercase rounded">Live</span>
-</div>
-<p class="font-body-sm text-body-sm text-text-secondary truncate">Pitmaster Carlos is tending your Churrasco</p>
-</div>
-</div>
-<button class="w-8 h-8 rounded-full bg-surface-raised flex items-center justify-center text-text-primary hover:text-primary transition-colors shrink-0">
-<span class="material-symbols-outlined text-[20px]">videocam</span>
-</button>
-</div>
 </div>
 <!-- PAST ORDERS SECTION -->
 <div class="space-y-space-md" id="view-past">
 <div class="flex items-center justify-between">
-<h3 class="font-headline-lg text-headline-lg text-text-primary tracking-tight">Grill History</h3>
-<span class="font-label-caps text-label-caps text-text-muted uppercase">Past 60 Days</span>
+<h3 class="font-headline-lg text-headline-lg text-text-primary tracking-tight">Your past orders</h3>
+
 </div>
-<!-- Past Order Card 1: Mojarra Frita -->
-<div class="bg-surface-charcoal rounded-xl p-space-md space-y-3 shadow-md">
-<div class="flex items-start justify-between">
-<div class="flex flex-col">
-<div class="flex items-center gap-1.5">
-<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
-<span class="font-label-caps text-label-caps text-text-muted uppercase">Completed • Oct 18, 2024</span>
-</div>
-<h4 class="font-headline-md text-headline-md text-text-primary mt-0.5">Mojarra Frita Crispy Fish</h4>
-<span class="font-body-sm text-body-sm text-text-secondary">With Coconut Rice, Fried Tostones &amp; House Salad</span>
-</div>
-<span class="font-headline-md text-headline-md text-text-primary">$32.40</span>
-</div>
-<div class="flex items-center gap-space-sm pt-1">
-<img class="w-14 h-14 rounded-lg object-cover shrink-0" data-alt="Golden crisp deep fried whole whole Mojarra fish served with Colombian coconut rice, crispy fried plantain tostones, and lime wedges on dark slate plate." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiwv9G3LztQcR0JWi12i-dd5iFbkE-KVLo1C-9rA9WEqPG3kS6J5mdBtZ178ebaPAOU-xRPohUw7Yhsx1bpFx-Mbj32yw4z0uj1nN1gk2TGwEiahojnLIGveoqt-cZvch3Qm-fEKKLJj85VrbGyzVAd-EOhiSmD9lHaPY9DL6Zk72LcVP1-j3iiDGi2Ko7rbd0v4UqrB50l0ho3zJms-HacX9vMeIaj_iCOO_gSX9OPc20GtMbHQaS"/>
-<div class="flex-1 min-w-0 bg-surface-raised rounded-lg p-2 flex items-center justify-between">
-<div class="flex flex-col">
-<span class="font-body-sm text-body-sm text-text-muted">Receipt #LC-7631</span>
-<span class="font-label-md text-label-md text-text-primary">Counter Pickup</span>
-</div>
-<button class="px-3 py-1.5 rounded-lg bg-surface-charcoal text-text-primary hover:text-primary font-label-md text-label-md flex items-center gap-1 transition-colors">
-<span class="material-symbols-outlined text-[14px]">info</span>
-<span>Details</span>
-</button>
-</div>
-</div>
-<div class="flex items-center justify-between pt-1">
-<span class="font-body-sm text-body-sm text-colombian-yellow flex items-center gap-1">
-<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
-<span>You rated 5.0</span>
-</span>
-<button class="px-4 py-2 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-1.5 active:scale-95 transition-transform shadow-[0_0_12px_rgba(243,99,16,0.3)]">
-<span class="material-symbols-outlined text-[16px]">replay</span>
-<span>Reorder in 1-Click</span>
-</button>
-</div>
-</div>
-<!-- Past Order Card 2: Parrillada Surf & Turf -->
-<div class="bg-surface-charcoal rounded-xl p-space-md space-y-3 shadow-md">
-<div class="flex items-start justify-between">
-<div class="flex flex-col">
-<div class="flex items-center gap-1.5">
-<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
-<span class="font-label-caps text-label-caps text-text-muted uppercase">Completed • Sep 29, 2024</span>
-</div>
-<div class="flex items-center gap-2 mt-0.5">
-<h4 class="font-headline-md text-headline-md text-text-primary">Parrillada La Cabaña</h4>
-<span class="px-1.5 py-0.2 rounded bg-secondary-fixed/20 text-secondary-fixed font-label-caps text-label-caps">Chef Special</span>
-</div>
-<span class="font-body-sm text-body-sm text-text-secondary">Feast for 3-4 • Skirt Steak, Chorizo, Shrimp, Arepas</span>
-</div>
-<span class="font-headline-md text-headline-md text-text-primary">$119.00</span>
-</div>
-<div class="flex items-center gap-space-sm pt-1">
-<img class="w-14 h-14 rounded-lg object-cover shrink-0" data-alt="Extravagant grand South American parrillada grill platter loaded with sizzled skirt steak, grilled jumbo shrimp skewers, morcilla, Colombian chorizo sausage, yuca, and arepas presented over a smoking tabletop grill." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgpD8M0B3A5xeB6fsaD8K3KOYQRg5HAUk5020n2No_pIUY7XDgzs8ryf1cfwP02zI_ctUrjt2SZYqsBANT8VM82VBH-OD0exMDt_9-ai0FMk4Ifr6dI02jFjmj7T8mCrpBRNhfFpDn6mRl9xR-WvkevcCN4eRYXsrcoQlqQrkjVim89uF0vIJ44VaUYYRsSHIHNopkLessiOGf-7vSjCx0ohhsNOlqWjxW2FEaVy_vJLJCyFuR-hX_"/>
-<div class="flex-1 min-w-0 bg-surface-raised rounded-lg p-2 flex items-center justify-between">
-<div class="flex flex-col">
-<span class="font-body-sm text-body-sm text-text-muted">Receipt #LC-6902</span>
-<span class="font-label-md text-label-md text-text-primary">Dine-in Tab</span>
-</div>
-<button class="px-3 py-1.5 rounded-lg bg-surface-charcoal text-text-primary hover:text-primary font-label-md text-label-md flex items-center gap-1 transition-colors">
-<span class="material-symbols-outlined text-[14px]">info</span>
-<span>Details</span>
-</button>
-</div>
-</div>
-<div class="flex items-center justify-between pt-1">
-<span class="font-body-sm text-body-sm text-text-muted flex items-center gap-1">
-<span class="material-symbols-outlined text-[16px] text-secondary">local_fire_department</span>
-<span>Earned 238 Flame Points</span>
-</span>
-<button class="px-4 py-2 rounded-lg bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-1.5 active:scale-95 transition-transform shadow-[0_0_12px_rgba(243,99,16,0.3)]">
-<span class="material-symbols-outlined text-[16px]">replay</span>
-<span>Reorder in 1-Click</span>
-</button>
-</div>
-</div>
+<div id="past-orders-list" class="space-y-space-md"></div>
 </div>
 <!-- QR Code Modal (Hidden by default) -->
 <div class="fixed inset-0 z-50 bg-surface-dim/80 backdrop-blur-md hidden items-center justify-center p-gutter" id="qr-modal">
@@ -414,9 +318,9 @@
   }
 
   function renderPastOrders(orders) {
-    if (orders.length === 0) return;
-    const container = document.getElementById('view-past');
-    const heading = container.querySelector('.flex.items-center.justify-between');
+    const list = document.getElementById('past-orders-list');
+    const cnt = document.getElementById('past-count'); if (cnt) cnt.textContent = orders.length ? '(' + orders.length + ')' : '';
+    if (orders.length === 0) { list.innerHTML = '<div class="bg-surface-charcoal rounded-xl p-space-md text-center font-body-md text-body-md text-text-secondary">Your past orders will show up here.</div>'; return; }
     const cards = orders.map((order) => {
       const placed = new Date(order.placedAt);
       const dateLabel = placed.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
@@ -443,7 +347,7 @@
         </div>
       </div>`;
     }).join('');
-    heading.insertAdjacentHTML('afterend', cards);
+    list.innerHTML = cards;
   }
 
   function reorderPast(orderId) {
@@ -455,8 +359,9 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     const orders = getOrders();
+    if (orders.length) document.getElementById('active-count').style.display = '';
     renderActiveOrder();
     renderPastOrders(orders.slice(1));
   });
-</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-8px_24px_rgba(0,0,0,0.55)]" data-active-classes="text-primary-container font-headline-md"><div class="h-16 px-gutter flex items-center justify-around"><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="home" href="home.html"><span class="material-symbols-outlined text-[24px]">local_fire_department</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="menu" href="menu.html"><span class="material-symbols-outlined text-[24px]">restaurant_menu</span><span class="font-label-caps text-label-caps">Menu</span></a><a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 transition-colors text-primary-container font-headline-md" data-path="orders" href="orders.html"><span class="material-symbols-outlined text-[24px]">receipt_long</span><span class="font-label-caps text-label-caps">Orders</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="favorites" href="#" onclick="event.preventDefault(); showToast('Favorites coming soon')"><span class="material-symbols-outlined text-[24px]">favorite</span><span class="font-label-caps text-label-caps">Favorites</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="account" href="account.html"><span class="material-symbols-outlined text-[24px]">account_circle</span><span class="font-label-caps text-label-caps">Account</span></a></div></nav><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}</script><script src="ptr.js"></script>
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-8px_24px_rgba(0,0,0,0.55)]" data-active-classes="text-primary-container font-headline-md"><div class="h-16 px-gutter flex items-center justify-around"><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="home" href="home.html"><span class="material-symbols-outlined text-[24px]">local_fire_department</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="menu" href="menu.html"><span class="material-symbols-outlined text-[24px]">restaurant_menu</span><span class="font-label-caps text-label-caps">Menu</span></a><a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 transition-colors text-primary-container font-headline-md" data-path="orders" href="orders.html"><span class="material-symbols-outlined text-[24px]">receipt_long</span><span class="font-label-caps text-label-caps">Orders</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="favorites" href="home.html#favorites"><span class="material-symbols-outlined text-[24px]">favorite</span><span class="font-label-caps text-label-caps">Favorites</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="account" href="account.html"><span class="material-symbols-outlined text-[24px]">account_circle</span><span class="font-label-caps text-label-caps">Account</span></a></div></nav><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}</script><script src="ptr.js"></script>
 </body></html>

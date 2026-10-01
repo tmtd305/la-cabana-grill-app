@@ -244,7 +244,7 @@ const CATEGORIES = [
 // Sides and extras: order on their own, or add to any plate from the dish screen.
 // PRICES ARE PLACEHOLDERS: confirm with the restaurant before launch.
 const SIDES_MENU = [
-  { id: "side-rice", name: "Side of White Rice", price: 3.5, category: "sides", desc: "Fluffy white jasmine rice" },
+  { id: "side-rice", name: "White Rice", price: 3.5, category: "sides", desc: "Fluffy white jasmine rice" },
   { id: "side-beans", name: "Colombian Red Beans", price: 4.5, category: "sides", desc: "Slow-cooked frijoles" },
   { id: "side-maduros", name: "Maduros", price: 4.5, category: "sides", desc: "Sweet fried plantains" },
   { id: "side-tostones", name: "Tostones", price: 4.5, category: "sides", desc: "Crispy green plantains" },
@@ -292,6 +292,8 @@ const TEST_ITEMS = [{ id: "test-penny", name: "Payment test (1 cent)", price: 0.
 const ALL_ITEMS = MENU.concat(JUICES, SIDES_MENU, PROMOS, TEST_ITEMS);
 // Members-only free juice + the "Join free" card. Off for now (everyone gets the free juice); set to true to bring it back.
 const MEMBER_PERKS = false;
+// Hold-to-talk (voice ordering) buttons. Hidden for now, nothing deleted; set to true to bring them back.
+const TALK_ENABLED = false;
 
 const RESTAURANT = {
   name: "La Cabaña Grill",

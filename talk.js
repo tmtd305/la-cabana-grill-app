@@ -576,10 +576,14 @@
   if (document.readyState === 'complete') setTimeout(warm, 800); else window.addEventListener('load', function () { setTimeout(warm, 800); });
 
   // Button markup helpers
+  var talkOn = typeof TALK_ENABLED === "undefined" || TALK_ENABLED;
+  if (!talkOn) { var hs = document.createElement("style"); hs.textContent = "[data-hold-talk]{display:none!important}"; document.head.appendChild(hs); }
   window.holdButtonHTML = function (id, small) {
+    if (!talkOn) return "";
     return '<button type="button" data-hold-talk="' + id + '" class="lc-hold' + (small ? ' sm' : '') + '" aria-label="Hold to order by voice">' + MIC_SVG + (small ? '' : 'Hold to talk') + '</button>';
   };
   window.talkButtonHTML = function (id, extraClass) {
+    if (!talkOn) return "";
     return '<button type="button" data-hold-talk="' + id + '" class="' + (extraClass || 'h-9 px-3 rounded-xl bg-surface-raised hover:bg-surface-elevated text-primary font-label-md text-label-md flex items-center gap-1.5 transition-colors') + '" aria-label="Hold to talk">' +
       '<span class="material-symbols-outlined text-[18px]">mic</span>Hold to talk</button>';
   };
