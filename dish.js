@@ -55,6 +55,12 @@
       "#dish .d-step button:disabled{opacity:.35}" +
       "#dish textarea{width:100%;background:#242424;border:1px solid rgba(255,255,255,.08);border-radius:12px;color:#F9FAFB;padding:12px;font-size:16px;resize:none}" +
       "#dish textarea:focus{outline:none;border-color:#f36310}" +
+      "#dish .d-recs,#upsell .d-recs{display:flex;gap:10px;overflow-x:auto;padding:6px 0 4px;scrollbar-width:none;scroll-snap-type:x mandatory}#dish .d-recs::-webkit-scrollbar{display:none}" +
+      ".d-rec{flex:0 0 132px;scroll-snap-align:start;background:#242424;border-radius:16px;overflow:hidden;cursor:pointer;position:relative}.d-rec img{width:100%;height:96px;object-fit:cover;display:block}.d-rec .d-rp{padding:8px 10px 10px}.d-rec .d-rn{color:#F9FAFB;font-size:13px;font-weight:600;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:31px}.d-rec .d-rpr{color:#ffb595;font-size:13px;font-weight:700;margin-top:4px}" +
+      ".d-rec .d-radd,.u-row .d-radd{position:absolute;top:66px;right:8px;width:30px;height:30px;border-radius:50%;background:#f36310;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,.4);transition:transform .15s}.d-radd.done{background:#10b981}.d-radd:active{transform:scale(.88)}" +
+      "#upsell{position:fixed;inset:0;z-index:95;display:flex;align-items:flex-end;justify-content:center}#upsell .u-bg{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;transition:opacity .25s}#upsell.open .u-bg{opacity:1}" +
+      "#upsell .u-panel{position:relative;width:100%;max-width:560px;background:#1A1A1A;border-radius:24px 24px 0 0;padding:18px 20px calc(16px + env(safe-area-inset-bottom,0px));transform:translateY(100%);transition:transform .28s cubic-bezier(.2,.8,.2,1)}#upsell.open .u-panel{transform:none}" +
+      ".u-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);position:relative;cursor:pointer}.u-row img{width:56px;height:56px;border-radius:12px;object-fit:cover}.u-row .d-radd{position:static;flex-shrink:0}" +
       "@media (min-width:768px){#dish{align-items:center}#dish .d-panel{border-radius:24px;max-height:88vh}}";
     document.head.appendChild(st);
   }
@@ -92,7 +98,10 @@
 
     html += '<div class="px-5 pb-6 -mt-6 relative">' +
       '<div class="flex items-start justify-between gap-3"><h3 class="font-headline-xl text-headline-xl text-text-primary">' + esc(item.name) + "</h3>" +
-      '<span class="font-headline-lg text-headline-lg text-primary font-bold shrink-0 pt-1">' + money(item.price) + "</span></div>" +
+      '<span class="shrink-0 pt-1 text-right"><span class="font-headline-lg text-headline-lg text-primary font-bold block">' + money(item.price) + "</span>" +
+        (item.was && item.was > item.price ? '<span class="block font-label-md text-label-md text-text-muted line-through">' + money(item.was) + '</span><span class="inline-block mt-1 px-2 py-0.5 rounded-md bg-colombian-red text-white font-label-caps text-label-caps font-bold">' + Math.round((1 - item.price / item.was) * 100) + '% OFF</span>' : "") +
+      "</span></div>" +
+      (item.deal ? '<div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-colombian-yellow/15 text-colombian-yellow font-label-md text-label-md font-bold"><span class="material-symbols-outlined text-[16px]">sell</span>' + esc(item.deal) + "</div>" : "") +
       (item.rating ? '<div class="flex items-center gap-1 mt-1 text-secondary font-label-md text-label-md"><span class="material-symbols-outlined text-[16px] text-colombian-yellow" style="font-variation-settings:\'FILL\' 1">star</span>' + esc(item.rating) + "</div>" : "") +
       '<p class="font-body-md text-body-md text-text-secondary mt-2">' + esc(item.desc) + "</p>";
 
@@ -116,13 +125,28 @@
       }).join("");
     }
 
+    // sides and extras anyone can add to a plate (rice, empanadas, maduros...)
+    var sidesMenu = (typeof SIDES_MENU !== "undefined" ? SIDES_MENU : []).filter(function (x) { return x.id !== item.id; });
+    if (sidesMenu.length && item.category !== "juice") {
+      html += sectionTitle("Add a side", "Optional") + sidesMenu.map(function (x) {
+        var n = state.addons[x.id] || 0;
+        return '<div class="d-opt" style="cursor:default"><div class="min-w-0"><div class="font-body-md text-body-md text-text-primary truncate">' + esc(x.name) + '</div><div class="font-label-md text-label-md text-text-muted">+' + money(x.price) + "</div></div>" +
+          '<div class="d-step"><button type="button" data-d="addon-" data-v="' + x.id + '" aria-label="Remove one"' + (n ? "" : " disabled") + '><span class="material-symbols-outlined text-[18px]">remove</span></button><span class="font-label-lg text-label-lg text-text-primary w-4 text-center">' + n + '</span><button type="button" data-d="addon+" data-v="' + x.id + '" aria-label="Add one"><span class="material-symbols-outlined text-[18px]">add</span></button></div></div>';
+      }).join("");
+    }
+
     var extras = juices().filter(function (j) { return j.id !== item.id; });
     if (extras.length) {
-      html += sectionTitle(isJuice ? "Add another juice" : "Add-ons", "Optional") + extras.map(function (j) {
+      html += sectionTitle(isJuice ? "Add another juice" : "Add a juice", "Optional") + extras.map(function (j) {
         var n = state.addons[j.id] || 0;
         return '<div class="d-opt" style="cursor:default"><div class="flex items-center gap-3 min-w-0"><img src="' + esc(j.img) + '" alt="" class="w-10 h-10 rounded-lg object-cover shrink-0"/><div class="min-w-0"><div class="font-body-md text-body-md text-text-primary truncate">' + esc(j.name) + '</div><div class="font-label-md text-label-md text-text-muted">+' + money(j.price) + "</div></div></div>" +
           '<div class="d-step"><button type="button" data-d="addon-" data-v="' + j.id + '" aria-label="Remove one"' + (n ? "" : " disabled") + '><span class="material-symbols-outlined text-[18px]">remove</span></button><span class="font-label-lg text-label-lg text-text-primary w-4 text-center">' + n + '</span><button type="button" data-d="addon+" data-v="' + j.id + '" aria-label="Add one"><span class="material-symbols-outlined text-[18px]">add</span></button></div></div>';
       }).join("");
+    }
+
+    var recs = recommendFor(item.id, 6);
+    if (recs.length) {
+      html += sectionTitle("Goes great with", "Recommended") + '<div class="d-recs">' + recs.map(recCard).join("") + "</div>";
     }
 
     html += sectionTitle("Special instructions", "Optional") +
@@ -164,6 +188,8 @@
       else if (a === "qty+") { state.qty = Math.min(50, state.qty + 1); refreshFooter(); }
       else if (a === "qty-") { state.qty = Math.max(1, state.qty - 1); refreshFooter(); }
       else if (a === "add") addNow();
+      else if (a === "rec") openDish(v);
+      else if (a === "recadd") quickAdd(t, v);
     });
     document.addEventListener("keydown", function (e) { if (e.key === "Escape" && state) closeDish(); });
     window.addEventListener("popstate", function () { if (state) { pushed = false; closeDish(); } });
@@ -179,8 +205,75 @@
     var note = state.note.trim().slice(0, 200);
     if (note) opts.note = note;
     if (navigator.vibrate) try { navigator.vibrate(12); } catch (e) {}
-    addToCart(state.item.id, state.qty, opts);
+    var added = state.item.id;
+    addToCart(added, state.qty, opts);
     closeDish();
+    setTimeout(function () { showUpsell(added); }, 320);
+  }
+
+  // Recommendations: pair each dish with what people usually add (street food, juices, other plates). Sale items first; skip what's already in the bag.
+  var PAIRS = { steak: ["streetfood", "juice", "seafood"], seafood: ["juice", "streetfood", "rice"], chicken: ["juice", "streetfood", "steak"],
+    rice: ["juice", "streetfood", "chicken"], streetfood: ["steak", "juice", "chicken"], juice: ["steak", "streetfood", "chicken"], sides: ["juice", "steak", "streetfood"] };
+  function recommendFor(id, n) {
+    var item = findItem(id); if (!item) return [];
+    var inBag = {}; try { (typeof getCart === "function" ? getCart() : []).forEach(function (c) { inBag[c.id] = 1; }); } catch (e) {}
+    var pool = (typeof MENU !== "undefined" ? MENU : []).concat(juices()).filter(function (x) { return x.img && x.id !== id && !inBag[x.id]; });
+    var score = function (x) { return (x.was ? 2 : 0) + (x.deal ? 1.5 : 0) + (x.badge ? 1 : 0) + (parseFloat(x.rating) || 0) / 10; };
+    var lists = (PAIRS[item.category] || ["juice", "steak"]).map(function (c) {
+      return pool.filter(function (x) { return x.category === c; }).sort(function (a, b) { return score(b) - score(a); });
+    });
+    var out = [];
+    for (var i = 0; out.length < n && i < 10; i++) lists.forEach(function (l) { if (l[i] && out.length < n) out.push(l[i]); });
+    return out;
+  }
+  window.recommendFor = recommendFor;
+
+  function recCard(x) {
+    return '<div class="d-rec" data-d="rec" data-v="' + x.id + '"><img src="' + esc(x.img) + '" alt="" loading="lazy"/>' +
+      '<button type="button" class="d-radd" data-d="recadd" data-v="' + x.id + '" aria-label="Add ' + esc(x.name) + '"><span class="material-symbols-outlined text-[18px]">add</span></button>' +
+      '<div class="d-rp"><div class="d-rn">' + esc(x.name) + '</div><div class="d-rpr">' + money(x.price) +
+      (x.was ? ' <span style="color:#6B7280;text-decoration:line-through;font-weight:500">' + money(x.was) + "</span>" : "") + "</div></div></div>";
+  }
+
+  function quickAdd(btn, id) {
+    addToCart(id, 1);
+    if (navigator.vibrate) try { navigator.vibrate(10); } catch (e) {}
+    btn.classList.add("done"); btn.querySelector("span").textContent = "check";
+    setTimeout(function () { btn.classList.remove("done"); btn.querySelector("span").textContent = "add"; }, 900);
+  }
+
+  // After adding: a short "Goes great with" sheet with 3 picks and a View cart button
+  window.showUpsell = function (id) {
+    var recs = recommendFor(id, 3), item = findItem(id);
+    if (!recs.length || !item) return;
+    injectStyles();
+    var el = document.getElementById("upsell");
+    if (!el) {
+      el = document.createElement("div"); el.id = "upsell"; el.setAttribute("role", "dialog"); document.body.appendChild(el);
+      el.addEventListener("click", function (e) {
+        var t = e.target.closest("[data-u]"); if (!t) return;
+        var a = t.getAttribute("data-u"), v = t.getAttribute("data-v");
+        if (a === "close") hideUpsell();
+        else if (a === "add") { e.stopPropagation(); quickAdd(t, v); }
+        else if (a === "open") { hideUpsell(); setTimeout(function () { openDish(v); }, 200); }
+      });
+    }
+    el.innerHTML = '<div class="u-bg" data-u="close"></div><div class="u-panel">' +
+      '<div class="flex items-center gap-2 mb-1"><span class="material-symbols-outlined text-emerald-400" style="font-variation-settings:\'FILL\' 1">check_circle</span><span class="font-title-sm text-title-sm text-text-primary">Added: ' + esc(item.name) + "</span></div>" +
+      '<div class="font-label-caps text-label-caps uppercase text-text-muted pt-2">Goes great with</div>' +
+      recs.map(function (x) {
+        return '<div class="u-row" data-u="open" data-v="' + x.id + '"><img src="' + esc(x.img) + '" alt=""/><div class="flex-1 min-w-0"><div class="font-body-md text-body-md text-text-primary truncate">' + esc(x.name) + '</div><div class="font-label-md text-label-md text-primary font-bold">' + money(x.price) +
+          (x.was ? ' <span class="text-text-muted line-through font-normal">' + money(x.was) + "</span>" : "") + (x.deal ? ' <span class="text-colombian-yellow font-normal">' + esc(x.deal) + "</span>" : "") + "</div></div>" +
+          '<button type="button" class="d-radd" data-u="add" data-v="' + x.id + '" aria-label="Add ' + esc(x.name) + '"><span class="material-symbols-outlined text-[18px]">add</span></button></div>';
+      }).join("") +
+      '<div class="flex gap-3 pt-4"><button type="button" data-u="close" class="flex-1 h-12 rounded-xl bg-surface-raised text-text-primary font-label-lg text-label-lg">Keep browsing</button>' +
+      '<a href="cart.html" class="flex-1 h-12 rounded-xl bg-primary-container text-white font-label-lg text-label-lg flex items-center justify-center gap-2"><span class="material-symbols-outlined text-[20px]">shopping_bag</span>View cart</a></div></div>';
+    el.style.display = "flex";
+    requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.add("open"); }); });
+  };
+  function hideUpsell() {
+    var el = document.getElementById("upsell"); if (!el) return;
+    el.classList.remove("open"); setTimeout(function () { el.style.display = "none"; }, 280);
   }
 
   window.openDish = function (id) {

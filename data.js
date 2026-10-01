@@ -241,7 +241,38 @@ const CATEGORIES = [
   { id: "streetfood", label: "Street Food", emoji: "🍔" }
 ];
 
-const ALL_ITEMS = MENU.concat(JUICES);
+// Sides and extras: order on their own, or add to any plate from the dish screen.
+// PRICES ARE PLACEHOLDERS: confirm with the restaurant before launch.
+const SIDES_MENU = [
+  { id: "side-rice", name: "Side of White Rice", price: 3.5, category: "sides", desc: "Fluffy white jasmine rice" },
+  { id: "side-beans", name: "Colombian Red Beans", price: 4.5, category: "sides", desc: "Slow-cooked frijoles" },
+  { id: "side-maduros", name: "Maduros", price: 4.5, category: "sides", desc: "Sweet fried plantains" },
+  { id: "side-tostones", name: "Tostones", price: 4.5, category: "sides", desc: "Crispy green plantains" },
+  { id: "side-yuca", name: "Yuca Frita", price: 4.99, category: "sides", desc: "Golden fried yuca" },
+  { id: "side-empanadas", name: "Empanadas (3)", price: 6.99, category: "sides", desc: "Crispy beef empanadas with ají" },
+  { id: "side-arepa", name: "Arepa con Queso", price: 4.5, category: "sides", desc: "Warm arepa with melted cheese" },
+  { id: "side-fries", name: "French Fries", price: 4.0, category: "sides", desc: "Crispy and salted" },
+  { id: "side-salad", name: "House Salad", price: 4.5, category: "sides", desc: "Fresh greens, tomato, onion" },
+  { id: "side-avocado", name: "Avocado", price: 3.0, category: "sides", desc: "Fresh sliced avocado" },
+  { id: "side-egg", name: "Fried Egg", price: 2.0, category: "sides", desc: "Sunny-side up" },
+  { id: "side-chicharron", name: "Chicharrón", price: 5.99, category: "sides", desc: "Crispy pork belly" }
+];
+CATEGORIES.push({ id: "sides", label: "Sides & Extras" });
+
+// SAMPLE SALES FOR TESTING (replace with real sales before launch).
+// was = regular price shown crossed out; deal = a special the dish qualifies for.
+const DEMO_SALES = {
+  "bandeja-paisa": { was: 27.99 },
+  "churrasco-a-la-parrilla": { was: 34.99 },
+  "carne-asada": { was: 24.99 },
+  "jalea-mixta": { deal: "Buy 2, get 1 free" },
+  "pollo-asado-la-cabana": { deal: "Family deal" },
+  "camaron-al-ajillo": { was: 25.99 },
+  "jugo-de-mango": { deal: "2 for $11" }
+};
+MENU.concat(JUICES).forEach(function (i) { if (DEMO_SALES[i.id]) Object.assign(i, DEMO_SALES[i.id]); });
+
+const ALL_ITEMS = MENU.concat(JUICES, SIDES_MENU);
 const RESTAURANT = {
   name: "La Cabaña Grill",
   address: "6780 Collins Ave, Miami Beach, FL",
