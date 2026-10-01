@@ -28,27 +28,10 @@
       </button>
 </div>
 </section>
-<!-- Hero Promo Banner Carousel Card -->
-<section class="relative w-full rounded-xl overflow-hidden bg-surface-charcoal shadow-xl">
-<div class="relative h-48 w-full overflow-hidden">
-<div class="absolute inset-0 bg-cover bg-center" data-alt="Trio of fresh chilled tropical South American juices including passionfruit, guanabana, and golden mango in tall frosted glasses on a warm wooden bar with atmospheric ambient backlighting and palm shadows, authentic Miami Latin grill style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCYrm2O8vYjVkQHl3g15-uFTsxIsc55-wx_sYi7qnfOZKSb0rnO-dUn3Frl182vsMKjKHKDaQ6kSlKDKB42KXrSUBc-URZFSVdZxUptvOdPs3403nofUPJaNsb4YOP6PiyGXaYcD7ulyUuNOhZcezxCnqLPfRoWaaazKGSwNddvKUJykOO3MwBaIf7ThMUH6q5Q7N4VYq0tfOqu7WGm0e5utdGYZSQiHbyAWZ9aYyjJIMbYlx_kXktL')"></div>
-<div class="absolute inset-0 bg-gradient-to-t from-surface-charcoal via-surface-charcoal/60 to-transparent"></div>
-<div class="absolute top-3 left-3 flex items-center gap-1.5 bg-primary-container/90 backdrop-blur-md px-2.5 py-1 rounded-full text-text-primary">
-<span class="material-symbols-outlined text-[14px]">local_offer</span>
-<span class="font-label-caps text-label-caps uppercase tracking-wider font-bold">Valid Today Only</span>
-</div>
-<div class="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
-<div class="max-w-[70%]">
-<span class="font-label-caps text-label-caps text-colombian-yellow uppercase tracking-wider block mb-0.5">La Cabaña Specialty</span>
-<h2 class="font-headline-md text-headline-md text-text-primary leading-tight">FREE Tropical Fruit Juice</h2>
-<p class="font-body-sm text-body-sm text-text-secondary line-clamp-1">With any signature Parrilla meal purchase</p>
-</div>
-<button onclick="window.location.href='menu.html?quick=specialty'" class="bg-primary-container hover:bg-secondary-container text-text-primary px-3.5 py-2 rounded-lg font-label-md text-label-md font-semibold transition-all shadow-md shrink-0 flex items-center gap-1 active:scale-95">
-<span>Claim</span>
-<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-</button>
-</div>
-</div>
+<!-- Promotions: swipe through today's sales -->
+<section id="lc-promos" class="w-full">
+<div class="flex items-baseline justify-between mb-2"><h3 class="lc-promo-h"><span class="material-symbols-outlined">sell</span>Promotions</h3><span class="lc-promo-n" id="lc-promo-n"></span></div>
+<div class="lc-promo-row" id="lc-promo-row"></div>
 </section>
 <section id="lc-reorder" class="w-full" style="display:none"></section>
 <!-- Full menu by section (sections switch as you scroll, like Uber Eats) -->
@@ -65,6 +48,21 @@
   .lc-chips::-webkit-scrollbar{display:none;}
   .lc-chip{all:unset;cursor:pointer;flex-shrink:0;padding:9px 15px;border-radius:999px;background:#1f1f1f;font:700 13px Manrope,sans-serif;color:#d1d1d1;transition:background .2s,color .2s,transform .2s;}
   .lc-chip.on{background:#fff;color:#131313;transform:scale(1.04);}
+  .lc-promo-h{display:flex;align-items:center;gap:6px;font:800 22px Outfit,sans-serif;color:#F9FAFB;}
+  .lc-promo-h .material-symbols-outlined{color:#4cc417;font-size:24px;}
+  .lc-promo-n{font:700 12px Manrope,sans-serif;color:#9CA3AF;}
+  .lc-promo-row{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:2px 16px 6px;scrollbar-width:none;}
+  .lc-promo-row::-webkit-scrollbar{display:none;}
+  .lc-promo{position:relative;flex:0 0 84%;height:190px;border-radius:20px;overflow:hidden;scroll-snap-align:center;background:#1A1A1A;box-shadow:0 12px 28px rgba(0,0,0,.45);cursor:pointer;}
+  .lc-promo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+  .lc-promo::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,10,.95) 10%,rgba(10,10,10,.55) 50%,rgba(10,10,10,0) 80%);}
+  .lc-promo-tag{position:absolute;top:10px;left:10px;z-index:2;padding:5px 10px;border-radius:999px;background:#4cc417;color:#0b1a00;font:800 12px Outfit,sans-serif;box-shadow:0 4px 14px rgba(76,196,23,.5);}
+  .lc-promo-body{position:absolute;left:14px;right:14px;bottom:12px;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;}
+  .lc-promo-body b{display:block;font:800 19px/1.15 Outfit,sans-serif;color:#fff;}
+  .lc-promo-body .pr{margin-top:3px;font:800 16px Manrope,sans-serif;color:#4cc417;}
+  .lc-promo-body .pr s{color:#9CA3AF;font-weight:600;font-size:13px;margin-left:6px;}
+  .lc-promo-body .pr small{display:block;color:#D1D5DB;font:600 12px Manrope,sans-serif;}
+  .lc-promo-body .lc-order{flex:0 0 auto;padding:10px 16px;}
   .lc-sec{scroll-margin-top:calc(140px + env(safe-area-inset-top,0px));}
   .lc-sec h3{font:800 22px Outfit,sans-serif;margin:20px 2px 12px;display:flex;align-items:baseline;gap:8px;color:#F9FAFB;}
   .lc-sec h3 span{font:600 12.5px Manrope,sans-serif;color:#9CA3AF;}
@@ -76,7 +74,7 @@
   .lc-card.press .lc-pic{transform:translateY(-4px) scale(1.03);box-shadow:0 22px 40px rgba(243,99,16,.35),0 0 0 2px rgba(243,99,16,.6);}
   .lc-card.press .lc-pic img{transform:scale(1.22);}
   .lc-off{position:absolute;top:10px;left:10px;z-index:2;font:900 12px Outfit,sans-serif;padding:5px 8px;border-radius:9px;background:#DC2626;color:#fff;box-shadow:0 4px 12px rgba(220,38,38,.5);}
-  .lc-deal{position:absolute;top:10px;left:10px;z-index:2;max-width:calc(100% - 20px);font:800 11px Outfit,sans-serif;letter-spacing:.02em;padding:5px 8px;border-radius:9px;background:#FBBF24;color:#2a1700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 12px rgba(251,191,36,.4);}
+  .lc-deal{position:absolute;top:10px;left:10px;z-index:2;max-width:calc(100% - 20px);font:800 11px Outfit,sans-serif;letter-spacing:.02em;padding:5px 8px;border-radius:9px;background:#4cc417;color:#0b1a00;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 12px rgba(76,196,23,.45);}
   .lc-off + .lc-deal{top:40px;}
   .lc-tag{position:absolute;top:10px;right:10px;z-index:2;font:800 9.5px Outfit,sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:4px 7px;border-radius:8px;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);color:#FBBF24;}
   .lc-mic{position:absolute;bottom:8px;left:8px;z-index:3;}
@@ -85,9 +83,10 @@
   .lc-info b{font:700 14.5px Outfit,sans-serif;line-height:1.2;color:#F9FAFB;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
   .lc-price{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;}
   .lc-price i{font-style:normal;font:800 16px Manrope,sans-serif;color:#ffb596;}
+  .lc-price i.sale{color:#4cc417;}
   .lc-price s{font:600 12.5px Manrope,sans-serif;color:#6B7280;}
-  .lc-price em{font-style:normal;font:800 11px Manrope,sans-serif;color:#a3e635;}
-  .lc-free{display:flex;align-items:center;gap:4px;font:700 11px Manrope,sans-serif;color:#a3e635;}
+  .lc-price em{font-style:normal;font:800 11px Manrope,sans-serif;color:#4cc417;}
+  .lc-free{display:flex;align-items:center;gap:4px;font:700 11px Manrope,sans-serif;color:#4cc417;}
   .lc-free .material-symbols-outlined{font-size:15px;}
   .lc-btns{display:flex;gap:6px;margin-top:auto;padding-top:3px;}
   .lc-order{all:unset;cursor:pointer;flex:1;text-align:center;padding:9px 0;border-radius:12px;background:#f36310;color:#fff;font:800 13px Manrope,sans-serif;box-shadow:0 6px 16px rgba(243,99,16,.4);transition:transform .12s;}
@@ -120,7 +119,7 @@
       (it.badge ? '<span class="lc-tag">' + esc(it.badge) + '</span>' : '') +
       '<img src="' + esc(it.img) + '" alt="' + esc(it.name) + '" loading="lazy"/><div class="lc-mic">' + mic(it.id) + '</div></div>' +
       '<div class="lc-info"><b>' + esc(it.name) + '</b>' +
-      '<div class="lc-price"><i>' + money(it.price) + '</i>' + (off ? '<s>' + money(it.was) + '</s>' : '') + '</div>' +
+      '<div class="lc-price"><i' + (off ? ' class="sale"' : '') + '>' + money(it.price) + '</i>' + (off ? '<s>' + money(it.was) + '</s>' : '') + '</div>' +
       (freeJuice ? '<div class="lc-free"><span class="material-symbols-outlined">local_drink</span>Free juice included</div>' : '') +
       '<div class="lc-btns"><button class="lc-order" data-order="' + it.id + '">Order now</button><button class="lc-add" data-add="' + it.id + '" aria-label="Quick add ' + esc(it.name) + '"><span class="material-symbols-outlined">add</span></button></div></div></div>';
   }
@@ -178,6 +177,25 @@
     b.classList.toggle('on', b.dataset.m === mode);
     b.onclick = () => { localStorage.setItem('lacabana_mode', b.dataset.m); document.querySelectorAll('#lc-mode button').forEach(x => x.classList.toggle('on', x === b)); };
   });
+
+
+  // Promotions: every dish on sale or with a deal, plus the free juice offer
+  {
+    const promos = ALL_ITEMS.filter(i => (i.was && i.was > i.price) || i.deal);
+    const pc = it => {
+      const off = it.was && it.was > it.price;
+      return '<div class="lc-promo" data-dish="' + it.id + '"><img src="' + esc(it.img) + '" alt="" loading="lazy"/>' +
+        '<span class="lc-promo-tag">' + esc(it.deal || 'On sale') + '</span>' +
+        '<div class="lc-promo-body"><div class="min-w-0"><b>' + esc(it.name) + '</b><div class="pr">' + money(it.price) + (off ? '<s>' + money(it.was) + '</s>' : '') +
+        (it.category !== 'juice' ? '<small>Free juice included</small>' : '') + '</div></div>' +
+        '<button class="lc-order" data-order="' + it.id + '">Order now</button></div></div>';
+    };
+    const juice = (typeof JUICES !== 'undefined' && JUICES[0]) || null;
+    const freeCard = juice ? '<div class="lc-promo" onclick="document.querySelector(\'.lc-chip[data-c=steak]\').click()"><img src="' + esc(juice.img) + '" alt="" loading="lazy"/><span class="lc-promo-tag">Every plate</span>' +
+      '<div class="lc-promo-body"><div class="min-w-0"><b>Free natural juice</b><div class="pr">With every plate<small>Lulo, guanábana, mango or piña</small></div></div></div></div>' : '';
+    document.getElementById('lc-promo-row').innerHTML = promos.map(pc).join('') + freeCard;
+    document.getElementById('lc-promo-n').textContent = (promos.length + (freeCard ? 1 : 0)) + ' deals';
+  }
 
   // Order again: your last real order, one tap
   try {
