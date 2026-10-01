@@ -22,12 +22,34 @@
 <span>Map</span>
 </button>
 </div>
+<!-- Pickup or delivery (delivery by Uber Direct) -->
+<section class="bg-surface-container rounded-xl p-space-md shadow-md flex flex-col gap-space-sm" id="fulfillCard">
+<h2 class="font-headline-md text-headline-md text-text-primary">How do you want it?</h2>
+<div class="grid grid-cols-2 p-1 bg-surface-container-lowest rounded-xl gap-1" id="fulfillToggle">
+<button type="button" data-f="pickup" class="py-2.5 rounded-lg font-label-lg text-label-lg flex items-center justify-center gap-1.5 transition-all"><span class="material-symbols-outlined text-[18px]">storefront</span>Pickup</button>
+<button type="button" data-f="delivery" class="py-2.5 rounded-lg font-label-lg text-label-lg flex items-center justify-center gap-1.5 transition-all"><span class="material-symbols-outlined text-[18px]">two_wheeler</span>Delivery</button>
+</div>
+<div id="deliveryForm" class="hidden flex flex-col gap-2 pt-1">
+<div class="grid grid-cols-2 gap-2">
+<input id="d-name" type="text" autocomplete="name" placeholder="Your name" class="h-11 rounded-xl bg-surface-container-low px-3 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
+<input id="d-phone" type="tel" autocomplete="tel" placeholder="Phone" class="h-11 rounded-xl bg-surface-container-low px-3 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
+</div>
+<input id="d-street" type="text" autocomplete="address-line1" placeholder="Street address" class="h-11 rounded-xl bg-surface-container-low px-3 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
+<div class="grid gap-2" style="grid-template-columns:1fr 1.5fr .9fr">
+<input id="d-apt" type="text" autocomplete="address-line2" placeholder="Apt / unit" class="h-11 rounded-xl bg-surface-container-low px-3 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
+<input id="d-city" type="text" autocomplete="address-level2" placeholder="City" value="Miami Beach" class="h-11 rounded-xl bg-surface-container-low px-3 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
+<input id="d-zip" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="ZIP" maxlength="5" class="h-11 rounded-xl bg-surface-container-low px-3 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
+</div>
+<input id="d-notes" type="text" placeholder="Notes for the driver (gate code, floor...)" maxlength="200" class="h-11 rounded-xl bg-surface-container-low px-3 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
+<div id="d-quote" class="rounded-xl bg-surface-container-low p-3 flex items-center gap-3 font-body-md text-body-md text-text-secondary"><span class="material-symbols-outlined text-[20px]" style="color:#4cc417">two_wheeler</span><span id="d-quote-text">Enter your address to see the delivery price.</span></div>
+</div>
+</section>
 <!-- Timing Selection Card -->
 <section class="bg-surface-container rounded-xl p-space-md shadow-md flex flex-col gap-space-md">
 <div class="flex items-center justify-between">
 <div class="flex items-center gap-space-xs">
 <span class="material-symbols-outlined text-primary-container text-[20px]">schedule</span>
-<h2 class="font-headline-md text-headline-md text-text-primary">Pickup Timing</h2>
+<h2 class="font-headline-md text-headline-md text-text-primary" id="timingTitle">Pickup Timing</h2>
 </div>
 <span class="font-body-sm text-body-sm text-colombian-yellow font-semibold flex items-center gap-1">
 <span class="material-symbols-outlined text-[14px]">local_fire_department</span> High Sizzle Time
@@ -60,7 +82,7 @@
       </button>
 </div>
 <!-- Handover method: Counter vs Curbside -->
-<div class="grid grid-cols-2 gap-space-sm pt-space-xs">
+<div class="grid grid-cols-2 gap-space-sm pt-space-xs" id="handoverMethod">
 <label class="cursor-pointer bg-surface-container-low has-[:checked]:bg-surface-raised rounded-xl p-space-sm flex items-center gap-space-xs transition-colors">
 <input checked="" class="accent-primary-container w-4 h-4" name="pickup_mode" type="radio" value="counter"/>
 <div class="min-w-0">
@@ -182,6 +204,7 @@
         </span>
 <span class="font-medium" id="summaryDiscountValue">-$0.00</span>
 </div>
+<div class="flex justify-between items-center font-body-md text-body-md text-text-secondary hidden" id="delivery-row"><span>Delivery (Uber)</span><span class="text-text-primary font-medium" id="summaryDeliveryValue">$0.00</span></div>
 <div class="flex justify-between items-center text-text-secondary font-body-md text-body-md">
 <span>Taxes &amp; Local Fees</span>
 <span class="text-text-primary font-medium" id="summaryTaxesValue">$0.00</span>
@@ -274,6 +297,51 @@
     renderSummary();
   }
 
+
+  // ---------- Pickup or delivery (Uber Direct) ----------
+  let fulfillment = 'pickup', quote = null, quoteError = '', quoteAt = 0, quoteKey = '';
+  const val = id => (document.getElementById(id).value || '').trim();
+  const deliveryAddress = () => ({ street: val('d-street'), apt: val('d-apt'), city: val('d-city') || 'Miami Beach', state: 'FL', zip: val('d-zip') });
+  const deliveryFee = () => (fulfillment === 'delivery' && quote ? quote.fee : 0);
+  function paintFulfill() {
+    document.querySelectorAll('#fulfillToggle button').forEach(b => {
+      const on = b.dataset.f === fulfillment;
+      b.className = 'py-2.5 rounded-lg font-label-lg text-label-lg flex items-center justify-center gap-1.5 transition-all ' + (on ? 'bg-primary-container text-white shadow-md' : 'text-text-muted');
+    });
+    document.getElementById('deliveryForm').classList.toggle('hidden', fulfillment !== 'delivery');
+    document.getElementById('timingTitle').textContent = fulfillment === 'delivery' ? 'Delivery Timing' : 'Pickup Timing';
+    document.getElementById('handoverMethod').classList.toggle('hidden', fulfillment === 'delivery');
+    renderSummary();
+  }
+  function setQuoteText(t, good) {
+    const el = document.getElementById('d-quote-text');
+    el.innerHTML = t; el.style.color = good ? '#F9FAFB' : '';
+  }
+  async function getQuote() {
+    const a = deliveryAddress();
+    if (!a.street || a.zip.length < 5) { quote = null; setQuoteText('Enter your address to see the delivery price.'); renderSummary(); return; }
+    const key = JSON.stringify(a);
+    if (quote && key === quoteKey && Date.now() - quoteAt < 10 * 60000) return;
+    setQuoteText('Checking delivery price…');
+    try {
+      const r = await fetch('/api/uber-direct', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'quote', address: a }) });
+      const d = await r.json().catch(() => ({ error: 'Delivery isn\'t available right now. Choose pickup.' }));
+      if (!r.ok) throw new Error(d.error || 'We can\'t deliver there');
+      quote = d; quoteKey = key; quoteAt = Date.now(); quoteError = '';
+      setQuoteText('<b style="color:#4cc417">$' + d.fee.toFixed(2) + '</b> delivery by Uber' + (d.etaMinutes ? ' · about ' + d.etaMinutes + ' min' : ''), true);
+    } catch (e) { quote = null; quoteError = e.message; setQuoteText(e.message); }
+    renderSummary();
+  }
+  async function ensureFreshQuote() { if (!quote || Date.now() - quoteAt > 10 * 60000) { quoteAt = 0; await getQuote(); } if (!quote) throw new Error(quoteError || 'Delivery price unavailable'); }
+  document.querySelectorAll('#fulfillToggle button').forEach(b => b.onclick = () => { fulfillment = b.dataset.f; try { localStorage.setItem('lacabana_mode', fulfillment); } catch (x) {} paintFulfill(); if (fulfillment === 'delivery') getQuote(); });
+  ['d-street', 'd-apt', 'd-city', 'd-zip'].forEach(id => document.getElementById(id).addEventListener('change', getQuote));
+  document.getElementById('d-zip').addEventListener('input', e => { if (e.target.value.length === 5) getQuote(); });
+  try {   // prefill from the customer's profile
+    const acc = typeof getAccount === 'function' ? getAccount() : null;
+    if (acc) { document.getElementById('d-name').value = acc.name || ''; document.getElementById('d-phone').value = acc.phone || ''; if (acc.address) document.getElementById('d-street').value = acc.address.split(',')[0]; }
+    if (localStorage.getItem('lacabana_mode') === 'delivery') fulfillment = 'delivery';
+  } catch (x) {}
+
   function renderSummary() {
     const lines = cartLines();
     const totals = computeTotals(lines);
@@ -305,7 +373,10 @@
     document.getElementById('summaryTaxesValue').textContent = '$' + totals.taxes.toFixed(2);
     document.getElementById('summaryTipValue').textContent = '$' + currentTip.toFixed(2);
 
-    const total = (totals.subtotal - totals.discount + totals.taxes + currentTip);
+    const dFee = deliveryFee();
+    document.getElementById('delivery-row').classList.toggle('hidden', fulfillment !== 'delivery');
+    document.getElementById('summaryDeliveryValue').textContent = dFee ? '$' + dFee.toFixed(2) : '—';
+    const total = (totals.subtotal - totals.discount + totals.taxes + currentTip + dFee);
     document.getElementById('summaryTotalValue').textContent = '$' + total.toFixed(2);
     document.getElementById('btnTotalText').textContent = '$' + total.toFixed(2);
   }
@@ -348,6 +419,7 @@
     });
 
     document.getElementById('placeOrderBtn').addEventListener('click', handlePlaceOrderClick);
+    paintFulfill(); if (fulfillment === 'delivery') getQuote();
 
     document.addEventListener('DOMContentLoaded', () => { renderCartPage(); initSquarePayments(); });
     renderCartPage();
@@ -376,6 +448,10 @@
 
   async function handlePlaceOrderClick() {
     if (cartLines().length === 0) { showToast('Your cart is empty'); return; }
+    if (fulfillment === 'delivery') {
+      if (!val('d-name') || !val('d-phone') || !val('d-street') || !val('d-zip')) { showToast('Add your name, phone and address for delivery'); return; }
+      if (!quote) { showToast(quoteError || 'Getting your delivery price, try again in a second'); getQuote(); return; }
+    }
     if (!squareCard) { showToast('Payment form is still loading, try again in a moment'); return; }
 
     const btn = document.getElementById('placeOrderBtn');
@@ -393,7 +469,8 @@
 
       const lines = cartLines();
       const totals = computeTotals(lines);
-      const total = +(totals.subtotal - totals.discount + totals.taxes + currentTip).toFixed(2);
+      if (fulfillment === 'delivery') await ensureFreshQuote();
+      const total = +(totals.subtotal - totals.discount + totals.taxes + currentTip + deliveryFee()).toFixed(2);
 
       const res = await fetch('/api/process-payment', {
         method: 'POST',
@@ -405,7 +482,22 @@
         throw new Error(data.error || 'Payment failed');
       }
 
-      const order = placeOrder(currentTip);
+      // delivery: book the Uber driver now that the card is charged
+      let delivery = null;
+      if (fulfillment === 'delivery') {
+        const a = deliveryAddress();
+        delivery = { fee: deliveryFee(), address: a, name: val('d-name'), phone: val('d-phone'), notes: val('d-notes'), etaMinutes: quote.etaMinutes };
+        btn.innerHTML = '<span class="w-full text-center">Calling your driver…</span>';
+        try {
+          const dr = await fetch('/api/uber-direct', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+            action: 'create', quote, paymentId: data.paymentId, address: a, name: delivery.name, phone: delivery.phone, notes: delivery.notes,
+            items: lines.map(l => ({ name: l.item.name, qty: l.qty })), orderId: 'app' }) });
+          const dd = await dr.json().catch(() => ({}));
+          if (dr.ok && dd.trackingUrl) { delivery.trackingUrl = dd.trackingUrl; delivery.deliveryId = dd.deliveryId; }
+          else delivery.error = dd.error || 'Driver not booked yet';
+        } catch (x) { delivery.error = 'Driver not booked yet'; }
+      }
+      const order = placeOrder(currentTip, { delivery });
       if (order) window.location.href = 'orders.html';
     } catch (err) {
       errorsEl.textContent = err.message;

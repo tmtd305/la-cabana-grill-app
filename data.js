@@ -288,6 +288,9 @@ const PROMOS = [
     img: "images/arepa-rellena.jpg" }
 ];
 const ALL_ITEMS = MENU.concat(JUICES, SIDES_MENU, PROMOS);
+// Members-only free juice + the "Join free" card. Off for now (everyone gets the free juice); set to true to bring it back.
+const MEMBER_PERKS = false;
+
 const RESTAURANT = {
   name: "La Cabaña Grill",
   address: "6780 Collins Ave, Miami Beach, FL",

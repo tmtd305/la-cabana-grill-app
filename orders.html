@@ -375,6 +375,16 @@
     document.getElementById('order-placed-label').textContent = '• Placed ' + fmt(placed);
     document.getElementById('order-eta-time').textContent = fmt(eta);
     document.getElementById('order-eta-label').textContent = minsLeft > 0 ? ('Estimated Pickup • ' + minsLeft + ' mins left') : 'Ready for pickup now';
+    // delivery by Uber Direct: tracking link (or a note if the driver still needs to be booked)
+    let dBox = document.getElementById('lc-delivery-box');
+    if (!dBox) { dBox = document.createElement('div'); dBox.id = 'lc-delivery-box'; dBox.style.marginTop = '12px'; document.getElementById('order-eta-label').parentElement.appendChild(dBox); }
+    if (order.fulfillment === 'delivery' && order.delivery) {
+      const dv = order.delivery;
+      document.getElementById('order-eta-label').textContent = 'Delivery by Uber' + (dv.etaMinutes ? ' • about ' + dv.etaMinutes + ' min' : '');
+      dBox.innerHTML = dv.trackingUrl
+        ? '<a href="' + dv.trackingUrl + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:12px;background:#f36310;color:#fff;font:700 14px Manrope,sans-serif;text-decoration:none"><span class="material-symbols-outlined" style="font-size:18px">two_wheeler</span>Track your driver</a>'
+        : '<p style="font:600 13px Manrope,sans-serif;color:#FBBF24">We\'re booking your driver. We\'ll text you the tracking link.</p>';
+    } else dBox.innerHTML = '';
     document.getElementById('order-details-heading').textContent = 'Order Details (' + order.lines.reduce((n, l) => n + l.qty, 0) + ' Items)';
     document.getElementById('order-details-total').textContent = '$' + (order.subtotal - order.discount).toFixed(2);
     document.getElementById('qr-order-label').textContent = '#' + order.id + ' • SOUTH BEACH';

@@ -93,7 +93,7 @@ function cartLines() {
 
 function hasFreeJuicePromo(lines) {
   // members only; dishes already on sale or on a deal don't earn the free juice
-  if (typeof hasAccount === "function" && !hasAccount()) return false;
+  if (typeof MEMBER_PERKS !== "undefined" && MEMBER_PERKS && typeof hasAccount === "function" && !hasAccount()) return false;
   return lines.some((l) => l.item.specialty && !(l.item.was > l.item.price) && !l.item.deal);
 }
 
@@ -133,11 +133,12 @@ function showToast(message) {
   }, 2200);
 }
 
-function placeOrder(tipAmount) {
+function placeOrder(tipAmount, extra) {
   const lines = cartLines();
   if (lines.length === 0) return null;
   const totals = computeTotals(lines);
-  const total = +(totals.subtotal - totals.discount + totals.taxes + tipAmount).toFixed(2);
+  const deliveryFee = extra && extra.delivery ? extra.delivery.fee || 0 : 0;
+  const total = +(totals.subtotal - totals.discount + totals.taxes + tipAmount + deliveryFee).toFixed(2);
   const order = {
     id: "LC-" + Math.floor(1000 + Math.random() * 9000),
     placedAt: new Date().toISOString(),
@@ -147,7 +148,9 @@ function placeOrder(tipAmount) {
     taxes: totals.taxes,
     tip: tipAmount,
     total,
-    status: "queued"
+    status: "queued",
+    fulfillment: extra && extra.delivery ? "delivery" : "pickup",
+    delivery: extra && extra.delivery ? extra.delivery : null
   };
   const orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
   orders.unshift(order);

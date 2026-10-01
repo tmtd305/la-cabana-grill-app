@@ -124,7 +124,7 @@
     }
 
     var onSale = (item.was && item.was > item.price) || item.deal;   // sale items don't come with the free juice
-    var member = typeof hasAccount !== "function" || hasAccount();   // staff screens have no account.js: always allowed
+    var member = typeof MEMBER_PERKS === "undefined" || !MEMBER_PERKS || typeof hasAccount !== "function" || hasAccount();   // staff screens have no account.js: always allowed
     if (!isJuice && !onSale && !member) {
       html += sectionTitle("Free juice for members", "<span style=\"color:#4cc417\">Free</span>") +
         '<a href="account.html?join=1" class="d-opt" style="text-decoration:none"><span class="flex items-center gap-3"><span class="material-symbols-outlined" style="color:#4cc417">local_drink</span><span><span class="font-body-md text-body-md text-text-primary block">Join free to get a juice with this meal</span><span class="font-label-md text-label-md text-text-muted">Lulo, guanábana, mango or piña</span></span></span><span class="material-symbols-outlined text-text-muted">chevron_right</span></a>';

@@ -201,7 +201,7 @@
   const money = n => '$' + Number(n).toFixed(2);
   const cats = ORDER.filter(c => ALL_ITEMS.some(i => i.category === c));
   const mic = id => window.holdButtonHTML ? holdButtonHTML(id) : '';
-  const isMember = typeof hasAccount === 'function' && hasAccount();
+  const isMember = !MEMBER_PERKS || (typeof hasAccount === 'function' && hasAccount());
   function card(it) {
     const off = it.was && it.was > it.price ? Math.round((1 - it.price / it.was) * 100) : 0;
     const freeJuice = it.category !== 'juice' && !off && !it.deal;   // no free juice on items already on sale
@@ -343,8 +343,8 @@
   }
 
 
-  // Membership card: join to get a free juice with every meal
-  {
+  // Membership card: join to get a free juice with every meal (hidden while MEMBER_PERKS is off)
+  if (MEMBER_PERKS) {
     const a = typeof getAccount === 'function' ? getAccount() : null, j = (typeof JUICES !== 'undefined' && JUICES[2]) || {};
     document.getElementById('lc-member').innerHTML = a
       ? '<div class="lc-mb"><img src="' + esc(j.img || '') + '" alt=""/><div class="min-w-0"><div class="lc-mb-k">Member</div><h4>Hi ' + esc((a.name || '').split(' ')[0]) + ', your juice is on us</h4><p>A free natural juice comes with every meal.</p></div></div>'
