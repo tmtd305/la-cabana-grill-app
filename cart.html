@@ -298,6 +298,9 @@
   }
 
 
+  // ?test=1 puts only the hidden 1-cent test item in the cart (to check real payments reach Square)
+  if (/[?&]test=1/.test(location.search)) { try { clearCart(); addToCart('test-penny', 1); localStorage.setItem('lacabana_mode', 'pickup'); history.replaceState(null, '', 'cart.html'); } catch (x) {} }
+
   // ---------- Pickup or delivery (Uber Direct) ----------
   let fulfillment = 'pickup', quote = null, quoteError = '', quoteAt = 0, quoteKey = '';
   const val = id => (document.getElementById(id).value || '').trim();
