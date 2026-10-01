@@ -56,12 +56,8 @@
   .lc-promo{flex:0 0 80%;border-radius:20px;overflow:hidden;scroll-snap-align:center;background:#1c1b1b;box-shadow:0 12px 28px rgba(0,0,0,.45);cursor:pointer;display:flex;flex-direction:column;}
   .lc-promo-pic{position:relative;height:160px;overflow:hidden;}
   .lc-promo-pic img{width:100%;height:100%;object-fit:cover;display:block;}
-  .lc-promo-tag{position:absolute;left:12px;bottom:12px;display:flex;flex-direction:column;gap:3px;padding:9px 16px 10px 15px;border-radius:16px;background:linear-gradient(135deg,rgba(14,14,14,.78),rgba(14,14,14,.42));-webkit-backdrop-filter:blur(16px) saturate(170%);backdrop-filter:blur(16px) saturate(170%);border:1px solid rgba(255,255,255,.14);box-shadow:0 14px 34px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12);overflow:hidden;}
-  .lc-promo-tag::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:#4cc417;box-shadow:0 0 12px #4cc417;}
-  .lc-promo-tag::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.18),transparent);transform:skewX(-18deg);animation:lcSheen 4.5s ease-in-out infinite;}
-  @keyframes lcSheen{0%,60%{left:-60%}100%{left:130%}}
-  .lc-promo-tag em{font-style:normal;font:800 10px/1 Outfit,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#4cc417;}
-  .lc-promo-tag strong{font:900 24px/1 Outfit,sans-serif;letter-spacing:-.02em;color:#fff;}
+  .lc-promo-tag{position:absolute;top:10px;left:10px;display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:999px;background:rgba(12,12,12,.55);-webkit-backdrop-filter:blur(12px) saturate(160%);backdrop-filter:blur(12px) saturate(160%);border:1px solid rgba(255,255,255,.14);font:700 11.5px/1 Manrope,sans-serif;color:#fff;letter-spacing:.01em;}
+  .lc-promo-tag i{width:6px;height:6px;border-radius:50%;background:#4cc417;box-shadow:0 0 8px #4cc417;}
   .lc-promo-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:3px;flex:1;}
   .lc-promo-body b{font:800 18px/1.15 Outfit,sans-serif;color:#fff;}
   .lc-promo-body .pr{font:800 17px Manrope,sans-serif;color:#4cc417;}
@@ -187,13 +183,7 @@
   // Promotions: every dish on sale or with a deal, plus the free juice offer
   {
     const promos = typeof PROMOS !== 'undefined' ? PROMOS : [];
-    // "2 for $49.99" -> small "2 for" over a big "$49.99"; "Buy 1, get 1 half off" -> "Buy 1 get 1" over "Half off"
-    const tag = (deal, top) => {
-      let t = top || 'Deal', m = deal, x;
-      if ((x = /^(\d+) for (\$[\d.]+)$/i.exec(deal))) { t = x[1] + ' for'; m = x[2]; }
-      else if ((x = /^buy (\d+),? get (\d+) (.+)$/i.exec(deal))) { t = 'Buy ' + x[1] + ' get ' + x[2]; m = x[3]; }
-      return '<span class="lc-promo-tag"><em>' + esc(t) + '</em><strong>' + esc(m.replace(/^./, c => c.toUpperCase())) + '</strong></span>';
-    };
+    const tag = deal => '<span class="lc-promo-tag"><i></i>' + esc(deal) + '</span>';
     const pc = it => {
       const off = it.was && it.was > it.price;
       return '<div class="lc-promo" data-dish="' + it.id + '"><div class="lc-promo-pic"><img src="' + esc(it.img) + '" alt="" loading="lazy"/>' +
@@ -203,7 +193,7 @@
         '<button class="lc-order" data-order="' + it.id + '">Order now</button></div></div>';
     };
     const juice = (typeof JUICES !== 'undefined' && JUICES[0]) || null;
-    const freeCard = juice ? '<div class="lc-promo" onclick="document.querySelector(\'.lc-chip[data-c=steak]\').click()"><div class="lc-promo-pic"><img src="' + esc(juice.img) + '" alt="" loading="lazy"/>' + tag('Free', 'With every plate') + '</div>' +
+    const freeCard = juice ? '<div class="lc-promo" onclick="document.querySelector(\'.lc-chip[data-c=steak]\').click()"><div class="lc-promo-pic"><img src="' + esc(juice.img) + '" alt="" loading="lazy"/>' + tag('Free with every plate') + '</div>' +
       '<div class="lc-promo-body"><b>Free natural juice</b><div class="pr">With every plate</div><small>Lulo, guanábana, mango or piña</small><button class="lc-order">See the menu</button></div></div>' : '';
     document.getElementById('lc-promo-row').innerHTML = promos.map(pc).join('') + freeCard;
     document.getElementById('lc-promo-n').textContent = (promos.length + (freeCard ? 1 : 0)) + ' deals';
