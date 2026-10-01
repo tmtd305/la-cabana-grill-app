@@ -272,6 +272,9 @@ const DEMO_SALES = {
 };
 MENU.concat(JUICES).forEach(function (i) { if (DEMO_SALES[i.id]) Object.assign(i, DEMO_SALES[i.id]); });
 
+// DRAFTS: dishes we sell but keep hidden from the app for now (remove the id to show it again)
+const DRAFT_IDS = ["chicken-waffle"];
+for (let i = MENU.length - 1; i >= 0; i--) if (DRAFT_IDS.includes(MENU[i].id)) MENU.splice(i, 1);
 const ALL_ITEMS = MENU.concat(JUICES, SIDES_MENU);
 const RESTAURANT = {
   name: "La Cabaña Grill",

@@ -120,7 +120,7 @@
     }
 
     if (!isJuice) {
-      html += sectionTitle("Add your free drink", "Free") + DRINKS.map(function (d) {
+      html += sectionTitle("Add your free drink", "<span style=\"color:#a3e635\">Free</span>") + DRINKS.map(function (d) {
         return '<div class="d-opt' + (state.drink === d ? " sel" : "") + '" data-d="drink" data-v="' + esc(d) + '"><span class="font-body-md text-body-md text-text-primary">' + esc(d) + '</span><span class="flex items-center gap-3"><span class="font-label-md text-label-md text-text-muted">' + (d === "No Drink" ? "" : "Free") + '</span><span class="d-radio"></span></span></div>';
       }).join("");
     }

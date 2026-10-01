@@ -29,11 +29,14 @@
   function skip(t) {
     return !t || !t.closest || !!t.closest('input,textarea,select,[contenteditable="true"],[data-no-ptr],[data-hold-talk],#dish,#upsell,[role="dialog"]');
   }
+  // true when a newer version of the app was just downloaded
   async function checkUpdate() {
     try {
       var reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
-      if (reg) await Promise.race([reg.update(), new Promise(function (r) { setTimeout(r, 1500); })]);
-    } catch (e) {}
+      if (!reg) return false;
+      await Promise.race([reg.update(), new Promise(function (r) { setTimeout(r, 2500); })]);
+      return !!(reg.installing || reg.waiting);
+    } catch (e) { return false; }
   }
   document.addEventListener('touchstart', function (e) {
     startY = null; active = false; armed = false;
@@ -62,7 +65,12 @@
     if (!active) return; active = false;
     if (!armed) { show(0, true); return; }
     busy = true; show(56, true); spin.style.animation = 'lcPtrSpin .7s linear infinite';
-    checkUpdate().then(function () { location.reload(); });
+    // refresh in place (no blank page); only reload when there's a new version of the app
+    Promise.all([checkUpdate(), new Promise(function (r) { setTimeout(r, 700); })]).then(async function (res) {
+      if (res[0]) { document.body.style.transition = 'opacity .15s'; document.body.style.opacity = '0'; setTimeout(function () { location.reload(); }, 160); return; }
+      try { if (window.lcOnRefresh) await window.lcOnRefresh(); } catch (x) {}
+      spin.style.animation = ''; show(0, true); busy = false;
+    });
   }
   document.addEventListener('touchend', end, { capture: true });
   document.addEventListener('touchcancel', end, { capture: true });
