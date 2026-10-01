@@ -53,16 +53,16 @@
   .lc-promo-n{font:700 12px Manrope,sans-serif;color:#9CA3AF;}
   .lc-promo-row{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:2px 16px 6px;scrollbar-width:none;}
   .lc-promo-row::-webkit-scrollbar{display:none;}
-  .lc-promo{position:relative;flex:0 0 84%;height:190px;border-radius:20px;overflow:hidden;scroll-snap-align:center;background:#1A1A1A;box-shadow:0 12px 28px rgba(0,0,0,.45);cursor:pointer;}
-  .lc-promo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
-  .lc-promo::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,10,.95) 10%,rgba(10,10,10,.55) 50%,rgba(10,10,10,0) 80%);}
-  .lc-promo-tag{position:absolute;top:10px;left:10px;z-index:2;padding:5px 10px;border-radius:999px;background:#4cc417;color:#0b1a00;font:800 12px Outfit,sans-serif;box-shadow:0 4px 14px rgba(76,196,23,.5);}
-  .lc-promo-body{position:absolute;left:14px;right:14px;bottom:12px;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;}
-  .lc-promo-body b{display:block;font:800 19px/1.15 Outfit,sans-serif;color:#fff;}
-  .lc-promo-body .pr{margin-top:3px;font:800 16px Manrope,sans-serif;color:#4cc417;}
+  .lc-promo{flex:0 0 80%;border-radius:20px;overflow:hidden;scroll-snap-align:center;background:#1c1b1b;box-shadow:0 12px 28px rgba(0,0,0,.45);cursor:pointer;display:flex;flex-direction:column;}
+  .lc-promo-pic{position:relative;height:160px;overflow:hidden;}
+  .lc-promo-pic img{width:100%;height:100%;object-fit:cover;display:block;}
+  .lc-promo-tag{position:absolute;right:10px;bottom:10px;padding:7px 12px;border-radius:999px;background:#4cc417;color:#0b1a00;font:900 14px Outfit,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.45);}
+  .lc-promo-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:3px;flex:1;}
+  .lc-promo-body b{font:800 18px/1.15 Outfit,sans-serif;color:#fff;}
+  .lc-promo-body .pr{font:800 17px Manrope,sans-serif;color:#4cc417;}
   .lc-promo-body .pr s{color:#9CA3AF;font-weight:600;font-size:13px;margin-left:6px;}
-  .lc-promo-body .pr small{display:block;color:#D1D5DB;font:600 12px Manrope,sans-serif;}
-  .lc-promo-body .lc-order{flex:0 0 auto;padding:10px 16px;}
+  .lc-promo-body small{color:#4cc417;font:700 12px Manrope,sans-serif;}
+  .lc-promo-body .lc-order{flex:0 0 auto;margin-top:8px;padding:11px 0;}
   .lc-sec{scroll-margin-top:calc(140px + env(safe-area-inset-top,0px));}
   .lc-sec h3{font:800 22px Outfit,sans-serif;margin:20px 2px 12px;display:flex;align-items:baseline;gap:8px;color:#F9FAFB;}
   .lc-sec h3 span{font:600 12.5px Manrope,sans-serif;color:#9CA3AF;}
@@ -184,15 +184,15 @@
     const promos = typeof PROMOS !== 'undefined' ? PROMOS : [];
     const pc = it => {
       const off = it.was && it.was > it.price;
-      return '<div class="lc-promo" data-dish="' + it.id + '"><img src="' + esc(it.img) + '" alt="" loading="lazy"/>' +
-        '<span class="lc-promo-tag">' + esc(it.deal || 'On sale') + '</span>' +
-        '<div class="lc-promo-body"><div class="min-w-0"><b>' + esc(it.name) + '</b><div class="pr">' + money(it.price) + (off ? '<s>' + money(it.was) + '</s>' : '') +
-        (it.category !== 'juice' ? '<small>Free juice included</small>' : '') + '</div></div>' +
+      return '<div class="lc-promo" data-dish="' + it.id + '"><div class="lc-promo-pic"><img src="' + esc(it.img) + '" alt="" loading="lazy"/>' +
+        '<span class="lc-promo-tag">' + esc(it.deal || 'On sale') + '</span></div>' +
+        '<div class="lc-promo-body"><b>' + esc(it.name) + '</b><div class="pr">' + money(it.price) + (off ? '<s>' + money(it.was) + '</s>' : '') + '</div>' +
+        (it.category !== 'juice' ? '<small>Free juice included</small>' : '') +
         '<button class="lc-order" data-order="' + it.id + '">Order now</button></div></div>';
     };
     const juice = (typeof JUICES !== 'undefined' && JUICES[0]) || null;
-    const freeCard = juice ? '<div class="lc-promo" onclick="document.querySelector(\'.lc-chip[data-c=steak]\').click()"><img src="' + esc(juice.img) + '" alt="" loading="lazy"/><span class="lc-promo-tag">Every plate</span>' +
-      '<div class="lc-promo-body"><div class="min-w-0"><b>Free natural juice</b><div class="pr">With every plate<small>Lulo, guanábana, mango or piña</small></div></div></div></div>' : '';
+    const freeCard = juice ? '<div class="lc-promo" onclick="document.querySelector(\'.lc-chip[data-c=steak]\').click()"><div class="lc-promo-pic"><img src="' + esc(juice.img) + '" alt="" loading="lazy"/><span class="lc-promo-tag">FREE</span></div>' +
+      '<div class="lc-promo-body"><b>Free natural juice</b><div class="pr">With every plate</div><small>Lulo, guanábana, mango or piña</small><button class="lc-order">See the menu</button></div></div>' : '';
     document.getElementById('lc-promo-row').innerHTML = promos.map(pc).join('') + freeCard;
     document.getElementById('lc-promo-n').textContent = (promos.length + (freeCard ? 1 : 0)) + ' deals';
   }
