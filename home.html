@@ -17,14 +17,23 @@
 <p>Authentic Colombian grill, made fresh in Miami Beach.</p>
 <div class="lc-wel-chips"><span><span class="material-symbols-outlined">outdoor_grill</span>Colombian parrilla</span><span><span class="material-symbols-outlined">schedule</span>15–25 min</span></div>
 <div class="lc-wel-btns"><button type="button" class="lc-wel-go" onclick="document.getElementById('lc-menu-wrap').scrollIntoView({behavior:'smooth'})">Order now<span class="material-symbols-outlined">arrow_downward</span></button><button type="button" class="lc-wel-deals" onclick="document.getElementById('lc-promos').scrollIntoView({behavior:'smooth',block:'center'})"><span class="material-symbols-outlined">sell</span>Deals</button></div>
+<div class="lc-wel-avail"><span><span class="material-symbols-outlined">storefront</span>Pickup</span><i></i><span><span class="material-symbols-outlined">two_wheeler</span>Delivery</span><i></i><span>Available now</span></div>
 <div class="lc-wel-dots" id="lc-wel-dots"><i class="on"></i><i></i><i></i><i></i></div>
 </div>
 </section>
 <!-- Promotions: swipe through today's sales -->
-<section id="lc-promos" class="w-full">
+<section id="lc-promos" class="w-full lc-reveal">
 <div class="flex items-baseline justify-between mb-2"><h3 class="lc-promo-h"><span class="material-symbols-outlined">sell</span>Promotions</h3><span class="lc-promo-n" id="lc-promo-n"></span></div>
 <div class="lc-promo-row" id="lc-promo-row"></div>
 </section>
+<!-- Picks that change with the time of day -->
+<section id="lc-picks" class="w-full lc-reveal">
+<h3 class="lc-promo-h"><span class="material-symbols-outlined" id="lc-picks-ic">wb_sunny</span><span id="lc-picks-t">Picks for you</span></h3>
+<p class="lc-picks-sub" id="lc-picks-sub"></p>
+<div class="lc-picks-row" id="lc-picks-row"></div>
+</section>
+<!-- Rewards punch card: every 10th plate free -->
+<section id="lc-rewards" class="w-full lc-reveal"></section>
 <!-- Pickup Toggle & Location Bar -->
 <section class="w-full bg-surface-charcoal rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
 <div class="lc-mode" id="lc-mode"><button class="on" data-m="pickup"><span class="material-symbols-outlined">storefront</span>Pickup</button><button data-m="delivery"><span class="material-symbols-outlined">delivery_dining</span>Delivery</button></div>
@@ -54,7 +63,7 @@
 </section>
 <section id="lc-reorder" class="w-full" style="display:none"></section>
 <!-- Full menu by section (sections switch as you scroll, like Uber Eats) -->
-<section class="w-full" id="lc-menu-wrap">
+<section class="w-full lc-reveal" id="lc-menu-wrap">
 <div class="lc-chips" id="lc-chips"></div>
 <div id="lc-menu"></div>
 </section>
@@ -87,6 +96,38 @@
   .lc-wel-dots{display:flex;gap:6px;justify-content:center;margin-top:14px;}
   .lc-wel-dots i{width:6px;height:6px;border-radius:99px;background:rgba(255,255,255,.3);transition:all .3s;}
   .lc-wel-dots i.on{width:20px;background:#fff;}
+  .lc-wel-avail{display:flex;align-items:center;gap:8px;margin-top:12px;font:600 12px Manrope,sans-serif;color:#D1D5DB;}
+  .lc-wel-avail>span{display:inline-flex;align-items:center;gap:4px;}
+  .lc-wel-avail .material-symbols-outlined{font-size:16px;color:#4cc417;}
+  .lc-wel-avail>i{width:3px;height:3px;border-radius:50%;background:#6B7280;}
+  .lc-wel-avail>span:last-child{color:#4cc417;}
+  .lc-timer{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:999px;background:rgba(76,196,23,.12);color:#4cc417;font:800 12px Manrope,sans-serif;font-variant-numeric:tabular-nums;}
+  .lc-timer .material-symbols-outlined{font-size:15px;}
+  .lc-picks-sub{font:500 13px Manrope,sans-serif;color:#9CA3AF;margin:2px 0 10px;}
+  .lc-picks-row{display:flex;gap:12px;overflow-x:auto;margin:0 -16px;padding:0 16px 4px;scrollbar-width:none;scroll-snap-type:x mandatory;scroll-padding:0 16px;}
+  .lc-picks-row::-webkit-scrollbar{display:none;}
+  .lc-pick{flex:0 0 132px;scroll-snap-align:start;cursor:pointer;}
+  .lc-pick img{width:132px;height:132px;object-fit:cover;border-radius:18px;display:block;box-shadow:0 8px 20px rgba(0,0,0,.4);transition:transform .2s;}
+  .lc-pick:active img{transform:scale(.96);}
+  .lc-pick b{display:block;margin-top:8px;font:700 13px/1.25 Manrope,sans-serif;color:#F9FAFB;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .lc-pick span{font:800 13px Manrope,sans-serif;color:#ffb596;}
+  .lc-rw{position:relative;border-radius:22px;padding:18px;background:linear-gradient(140deg,#2a1608 0%,#1c1b1b 55%);border:1px solid rgba(243,99,16,.28);overflow:hidden;}
+  .lc-rw::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(243,99,16,.28),transparent 70%);pointer-events:none;}
+  .lc-rw-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .lc-rw-k{font:800 11px Outfit,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#FBBF24;}
+  .lc-rw h4{font:800 20px Outfit,sans-serif;color:#fff;margin-top:2px;}
+  .lc-rw-n{font:900 30px/1 Outfit,sans-serif;color:#fff;}
+  .lc-rw-n small{font:700 13px Manrope,sans-serif;color:#9CA3AF;}
+  .lc-rw-stamps{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin:14px 0 10px;}
+  .lc-rw-stamps i{aspect-ratio:1;border-radius:50%;border:1.5px dashed rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;}
+  .lc-rw-stamps i.on{border:0;background:#f36310;box-shadow:0 4px 12px rgba(243,99,16,.45);}
+  .lc-rw-stamps i.on .material-symbols-outlined{font-size:15px;color:#fff;font-variation-settings:'FILL' 1;}
+  .lc-rw-stamps i.free{border:1.5px solid #4cc417;}
+  .lc-rw-stamps i.free .material-symbols-outlined{font-size:14px;color:#4cc417;}
+  .lc-rw p{font:600 13px Manrope,sans-serif;color:#D1D5DB;}
+  .lc-rw p b{color:#4cc417;}
+  .lc-reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.2,1);}
+  .lc-reveal.in{opacity:1;transform:none;}
   .lc-promo-h{display:flex;align-items:center;gap:6px;font:800 22px Outfit,sans-serif;color:#F9FAFB;}
   .lc-promo-h .material-symbols-outlined{color:#4cc417;font-size:24px;}
   .lc-promo-n{font:700 12px Manrope,sans-serif;color:#9CA3AF;}
@@ -246,6 +287,49 @@
       cap.style.opacity = 0; setTimeout(() => { cap.textContent = imgs[k].dataset.name; cap.style.opacity = 1; }, 300);
     };
     if (imgs.length) setInterval(() => go(k + 1), 4500);
+  }
+
+
+  // Deals countdown: today's deals reset at midnight
+  {
+    const n = document.getElementById('lc-promo-n');
+    const tick = () => {
+      const now = new Date(), end = new Date(now); end.setHours(24, 0, 0, 0);
+      const t = Math.max(0, Math.floor((end - now) / 1000)), p = v => String(v).padStart(2, '0');
+      n.innerHTML = '<span class="lc-timer"><span class="material-symbols-outlined">timer</span>Ends in ' + p(Math.floor(t / 3600)) + ':' + p(Math.floor(t / 60) % 60) + ':' + p(t % 60) + '</span>';
+    };
+    tick(); setInterval(tick, 1000);
+  }
+
+  // Picks that change with the time of day
+  {
+    const h = new Date().getHours();
+    const slot = h < 11 ? { ic: 'wb_twilight', t: 'Good morning', sub: 'Start the day Colombian style.', cats: ['streetfood', 'rice', 'chicken'] }
+      : h < 16 ? { ic: 'wb_sunny', t: 'Lunch time', sub: 'Quick, filling plates for your break.', cats: ['chicken', 'rice', 'streetfood'] }
+      : h < 22 ? { ic: 'dinner_dining', t: 'Dinner time', sub: 'Our grill favorites for tonight.', cats: ['steak', 'seafood'] }
+      : { ic: 'dark_mode', t: 'Late night cravings', sub: 'Something good before bed.', cats: ['streetfood', 'chicken'] };
+    const picks = slot.cats.flatMap(c => MENU.filter(i => i.category === c)).slice(0, 8);
+    document.getElementById('lc-picks-ic').textContent = slot.ic;
+    document.getElementById('lc-picks-t').textContent = slot.t;
+    document.getElementById('lc-picks-sub').textContent = slot.sub;
+    document.getElementById('lc-picks-row').innerHTML = picks.map(i => '<div class="lc-pick" data-dish="' + i.id + '"><img src="' + esc(i.img) + '" alt="" loading="lazy"/><b>' + esc(i.name) + '</b><span>' + money(i.price) + '</span></div>').join('');
+  }
+
+  // Rewards: every plate you order is a stamp, the 10th plate is free
+  {
+    let plates = 0;
+    try { (typeof getOrders === 'function' ? getOrders() : []).forEach(o => (o.lines || []).forEach(l => { const it = findItem(l.id); if (it && it.category !== 'juice' && it.category !== 'sides') plates += (l.qty || 1); })); } catch (x) {}
+    const have = plates % 10, left = 10 - have;
+    let st = '';
+    for (let i = 0; i < 10; i++) st += i < have ? '<i class="on"><span class="material-symbols-outlined">local_fire_department</span></i>' : i === 9 ? '<i class="free"><span class="material-symbols-outlined">redeem</span></i>' : '<i></i>';
+    document.getElementById('lc-rewards').innerHTML = '<div class="lc-rw"><div class="lc-rw-top"><div><div class="lc-rw-k">La Cabaña Rewards</div><h4>Every 10th plate is free</h4></div><div class="lc-rw-n">' + have + '<small>/10</small></div></div>' +
+      '<div class="lc-rw-stamps">' + st + '</div><p>' + (plates ? '<b>' + left + ' more plate' + (left === 1 ? '' : 's') + '</b> to your free one.' : 'Order your first plate to get your first stamp.') + '</p></div>';
+  }
+
+  // Sections glide in as you scroll
+  {
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.08 });
+    document.querySelectorAll('.lc-reveal').forEach(el => io.observe(el));
   }
 
   // Order again: your last real order, one tap
