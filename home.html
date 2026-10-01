@@ -56,7 +56,7 @@
   .lc-promo{flex:0 0 80%;border-radius:20px;overflow:hidden;scroll-snap-align:center;background:#1c1b1b;box-shadow:0 12px 28px rgba(0,0,0,.45);cursor:pointer;display:flex;flex-direction:column;}
   .lc-promo-pic{position:relative;height:160px;overflow:hidden;}
   .lc-promo-pic img{width:100%;height:100%;object-fit:cover;display:block;}
-  .lc-promo-tag{position:absolute;top:10px;left:10px;display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:999px;background:rgba(12,12,12,.55);-webkit-backdrop-filter:blur(12px) saturate(160%);backdrop-filter:blur(12px) saturate(160%);border:1px solid rgba(255,255,255,.14);font:700 11.5px/1 Manrope,sans-serif;color:#fff;letter-spacing:.01em;}
+  .lc-promo-tag{position:absolute;right:10px;bottom:10px;display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:999px;background:rgba(12,12,12,.55);-webkit-backdrop-filter:blur(12px) saturate(160%);backdrop-filter:blur(12px) saturate(160%);border:1px solid rgba(255,255,255,.14);font:700 11.5px/1 Manrope,sans-serif;color:#fff;letter-spacing:.01em;}
   .lc-promo-tag i{width:6px;height:6px;border-radius:50%;background:#4cc417;box-shadow:0 0 8px #4cc417;}
   .lc-promo-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:3px;flex:1;}
   .lc-promo-body b{font:800 18px/1.15 Outfit,sans-serif;color:#fff;}
@@ -114,7 +114,7 @@
   const mic = id => window.holdButtonHTML ? holdButtonHTML(id) : '';
   function card(it) {
     const off = it.was && it.was > it.price ? Math.round((1 - it.price / it.was) * 100) : 0;
-    const freeJuice = it.category !== 'juice';
+    const freeJuice = it.category !== 'juice' && !off && !it.deal;   // no free juice on items already on sale
     return '<div class="lc-card" data-dish="' + it.id + '"><div class="lc-pic">' +
       (it.deal ? '<span class="lc-deal">' + esc(it.deal) + '</span>' : '') +
       (it.badge ? '<span class="lc-tag">' + esc(it.badge) + '</span>' : '') +
@@ -189,12 +189,9 @@
       return '<div class="lc-promo" data-dish="' + it.id + '"><div class="lc-promo-pic"><img src="' + esc(it.img) + '" alt="" loading="lazy"/>' +
         tag(it.deal || 'On sale') + '</div>' +
         '<div class="lc-promo-body"><b>' + esc(it.name) + '</b><div class="pr">' + money(it.price) + (off ? '<s>' + money(it.was) + '</s>' : '') + '</div>' +
-        (it.category !== 'juice' ? '<small>Free juice included</small>' : '') +
         '<button class="lc-order" data-order="' + it.id + '">Order now</button></div></div>';
     };
-    const juice = (typeof JUICES !== 'undefined' && JUICES[0]) || null;
-    const freeCard = juice ? '<div class="lc-promo" onclick="document.querySelector(\'.lc-chip[data-c=steak]\').click()"><div class="lc-promo-pic"><img src="' + esc(juice.img) + '" alt="" loading="lazy"/>' + tag('Free with every plate') + '</div>' +
-      '<div class="lc-promo-body"><b>Free natural juice</b><div class="pr">With every plate</div><small>Lulo, guanábana, mango or piña</small><button class="lc-order">See the menu</button></div></div>' : '';
+    const freeCard = '';
     document.getElementById('lc-promo-row').innerHTML = promos.map(pc).join('') + freeCard;
     document.getElementById('lc-promo-n').textContent = (promos.length + (freeCard ? 1 : 0)) + ' deals';
   }

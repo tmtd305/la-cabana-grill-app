@@ -123,7 +123,8 @@
       }).join("");
     }
 
-    if (!isJuice) {
+    var onSale = (item.was && item.was > item.price) || item.deal;   // sale items don't come with the free juice
+    if (!isJuice && !onSale) {
       html += sectionTitle("Add your free drink", "<span style=\"color:#4cc417\">Free</span>") + DRINKS.map(function (d) {
         return '<div class="d-opt' + (state.drink === d ? " sel" : "") + '" data-d="drink" data-v="' + esc(d) + '"><span class="font-body-md text-body-md text-text-primary">' + esc(d) + '</span><span class="flex items-center gap-3"><span class="font-label-md text-label-md font-bold" style="color:#4cc417">' + (d === "No Drink" ? "" : "Free") + '</span><span class="d-radio"></span></span></div>';
       }).join("");

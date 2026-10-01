@@ -92,7 +92,8 @@ function cartLines() {
 }
 
 function hasFreeJuicePromo(lines) {
-  return lines.some((l) => l.item.specialty);
+  // dishes already on sale or on a deal don't earn the free juice
+  return lines.some((l) => l.item.specialty && !(l.item.was > l.item.price) && !l.item.deal);
 }
 
 // Cheapest juice line becomes free when a specialty entree is in the cart.
