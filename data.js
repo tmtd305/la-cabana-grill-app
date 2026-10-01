@@ -275,7 +275,19 @@ MENU.concat(JUICES).forEach(function (i) { if (DEMO_SALES[i.id]) Object.assign(i
 // DRAFTS: dishes we sell but keep hidden from the app for now (remove the id to show it again)
 const DRAFT_IDS = ["chicken-waffle"];
 for (let i = MENU.length - 1; i >= 0; i--) if (DRAFT_IDS.includes(MENU[i].id)) MENU.splice(i, 1);
-const ALL_ITEMS = MENU.concat(JUICES, SIDES_MENU);
+// PROMOTIONS: bundle deals shown on top of the home page. Each one is its own item, so the cart charges the deal price.
+const PROMOS = [
+  { id: "promo-2-mojarras", name: "2 Mojarras Fritas", price: 49.99, was: 59.98, deal: "2 for $49.99", category: "promo",
+    desc: "Two whole crispy fried mojarras, Costeña style, each with rice, salad and fried plantains.",
+    img: "https://lacabanagrill.net/cdn/shop/files/mojarraedited_0372a674-00e9-421b-b1a7-d358f5accf1d.png?v=1753663383" },
+  { id: "promo-2-pollos-apanados", name: "2 Pollos Apanados", price: 34.99, deal: "2 for $34.99", category: "promo",
+    desc: "Two golden breaded chicken breasts, each with rice, salad and fries.",
+    img: "https://lacabanagrill.net/cdn/shop/files/MilanesadeCarneWEBSITEresized-20_grande.jpg?v=1753655230" },
+  { id: "promo-arepas-rellenas", name: "2 Arepas Rellenas", price: 14.99, was: 19.98, deal: "Buy 1, get 1 half off", category: "promo",
+    desc: "Two stuffed arepas with the filling of your choice. The second one is half price.",
+    img: "images/arepa-rellena.jpg" }
+];
+const ALL_ITEMS = MENU.concat(JUICES, SIDES_MENU, PROMOS);
 const RESTAURANT = {
   name: "La Cabaña Grill",
   address: "6780 Collins Ave, Miami Beach, FL",

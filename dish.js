@@ -14,6 +14,8 @@
     "chicken-waffle": ["Waffle", "Syrup"],
     "pollo-asado-la-cabana": ["Salted potatoes", "Fresh salad", "Rice", "Arepitas"],
     "jalea-mixta": ["Purple onions", "Lime", "Cilantro"],
+    "promo-2-mojarras": ["Rice", "Fresh salad", "Fried plantains"],
+    "promo-2-pollos-apanados": ["Rice", "Fresh salad", "French fries"],
     "mojarra-frita": ["Fresh salad", "Rice", "Fried plantains"],
     "pescado-en-salsa-de-mariscos": ["Fresh salad", "Steamed rice", "Fried plantains"],
     "camaron-al-ajillo": ["Rice", "Tostones", "Fresh salad"],
@@ -26,7 +28,9 @@
     "bacon-double-stack-cheese-burger-free-fries-drink": ["French fries", "Drink"]
   };
   var DRINKS = ["No Drink", "Pineapple Juice", "Mango Juice", "Mora Juice", "Lulo Juice", "Guanabana Juice", "Pepsi"];
-  var MEAT_CHOICE = { "bandeja-paisa": ["Grilled meat", "Ground meat"] };
+  var MEAT_CHOICE = { "bandeja-paisa": ["Grilled meat", "Ground meat"],
+    "promo-arepas-rellenas": ["Both shredded beef & cheese", "Both shredded chicken & cheese", "1 beef & cheese + 1 chicken & cheese"] };
+  var CHOICE_TITLE = { "promo-arepas-rellenas": "Choose your fillings" };
 
   // shared with the staff screen so both sides offer the same choices
   window.DISH_OPTIONS = { SIDES: SIDES, DRINKS: DRINKS, MEAT_CHOICE: MEAT_CHOICE };
@@ -114,14 +118,14 @@
 
     var meats = MEAT_CHOICE[item.id];
     if (meats) {
-      html += sectionTitle("Choose your meat", "Required") + meats.map(function (m) {
+      html += sectionTitle(CHOICE_TITLE[item.id] || "Choose your meat", "Required") + meats.map(function (m) {
         return '<div class="d-opt' + (state.meat === m ? " sel" : "") + '" data-d="meat" data-v="' + esc(m) + '"><span class="font-body-md text-body-md text-text-primary">' + esc(m) + '</span><span class="d-radio"></span></div>';
       }).join("");
     }
 
     if (!isJuice) {
       html += sectionTitle("Add your free drink", "<span style=\"color:#4cc417\">Free</span>") + DRINKS.map(function (d) {
-        return '<div class="d-opt' + (state.drink === d ? " sel" : "") + '" data-d="drink" data-v="' + esc(d) + '"><span class="font-body-md text-body-md text-text-primary">' + esc(d) + '</span><span class="flex items-center gap-3"><span class="font-label-md text-label-md text-text-muted">' + (d === "No Drink" ? "" : "Free") + '</span><span class="d-radio"></span></span></div>';
+        return '<div class="d-opt' + (state.drink === d ? " sel" : "") + '" data-d="drink" data-v="' + esc(d) + '"><span class="font-body-md text-body-md text-text-primary">' + esc(d) + '</span><span class="flex items-center gap-3"><span class="font-label-md text-label-md font-bold" style="color:#4cc417">' + (d === "No Drink" ? "" : "Free") + '</span><span class="d-radio"></span></span></div>';
       }).join("");
     }
 
@@ -212,7 +216,7 @@
   }
 
   // Recommendations: pair each dish with what people usually add (street food, juices, other plates). Sale items first; skip what's already in the bag.
-  var PAIRS = { steak: ["streetfood", "juice", "seafood"], seafood: ["juice", "streetfood", "rice"], chicken: ["juice", "streetfood", "steak"],
+  var PAIRS = { promo: ["juice", "streetfood", "steak"], steak: ["streetfood", "juice", "seafood"], seafood: ["juice", "streetfood", "rice"], chicken: ["juice", "streetfood", "steak"],
     rice: ["juice", "streetfood", "chicken"], streetfood: ["steak", "juice", "chicken"], juice: ["steak", "streetfood", "chicken"], sides: ["juice", "steak", "streetfood"] };
   function recommendFor(id, n) {
     var item = findItem(id); if (!item) return [];
