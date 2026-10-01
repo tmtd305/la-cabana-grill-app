@@ -577,7 +577,7 @@
 
   // Button markup helpers
   window.holdButtonHTML = function (id, small) {
-    return '<button type="button" data-hold-talk="' + id + '" class="lc-hold' + (small ? ' sm' : '') + '" aria-label="Hold to order by voice">' + MIC_SVG + (small ? '' : 'Hold to order') + '</button>';
+    return '<button type="button" data-hold-talk="' + id + '" class="lc-hold' + (small ? ' sm' : '') + '" aria-label="Hold to order by voice">' + MIC_SVG + (small ? '' : 'Hold to talk') + '</button>';
   };
   window.talkButtonHTML = function (id, extraClass) {
     return '<button type="button" data-hold-talk="' + id + '" class="' + (extraClass || 'h-9 px-3 rounded-xl bg-surface-raised hover:bg-surface-elevated text-primary font-label-md text-label-md flex items-center gap-1.5 transition-colors') + '" aria-label="Hold to talk">' +
