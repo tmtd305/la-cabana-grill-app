@@ -32,8 +32,6 @@
 <p class="lc-picks-sub" id="lc-picks-sub"></p>
 <div class="lc-picks-row" id="lc-picks-row"></div>
 </section>
-<!-- Rewards punch card: every 10th plate free -->
-<section id="lc-rewards" class="w-full lc-reveal"></section>
 <!-- Pickup Toggle & Location Bar -->
 <section class="w-full bg-surface-charcoal rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
 <div class="lc-mode" id="lc-mode"><button class="on" data-m="pickup"><span class="material-symbols-outlined">storefront</span>Pickup</button><button data-m="delivery"><span class="material-symbols-outlined">delivery_dining</span>Delivery</button></div>
@@ -111,21 +109,6 @@
   .lc-pick:active img{transform:scale(.96);}
   .lc-pick b{display:block;margin-top:8px;font:700 13px/1.25 Manrope,sans-serif;color:#F9FAFB;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
   .lc-pick span{font:800 13px Manrope,sans-serif;color:#ffb596;}
-  .lc-rw{position:relative;border-radius:22px;padding:18px;background:linear-gradient(140deg,#2a1608 0%,#1c1b1b 55%);border:1px solid rgba(243,99,16,.28);overflow:hidden;}
-  .lc-rw::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(243,99,16,.28),transparent 70%);pointer-events:none;}
-  .lc-rw-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-  .lc-rw-k{font:800 11px Outfit,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#FBBF24;}
-  .lc-rw h4{font:800 20px Outfit,sans-serif;color:#fff;margin-top:2px;}
-  .lc-rw-n{font:900 30px/1 Outfit,sans-serif;color:#fff;}
-  .lc-rw-n small{font:700 13px Manrope,sans-serif;color:#9CA3AF;}
-  .lc-rw-stamps{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin:14px 0 10px;}
-  .lc-rw-stamps i{aspect-ratio:1;border-radius:50%;border:1.5px dashed rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;}
-  .lc-rw-stamps i.on{border:0;background:#f36310;box-shadow:0 4px 12px rgba(243,99,16,.45);}
-  .lc-rw-stamps i.on .material-symbols-outlined{font-size:15px;color:#fff;font-variation-settings:'FILL' 1;}
-  .lc-rw-stamps i.free{border:1.5px solid #4cc417;}
-  .lc-rw-stamps i.free .material-symbols-outlined{font-size:14px;color:#4cc417;}
-  .lc-rw p{font:600 13px Manrope,sans-serif;color:#D1D5DB;}
-  .lc-rw p b{color:#4cc417;}
   .lc-reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.2,1);}
   .lc-reveal.in{opacity:1;transform:none;}
   .lc-promo-h{display:flex;align-items:center;gap:6px;font:800 22px Outfit,sans-serif;color:#F9FAFB;}
@@ -313,17 +296,6 @@
     document.getElementById('lc-picks-t').textContent = slot.t;
     document.getElementById('lc-picks-sub').textContent = slot.sub;
     document.getElementById('lc-picks-row').innerHTML = picks.map(i => '<div class="lc-pick" data-dish="' + i.id + '"><img src="' + esc(i.img) + '" alt="" loading="lazy"/><b>' + esc(i.name) + '</b><span>' + money(i.price) + '</span></div>').join('');
-  }
-
-  // Rewards: every plate you order is a stamp, the 10th plate is free
-  {
-    let plates = 0;
-    try { (typeof getOrders === 'function' ? getOrders() : []).forEach(o => (o.lines || []).forEach(l => { const it = findItem(l.id); if (it && it.category !== 'juice' && it.category !== 'sides') plates += (l.qty || 1); })); } catch (x) {}
-    const have = plates % 10, left = 10 - have;
-    let st = '';
-    for (let i = 0; i < 10; i++) st += i < have ? '<i class="on"><span class="material-symbols-outlined">local_fire_department</span></i>' : i === 9 ? '<i class="free"><span class="material-symbols-outlined">redeem</span></i>' : '<i></i>';
-    document.getElementById('lc-rewards').innerHTML = '<div class="lc-rw"><div class="lc-rw-top"><div><div class="lc-rw-k">La Cabaña Rewards</div><h4>Every 10th plate is free</h4></div><div class="lc-rw-n">' + have + '<small>/10</small></div></div>' +
-      '<div class="lc-rw-stamps">' + st + '</div><p>' + (plates ? '<b>' + left + ' more plate' + (left === 1 ? '' : 's') + '</b> to your free one.' : 'Order your first plate to get your first stamp.') + '</p></div>';
   }
 
   // Sections glide in as you scroll
