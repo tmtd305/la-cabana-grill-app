@@ -20,6 +20,11 @@
 <div class="lc-wel-dots" id="lc-wel-dots"><i class="on"></i><i></i><i></i><i></i></div>
 </div>
 </section>
+<!-- Address + call, right under the welcome -->
+<div class="lc-info-strip">
+<a href="https://maps.google.com/?q=La+Caba%C3%B1a+Grill+6780+Collins+Ave+Miami+Beach+FL" target="_blank" rel="noopener"><span class="material-symbols-outlined">location_on</span><span>6780 Collins Ave<small>Miami Beach, FL</small></span></a>
+<a href="tel:+17862547968"><span class="material-symbols-outlined">call</span><span>(786) 254-7968<small>Call us</small></span></a>
+</div>
 <!-- Reels: short kitchen videos, play as you scroll -->
 <section id="lc-reels" class="w-full lc-reveal">
 <h3 class="lc-promo-h"><span class="material-symbols-outlined">local_fire_department</span>Fresh from the kitchen</h3>
@@ -39,32 +44,6 @@
 </section>
 <!-- Membership: members get a free juice with every meal -->
 <section id="lc-member" class="w-full lc-reveal"></section>
-<!-- Pickup Toggle & Location Bar -->
-<section class="w-full bg-surface-charcoal rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
-<div class="flex items-center justify-between">
-<div class="flex items-center gap-space-xs min-w-0">
-<span class="material-symbols-outlined text-primary-container text-[20px] shrink-0" style="font-variation-settings: 'FILL' 1;">storefront</span>
-<div class="flex flex-col min-w-0">
-<span class="font-label-caps text-label-caps text-secondary uppercase tracking-widest">Pickup Location</span>
-<span class="font-title-sm text-title-sm text-text-primary truncate">Miami Beach • 6780 Collins Ave</span>
-</div>
-</div>
-<button class="bg-surface-raised hover:bg-surface-elevated text-primary px-3 py-1.5 rounded-lg font-label-md text-label-md transition-all shrink-0">
-        Change
-      </button>
-</div>
-<!-- Fulfillment Mode Switcher -->
-<div class="bg-surface-container-lowest p-1 rounded-lg flex items-center gap-1">
-<button class="flex-1 py-1.5 rounded-md font-label-md text-label-md text-center transition-all bg-primary-container text-text-primary shadow-sm flex items-center justify-center gap-1" id="tab-asap" onclick="selectTiming('asap')">
-<span class="material-symbols-outlined text-[16px]">bolt</span>
-        ASAP (15–25 min)
-      </button>
-<button class="flex-1 py-1.5 rounded-md font-label-md text-label-md text-center transition-all text-text-secondary hover:text-text-primary flex items-center justify-center gap-1" id="tab-schedule" onclick="selectTiming('schedule')">
-<span class="material-symbols-outlined text-[16px]">schedule</span>
-        Schedule Time
-      </button>
-</div>
-</section>
 <section id="lc-reorder" class="w-full" style="display:none"></section>
 <!-- Full menu by section (sections switch as you scroll, like Uber Eats) -->
 <section class="w-full lc-reveal" id="lc-menu-wrap">
@@ -136,6 +115,11 @@
   .lc-wel-mode + .lc-wel-btns{margin-top:10px;}
   .lc-toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;z-index:90;padding:11px 16px;border-radius:14px;background:#242424;color:#fff;font:600 13px Manrope,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);transition:all .25s;white-space:nowrap;}
   .lc-toast.on{opacity:1;transform:translate(-50%,0);}
+  .lc-info-strip{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .lc-info-strip a{display:flex;align-items:center;gap:10px;padding:12px;border-radius:16px;background:#1c1b1b;border:1px solid rgba(255,255,255,.06);text-decoration:none;}
+  .lc-info-strip .material-symbols-outlined{width:36px;height:36px;border-radius:12px;background:rgba(243,99,16,.12);color:#f36310;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .lc-info-strip span:not(.material-symbols-outlined){font:700 13px/1.2 Outfit,sans-serif;color:#F9FAFB;min-width:0;white-space:nowrap;}
+  .lc-info-strip small{display:block;font:600 11.5px Manrope,sans-serif;color:#9CA3AF;margin-top:2px;}
   .lc-promo-h{display:flex;align-items:center;gap:6px;font:800 22px Outfit,sans-serif;color:#F9FAFB;}
   .lc-promo-h .material-symbols-outlined{color:#4cc417;font-size:24px;}
   .lc-promo-n{font:700 12px Manrope,sans-serif;color:#9CA3AF;}
@@ -265,6 +249,8 @@
     clearTimeout(window._lcFavT); window._lcFavT = setTimeout(renderMenu, 350);
   }, true);
   document.addEventListener('lc-favs', () => { clearTimeout(window._lcFavT); window._lcFavT = setTimeout(renderMenu, 350); });
+  // opened from search on another page
+  if (location.hash.indexOf('#dish=') === 0) setTimeout(() => { const id = decodeURIComponent(location.hash.slice(6)); if (window.openDish && findItem(id)) openDish(id); }, 500);
   // opened from the Favorites tab
   if (location.hash === '#favorites') setTimeout(() => {
     const sec = document.getElementById('lc-s-favorites');
@@ -453,5 +439,5 @@
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
-</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-8px_24px_rgba(0,0,0,0.55)]" data-active-classes="text-primary-container font-headline-md"><div class="h-16 px-gutter flex items-center justify-around"><a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 transition-colors text-primary-container font-headline-md" data-path="home" href="home.html"><span class="material-symbols-outlined text-[24px]">local_fire_department</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="menu" href="menu.html"><span class="material-symbols-outlined text-[24px]">restaurant_menu</span><span class="font-label-caps text-label-caps">Menu</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="orders" href="orders.html"><span class="material-symbols-outlined text-[24px]">receipt_long</span><span class="font-label-caps text-label-caps">Orders</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="favorites" href="home.html#favorites"><span class="material-symbols-outlined text-[24px]">favorite</span><span class="font-label-caps text-label-caps">Favorites</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="account" href="account.html"><span class="material-symbols-outlined text-[24px]">account_circle</span><span class="font-label-caps text-label-caps">Account</span></a></div></nav><script src="ptr.js"></script>
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-8px_24px_rgba(0,0,0,0.55)]" data-active-classes="text-primary-container font-headline-md"><div class="h-16 px-gutter flex items-center justify-around"><a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 transition-colors text-primary-container font-headline-md" data-path="home" href="home.html"><span class="material-symbols-outlined text-[24px]">local_fire_department</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="menu" href="menu.html"><span class="material-symbols-outlined text-[24px]">restaurant_menu</span><span class="font-label-caps text-label-caps">Menu</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="orders" href="orders.html"><span class="material-symbols-outlined text-[24px]">receipt_long</span><span class="font-label-caps text-label-caps">Orders</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="favorites" href="home.html#favorites"><span class="material-symbols-outlined text-[24px]">favorite</span><span class="font-label-caps text-label-caps">Favorites</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="account" href="account.html"><span class="material-symbols-outlined text-[24px]">account_circle</span><span class="font-label-caps text-label-caps">Account</span></a></div></nav><script src="ui.js"></script><script src="ptr.js"></script>
 </body></html>
