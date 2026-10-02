@@ -58,7 +58,13 @@
 
 <!-- 4. Payment -->
 <section class="flex flex-col gap-2">
-<h2 class="font-title-sm text-title-sm text-text-primary flex items-center gap-2"><span class="material-symbols-outlined text-[18px]" style="color:#4cc417">lock</span>Pay with card <span id="square-env-badge" class="hidden"></span></h2>
+<h2 class="font-title-sm text-title-sm text-text-primary flex items-center gap-2"><span class="material-symbols-outlined text-[18px]" style="color:#4cc417">lock</span>Payment <span id="square-env-badge" class="hidden"></span></h2>
+<div id="wallets" class="flex flex-col gap-2">
+<div id="applepay" class="hidden" role="button" aria-label="Pay with Apple Pay" style="-webkit-appearance:-apple-pay-button;-apple-pay-button-type:plain;-apple-pay-button-style:white;height:50px;border-radius:12px;cursor:pointer"></div>
+<div id="gpay" class="hidden" style="min-height:50px"></div>
+<div id="cashapp" class="hidden" style="min-height:50px"></div>
+<div id="or-card" class="hidden flex items-center gap-3 py-1 font-body-sm text-body-sm text-text-muted"><span class="flex-1 h-px bg-white/10"></span>or pay with card<span class="flex-1 h-px bg-white/10"></span></div>
+</div>
 <div id="card-container" class="min-h-[56px]"></div>
 <div id="card-errors" class="text-error text-body-sm hidden"></div>
 </section>
@@ -211,6 +217,7 @@
     const total = (totals.subtotal - totals.discount + totals.taxes + currentTip + dFee);
     document.getElementById('summaryTotalValue').textContent = '$' + total.toFixed(2);
     document.getElementById('btnTotalText').textContent = '$' + total.toFixed(2);
+    try { if (walletReq) walletReq.update({ total: { amount: total.toFixed(2), label: 'La Cabaña Grill' } }); } catch (e) {}
   }
 
   (function() {
@@ -246,6 +253,11 @@
   const SQUARE_LOCATION_ID = 'LVYWHP32RNMD0';
   let squareCard = null;
 
+  var walletReq = null, applePay = null, googlePay = null, cashAppPay = null;
+  function currentTotal() {
+    const t = computeTotals(cartLines());
+    return +(t.subtotal - t.discount + t.taxes + currentTip + deliveryFee()).toFixed(2);
+  }
   async function initSquarePayments() {
     const badge = document.getElementById('square-env-badge');
     if (badge) badge.textContent = '';
@@ -253,23 +265,57 @@
       document.getElementById('card-container').innerHTML = '<p class="text-body-sm text-text-muted">Payments unavailable (Square SDK failed to load).</p>';
       return;
     }
+    let payments;
     try {
-      const payments = window.Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
+      payments = window.Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
       squareCard = await payments.card();
       await squareCard.attach('#card-container');
     } catch (e) {
       document.getElementById('card-container').innerHTML = '<p class="text-body-sm text-error">Could not load card form: ' + e.message + '</p>';
+      return;
     }
+    // Apple Pay, Google Pay and Cash App Pay: one tap, same Square account. Each shows only where it's available.
+    try { walletReq = payments.paymentRequest({ countryCode: 'US', currencyCode: 'USD', total: { amount: currentTotal().toFixed(2), label: 'La Cabaña Grill' } }); } catch (e) { return; }
+    const showOr = () => document.getElementById('or-card').classList.remove('hidden');
+    try {
+      applePay = await payments.applePay(walletReq);
+      const el = document.getElementById('applepay'); el.classList.remove('hidden'); showOr();
+      el.onclick = () => { if (checkReady()) pay(() => applePay.tokenize()); };
+    } catch (e) { /* not on Apple Pay devices, or the domain isn't verified yet */ }
+    try {
+      googlePay = await payments.googlePay(walletReq);
+      const el = document.getElementById('gpay'); el.classList.remove('hidden');
+      await googlePay.attach('#gpay', { buttonColor: 'white', buttonSizeMode: 'fill', buttonType: 'long' }); showOr();
+      el.onclick = () => { if (checkReady()) pay(() => googlePay.tokenize()); };
+    } catch (e) { document.getElementById('gpay').classList.add('hidden'); }
+    try {
+      cashAppPay = await payments.cashAppPay(walletReq, { redirectURL: location.origin + '/cart.html', referenceId: 'lc-' + Date.now() });
+      document.getElementById('cashapp').classList.remove('hidden');
+      await cashAppPay.attach('#cashapp', { shape: 'semiround', width: 'full', size: 'medium' }); showOr();
+      cashAppPay.addEventListener('ontokenization', (ev) => {
+        const r = ev.detail && ev.detail.tokenResult;
+        if (!r || r.status !== 'OK') { showToast('Cash App Pay was cancelled'); return; }
+        if (checkReady()) pay(async () => r);
+      });
+    } catch (e) { document.getElementById('cashapp').classList.add('hidden'); }
   }
 
-  async function handlePlaceOrderClick() {
-    if (cartLines().length === 0) { showToast('Your cart is empty'); return; }
+  function checkReady() {
+    if (cartLines().length === 0) { showToast('Your cart is empty'); return false; }
     if (fulfillment === 'delivery') {
-      if (!val('d-name') || !val('d-phone') || !val('d-street') || !val('d-zip')) { showToast('Add your name, phone and address for delivery'); return; }
-      if (!quote) { showToast(quoteError || 'Getting your delivery price, try again in a second'); getQuote(); return; }
+      if (!val('d-name') || !val('d-phone') || !val('d-street') || !val('d-zip')) { showToast('Add your name, phone and address for delivery'); document.getElementById('fulfillCard').scrollIntoView({ behavior: 'smooth' }); return false; }
+      if (!quote) { showToast(quoteError || 'Getting your delivery fee, try again in a second'); getQuote(); return false; }
     }
+    return true;
+  }
+  function handlePlaceOrderClick() {
+    if (!checkReady()) return;
     if (!squareCard) { showToast('Payment form is still loading, try again in a moment'); return; }
+    pay(() => squareCard.tokenize());
+  }
 
+  async function pay(getToken) {
+    const tokenPromise = getToken();   // must start right away (Apple Pay needs the tap)
     const btn = document.getElementById('placeOrderBtn');
     const errorsEl = document.getElementById('card-errors');
     errorsEl.classList.add('hidden');
@@ -278,7 +324,7 @@
     btn.innerHTML = '<span class="w-full text-center">Processing payment…</span>';
 
     try {
-      const tokenResult = await squareCard.tokenize();
+      const tokenResult = await tokenPromise;
       if (tokenResult.status !== 'OK') {
         throw new Error(tokenResult.errors && tokenResult.errors[0] ? tokenResult.errors[0].message : 'Card declined');
       }
