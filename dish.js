@@ -29,8 +29,20 @@
   };
   var DRINKS = ["No Drink", "Pineapple Juice", "Mango Juice", "Mora Juice", "Lulo Juice", "Guanabana Juice", "Pepsi"];
   var MEAT_CHOICE = { "bandeja-paisa": ["Grilled meat", "Ground meat"],
-    "promo-arepas-rellenas": ["Both shredded beef & cheese", "Both shredded chicken & cheese", "1 beef & cheese + 1 chicken & cheese"] };
-  var CHOICE_TITLE = { "promo-arepas-rellenas": "Choose your fillings" };
+    "promo-arepas-rellenas": ["Both shredded beef & cheese", "Both shredded chicken & cheese", "1 beef & cheese + 1 chicken & cheese"],
+    "bakery-empanada": ["Chicken", "Beef", "Cheese"],
+    "app-soup": ["Chicken soup", "Lentil soup"],
+    "kids-grilled": ["Grilled chicken", "Steak"],
+    "postre-churros": ["Chocolate sauce", "Caramel sauce"],
+    "drink-cafe-con-leche": ["Hot", "Iced"] };
+  var CHOICE_TITLE = { "promo-arepas-rellenas": "Choose your fillings", "bakery-empanada": "Choose your filling", "app-soup": "Choose your soup",
+    "kids-grilled": "Choose", "postre-churros": "Dipping sauce", "drink-cafe-con-leche": "How do you like it?" };
+  // dishes without their own photo use their menu section's photo (or the restaurant photo)
+  function photoFor(item) {
+    if (item.img) return item.img;
+    var c = (typeof CATEGORIES !== "undefined" ? CATEGORIES : []).find(function (x) { return x.id === item.category; });
+    return (c && c.banner) || "images/hero-bandeja.jpg";
+  }
 
   // shared with the staff screen so both sides offer the same choices
   window.DISH_OPTIONS = { SIDES: SIDES, DRINKS: DRINKS, MEAT_CHOICE: MEAT_CHOICE };
@@ -94,7 +106,7 @@
     var html = "";
 
     html += '<div class="relative w-full h-64 sm:h-72 shrink-0 bg-surface-container-lowest">' +
-      '<img src="' + esc(item.img) + '" alt="' + esc(item.name) + '" class="w-full h-full object-cover"/>' +
+      '<img src="' + esc(photoFor(item)) + '" alt="' + esc(item.name) + '" class="w-full h-full object-cover"/>' +
       '<div class="absolute inset-0 bg-gradient-to-t from-[#1A1A1A] via-transparent to-black/40"></div>' +
       '<button type="button" data-d="close" aria-label="Close" class="absolute top-3 left-3 w-10 h-10 rounded-full bg-black/55 backdrop-blur-md text-white flex items-center justify-center"><span class="material-symbols-outlined text-[22px]">close</span></button>' +
       (window.holdButtonHTML ? '<div class="absolute bottom-8 right-4">' + holdButtonHTML(item.id) + '</div>' : '') +
@@ -226,7 +238,10 @@
   }
 
   // Recommendations: pair each dish with what people usually add (street food, juices, other plates). Sale items first; skip what's already in the bag.
-  var PAIRS = { promo: ["juice", "streetfood", "steak"], steak: ["streetfood", "juice", "seafood"], seafood: ["juice", "streetfood", "rice"], chicken: ["juice", "streetfood", "steak"],
+  var PAIRS = { bakery: ["juice", "drinks", "arepas"], arepas: ["juice", "bakery", "appetizers"], burgers: ["juice", "appetizers", "desserts"],
+    kids: ["desserts", "juice"], sandwiches: ["juice", "appetizers", "desserts"], salads: ["juice", "appetizers"], appetizers: ["steak", "seafood", "juice"],
+    roast: ["juice", "appetizers", "desserts"], pork: ["juice", "appetizers", "desserts"], desserts: ["drinks", "juice"], drinks: ["desserts", "bakery"],
+    promo: ["juice", "appetizers", "desserts"], steak: ["streetfood", "juice", "seafood"], seafood: ["juice", "streetfood", "rice"], chicken: ["juice", "streetfood", "steak"],
     rice: ["juice", "streetfood", "chicken"], streetfood: ["steak", "juice", "chicken"], juice: ["steak", "streetfood", "chicken"], sides: ["juice", "steak", "streetfood"] };
   function recommendFor(id, n) {
     var item = findItem(id); if (!item) return [];
