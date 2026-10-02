@@ -56,7 +56,6 @@
       '<a href="home.html#favorites"><span class="material-symbols-outlined">favorite</span>Favorites</a>' +
       '<a href="orders.html"><span class="material-symbols-outlined">receipt_long</span>Your orders</a>' +
       '<a href="messages.html"><span class="material-symbols-outlined">chat</span>Messages</a>' +
-      '<button type="button" data-notify><span class="material-symbols-outlined">notifications</span><span>Deals and order updates<span class="sub">Get notified about specials</span></span><span class="tg' + (notifyOn() ? " on" : "") + '"></span></button>' +
       '<div class="sep"></div>' +
       '<a href="' + reviewHref + '" target="_blank" rel="noopener"><span class="material-symbols-outlined">star</span>Review us on Google</a>' +
       '<a href="tel:' + PHONE + '"><span class="material-symbols-outlined">call</span>Call the restaurant</a>' +
@@ -96,6 +95,7 @@
   }
   // every "Enable notifications" button in the app uses this (the old push service only worked on the old website)
   window.requestNotifications = function () { turnOnNotify(); };
+  window.lcNotify = { isOn: notifyOn, toggle: toggleNotify };
 
   // ---------- search ----------
   var srch;
@@ -153,7 +153,7 @@
     }
     document.querySelectorAll('header img').forEach(function (img) { if (/googleusercontent/.test(img.src)) img.style.display = "none"; });
     document.querySelectorAll('button[aria-label="Search menu"]').forEach(function (b) { b.onclick = function (e) { e.preventDefault(); openSearch(); }; });
-    document.querySelectorAll('button[aria-label="Enable deal notifications"]').forEach(function (b) { b.removeAttribute("onclick"); b.onclick = function (e) { e.preventDefault(); openDrawer(); }; });
+    document.querySelectorAll('button[aria-label="Enable deal notifications"]').forEach(function (b) { b.removeAttribute("onclick"); b.onclick = function (e) { e.preventDefault(); location.href = "messages.html"; }; });
     document.querySelectorAll('header [onclick="goToAccount()"], header .material-symbols-outlined').forEach(function (el) {
       var t = el.closest('[onclick="goToAccount()"]') || (el.textContent.trim() === "person" ? el.parentElement : null);
       if (t && !t.closest("a")) { t.style.cursor = "pointer"; t.onclick = function () { location.href = "account.html"; }; }

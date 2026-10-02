@@ -21,5 +21,21 @@
       return '<div style="background:#1c1b1b;border-radius:20px;padding:18px;margin-bottom:10px"><p style="font:700 13px Manrope,sans-serif;color:#f36310">' + (m.from || 'La Cabaña Grill') + '</p><p style="font:500 14px/1.6 Manrope,sans-serif;color:#D1D5DB">' + String(m.text || '').replace(/</g, '&lt;') + '</p></div>';
     }).join('');
   })();
+</script><button type="button" id="ns-open" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:8px;margin:6px auto 0;font:600 13px Manrope,sans-serif;color:#9CA3AF"><span class="material-symbols-outlined" style="font-size:18px">settings</span>Notification settings</button>
+<div id="ns-panel" style="display:none;background:#1c1b1b;border-radius:20px;padding:16px">
+<div style="display:flex;align-items:center;gap:12px">
+<span class="material-symbols-outlined" style="color:#f36310">notifications</span>
+<div style="flex:1"><p style="font:700 15px Manrope,sans-serif;color:#fff">Deals and order updates</p><p style="font:500 12px Manrope,sans-serif;color:#9CA3AF">Specials, new dishes and your order status</p></div>
+<button type="button" id="ns-tg" aria-label="Notifications" style="all:unset;cursor:pointer;width:46px;height:26px;border-radius:99px;background:#4cc417;position:relative;flex-shrink:0;transition:background .2s"><span style="position:absolute;top:3px;left:23px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s"></span></button>
+</div>
+</div>
+<script>
+  (function () {
+    var tg = document.getElementById('ns-tg');
+    function paint() { var on = !window.lcNotify || window.lcNotify.isOn(); tg.style.background = on ? '#4cc417' : '#3a3a3a'; tg.firstChild.style.left = on ? '23px' : '3px'; }
+    document.getElementById('ns-open').onclick = function () { var p = document.getElementById('ns-panel'); p.style.display = p.style.display === 'none' ? 'block' : 'none'; paint(); };
+    tg.onclick = function () { if (window.lcNotify) { window.lcNotify.toggle(); setTimeout(paint, 50); } };
+    setTimeout(paint, 300);
+  })();
 </script></div></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-8px_24px_rgba(0,0,0,0.55)]" data-active-classes="text-text-secondary font-headline-md"><div class="h-16 px-gutter flex items-center justify-around"><a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 transition-colors text-text-secondary font-headline-md" data-path="home" href="home.html"><span class="material-symbols-outlined text-[24px]">local_fire_department</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="menu" href="menu.html"><span class="material-symbols-outlined text-[24px]">restaurant_menu</span><span class="font-label-caps text-label-caps">Menu</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="orders" href="orders.html"><span class="material-symbols-outlined text-[24px]">receipt_long</span><span class="font-label-caps text-label-caps">Orders</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="favorites" href="home.html#favorites"><span class="material-symbols-outlined text-[24px]">favorite</span><span class="font-label-caps text-label-caps">Favorites</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="account" href="account.html"><span class="material-symbols-outlined text-[24px]">account_circle</span><span class="font-label-caps text-label-caps">Account</span></a></div></nav><script src="ui.js"></script><script src="ptr.js"></script>
 </body></html>
