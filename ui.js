@@ -7,7 +7,8 @@
   var PREF_KEY = "lacabana_notify";
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
   var acct = function () { try { return typeof getAccount === "function" ? getAccount() : JSON.parse(localStorage.getItem("lacabana_account")); } catch (e) { return null; } };
-  var notifyOn = function () { try { return localStorage.getItem(PREF_KEY) === "on"; } catch (e) { return false; } };
+  // on by default; only off if the customer turned it off
+  var notifyOn = function () { try { return localStorage.getItem(PREF_KEY) !== "off"; } catch (e) { return true; } };
 
   var css = document.createElement("style");
   css.textContent =
