@@ -796,64 +796,8 @@ const JUICES = [
  }
 ];
 
-// Menu sections, in the same order as the printed menu. banner = section photo, note = the menu's extras line.
+// Menu sections. Big plates first (what we want to sell), then the rest; sides near the end. banner = section photo, note = the menu's extras line.
 const CATEGORIES = [
- {
-  "id": "bakery",
-  "label": "Bakery",
-  "es": "Antojos",
-  "note": "",
-  "banner": "images/menu/bunuelos.jpg"
- },
- {
-  "id": "arepas",
-  "label": "Arepas",
-  "es": "",
-  "note": "Colombian style arepas come with protein on the side. Extras: mozzarella +$2.99, Colombian cheese +$4.",
-  "banner": "images/menu/arepa-pollo-queso.jpg"
- },
- {
-  "id": "burgers",
-  "label": "Burgers",
-  "es": "Hamburguesas",
-  "note": "All burgers include french fries. Extras: cheese +$2.99, Colombian cheese +$4, bacon or ham +$2.99.",
-  "banner": "images/menu/toston-mega-burger.jpg"
- },
- {
-  "id": "kids",
-  "label": "Kids Menu",
-  "es": "Niños",
-  "note": "Includes french fries and kids juice. 8 years and under only.",
-  "banner": "images/menu/chicken-nuggets.jpg"
- },
- {
-  "id": "sandwiches",
-  "label": "Sandwiches",
-  "es": "",
-  "note": "All sandwiches include french fries.",
-  "banner": "images/menu/perro-colombiano.jpg"
- },
- {
-  "id": "salads",
-  "label": "Salads",
-  "es": "Ensaladas",
-  "note": "",
-  "banner": "images/menu/chicken-caesar.jpg"
- },
- {
-  "id": "appetizers",
-  "label": "Appetizers",
-  "es": "Entradas",
-  "note": "",
-  "banner": "images/menu/tostones-hogao.jpg"
- },
- {
-  "id": "sides",
-  "label": "Sides",
-  "es": "Acompañantes",
-  "note": "",
-  "banner": "images/menu/maduros.jpg"
- },
  {
   "id": "steak",
   "label": "Meats",
@@ -895,6 +839,62 @@ const CATEGORIES = [
   "es": "Cerdo",
   "note": "",
   "banner": "images/menu/cerdo-parrilla.jpg"
+ },
+ {
+  "id": "appetizers",
+  "label": "Appetizers",
+  "es": "Entradas",
+  "note": "",
+  "banner": "images/menu/tostones-hogao.jpg"
+ },
+ {
+  "id": "salads",
+  "label": "Salads",
+  "es": "Ensaladas",
+  "note": "",
+  "banner": "images/menu/chicken-caesar.jpg"
+ },
+ {
+  "id": "sandwiches",
+  "label": "Sandwiches",
+  "es": "",
+  "note": "All sandwiches include french fries.",
+  "banner": "images/menu/perro-colombiano.jpg"
+ },
+ {
+  "id": "burgers",
+  "label": "Burgers",
+  "es": "Hamburguesas",
+  "note": "All burgers include french fries. Extras: cheese +$2.99, Colombian cheese +$4, bacon or ham +$2.99.",
+  "banner": "images/menu/toston-mega-burger.jpg"
+ },
+ {
+  "id": "arepas",
+  "label": "Arepas",
+  "es": "",
+  "note": "Colombian style arepas come with protein on the side. Extras: mozzarella +$2.99, Colombian cheese +$4.",
+  "banner": "images/menu/arepa-pollo-queso.jpg"
+ },
+ {
+  "id": "bakery",
+  "label": "Bakery",
+  "es": "Antojos",
+  "note": "",
+  "banner": "images/menu/bunuelos.jpg"
+ },
+ {
+  "id": "kids",
+  "label": "Kids Menu",
+  "es": "Niños",
+  "note": "Includes french fries and kids juice. 8 years and under only.",
+  "banner": "images/menu/chicken-nuggets.jpg"
+ },
+ {
+  "id": "sides",
+  "label": "Sides",
+  "es": "Acompañantes",
+  "note": "",
+  "banner": "images/menu/maduros.jpg"
  },
  {
   "id": "desserts",
