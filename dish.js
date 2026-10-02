@@ -125,7 +125,7 @@
       }).join("");
     }
 
-    var onSale = (item.was && item.was > item.price) || item.deal;   // sale items don't come with the free juice
+    var onSale = (item.was && item.was > item.price) || item.deal || (typeof FREE_JUICE !== "undefined" && !FREE_JUICE);   // sale items don't come with the free juice
     var member = typeof MEMBER_PERKS === "undefined" || !MEMBER_PERKS || typeof hasAccount !== "function" || hasAccount();   // staff screens have no account.js: always allowed
     if (!isJuice && !onSale && !member) {
       html += sectionTitle("Free juice for members", "<span style=\"color:#4cc417\">Free</span>") +

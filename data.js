@@ -187,7 +187,7 @@ const MENU = [
     name: 'Bacon "Double Stack" Cheese Burger',
     price: 18.99,
     category: "streetfood",
-    desc: "Double stack bacon cheeseburger, comes with free fries & a drink.",
+    desc: "Double stack bacon cheeseburger, served with fries.",
     img: "https://lacabanagrill.net/cdn/shop/files/Doublestackbaconcheeseburger.png?v=1753579786",
     specialty: false
   }
@@ -287,9 +287,14 @@ const PROMOS = [
     desc: "Two stuffed arepas with the filling of your choice. The second one is half price.",
     img: "images/arepa-rellena.jpg" }
 ];
+// Promotions hidden for now (kept above, just not shown or sold)
+const HIDDEN_PROMOS = ["promo-arepas-rellenas"];
+for (let i = PROMOS.length - 1; i >= 0; i--) if (HIDDEN_PROMOS.includes(PROMOS[i].id)) PROMOS.splice(i, 1);
 const ALL_ITEMS = MENU.concat(JUICES, SIDES_MENU, PROMOS);
 // Members-only free juice + the "Join free" card. Off for now (everyone gets the free juice); set to true to bring it back.
 const MEMBER_PERKS = false;
+// Free juice / free drink with meals. OFF for now (no free drinks anywhere); set to true to bring it back.
+const FREE_JUICE = false;
 // Hold-to-talk (voice ordering) buttons. Hidden for now, nothing deleted; set to true to bring them back.
 const TALK_ENABLED = false;
 

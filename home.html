@@ -194,7 +194,7 @@
   const isMember = !MEMBER_PERKS || (typeof hasAccount === 'function' && hasAccount());
   function card(it) {
     const off = it.was && it.was > it.price ? Math.round((1 - it.price / it.was) * 100) : 0;
-    const freeJuice = it.category !== 'juice' && !off && !it.deal;   // no free juice on items already on sale
+    const freeJuice = FREE_JUICE && it.category !== 'juice' && !off && !it.deal;   // no free juice on items already on sale
     return '<div class="lc-card" data-dish="' + it.id + '"><div class="lc-pic">' +
       (it.deal ? '<span class="lc-deal">' + esc(it.deal) + '</span>' : '') +
       (it.badge ? '<span class="lc-tag">' + esc(it.badge) + '</span>' : '') +
