@@ -46,7 +46,7 @@
 <section id="lc-member" class="w-full lc-reveal"></section>
 <section id="lc-reorder" class="w-full" style="display:none"></section>
 <!-- Full menu by section (sections switch as you scroll, like Uber Eats) -->
-<section class="w-full lc-reveal" id="lc-menu-wrap">
+<section class="w-full" id="lc-menu-wrap">
 <div class="lc-chips" id="lc-chips"></div>
 <div id="lc-menu"></div>
 </section>
@@ -416,8 +416,10 @@
 
   // Sections glide in as you scroll
   {
-    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.08 });
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0, rootMargin: '0px 0px -40px 0px' });
     document.querySelectorAll('.lc-reveal').forEach(el => io.observe(el));
+    // safety: never leave anything hidden (very tall sections, slow phones)
+    setTimeout(() => document.querySelectorAll('.lc-reveal').forEach(el => el.classList.add('in')), 2500);
   }
 
   // Order again: your last real order, one tap
