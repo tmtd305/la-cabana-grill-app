@@ -287,9 +287,7 @@ const PROMOS = [
     desc: "Two stuffed arepas with the filling of your choice. The second one is half price.",
     img: "images/arepa-rellena.jpg" }
 ];
-// Hidden 1-cent item for testing real card payments. Only reachable via cart.html?test=1 (never shown on the menu).
-const TEST_ITEMS = [{ id: "test-penny", name: "Payment test (1 cent)", price: 0.01, category: "test", desc: "Testing payments", img: "images/spread-1.jpg" }];
-const ALL_ITEMS = MENU.concat(JUICES, SIDES_MENU, PROMOS, TEST_ITEMS);
+const ALL_ITEMS = MENU.concat(JUICES, SIDES_MENU, PROMOS);
 // Members-only free juice + the "Join free" card. Off for now (everyone gets the free juice); set to true to bring it back.
 const MEMBER_PERKS = false;
 // Hold-to-talk (voice ordering) buttons. Hidden for now, nothing deleted; set to true to bring them back.
