@@ -9,6 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0..1&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="data.js"></script>
 <script>
 // Store hours (Miami time). Default = Google/Apple Maps listing; the owner edits them in the dashboard (app_settings key "hours").
@@ -292,7 +294,8 @@ function lcHoursStatus(h, now) {
   .po-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-height:calc(100vh - 230px);overflow:auto}
   .po-it{all:unset;cursor:pointer;background:#111;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent}
   .po-it:active{transform:scale(.97)}
-  .po-it img,.po-it .ph{width:100%;aspect-ratio:16/10;object-fit:cover;background:#222;display:block}
+  .po-it img,.po-it .ph{width:100%;aspect-ratio:16/10;object-fit:cover;background:#1b1b1b;display:block}
+  .po-it .ph,.mi .ph{background:#1b1b1b url(icons/logo-transparent.png) center/52% auto no-repeat;opacity:.9}
   .po-it div{padding:8px 10px}
   .po-it b{display:block;font-size:13px;line-height:1.25}
   .po-it small{color:var(--or2);font-weight:800;font-size:12.5px}
@@ -318,6 +321,15 @@ function lcHoursStatus(h, now) {
   }
   @media (max-width:700px){.po-bar{bottom:calc(env(safe-area-inset-bottom) + 78px)}}
   body.v-neworder .fab-car{display:none}
+
+  .dmap{height:220px;border-radius:14px;overflow:hidden;background:#111;margin-top:4px}
+  .dmap .leaflet-control-attribution{font-size:9px;background:rgba(0,0,0,.5);color:#aaa}
+  .dmap .leaflet-control-attribution a{color:#ccc}
+  .pin{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 12px Manrope,sans-serif;color:#fff;border:2px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.5)}
+  .pin.car{background:#06C167;width:36px;height:36px}
+  .pin.shop{background:#f36310} .pin.home{background:#111}
+  .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#06C167;box-shadow:0 0 0 3px rgba(6,193,103,.25);margin-right:6px;animation:liveP 1.4s infinite}
+  @keyframes liveP{50%{opacity:.35}}
 </style>
 </head>
 <body>
@@ -327,8 +339,8 @@ function lcHoursStatus(h, now) {
   <aside class="side">
     <div class="brand"><img src="icons/logo-transparent.png" alt="La Cabaña Grill"><small>MIAMI BEACH</small></div>
     <button class="nav on" data-v="dash"><span class="ms">home</span>Dashboard</button>
-    <button class="nav" data-v="neworder"><span class="ms">add_call</span>New phone order</button>
     <button class="nav" data-v="orders"><span class="ms">receipt_long</span>Orders<span class="cnt hidden" data-cnt="orders"></span></button>
+    <button class="nav" data-v="neworder"><span class="ms">add_call</span>New phone order</button>
     <button class="nav" data-v="drivers"><span class="ms">delivery_dining</span>Drivers</button>
     <button class="nav" data-v="menu"><span class="ms">restaurant_menu</span>Menu &amp; Sold out</button>
     <button class="nav" data-v="customers"><span class="ms">group</span>Customers</button>
@@ -346,7 +358,6 @@ function lcHoursStatus(h, now) {
     <div class="top">
       <h1 id="title">Dashboard</h1>
       <div class="search"><span class="ms">search</span><input id="q" placeholder="Search customers, phone, items…" autocomplete="off"></div>
-      <button class="btn green" data-driver><svg viewBox="0 0 64 40" width="26" height="17" aria-hidden="true"><defs><linearGradient id="cg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9ffd8"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs><path d="M6 27c0-3 1.6-5.2 4.4-6l7.3-2.1 6.9-7.4C26.4 9.6 28.8 8.6 31.3 8.6h9.4c2.6 0 5 1.1 6.6 3.1l5.3 6.6 4.2 1.1c2.6.7 4.2 3 4.2 5.6V29c0 1.4-1.1 2.5-2.5 2.5H8.5C7.1 31.5 6 30.4 6 29z" fill="url(#cg2)"/><path d="M22.5 18.6l5.4-5.6c.9-.9 2.1-1.4 3.4-1.4h3.9v7z" fill="#0a7a3f"/><path d="M38.2 11.6h2.5c1.6 0 3 .7 4 1.9l4.1 5.1H38.2z" fill="#0a7a3f"/><circle cx="18" cy="31" r="6.2" fill="#063" stroke="#fff" stroke-width="2.6"/><circle cx="48" cy="31" r="6.2" fill="#063" stroke="#fff" stroke-width="2.6"/><path d="M1 22h8M0 26.5h6" stroke="#b9ffd8" stroke-width="2.4" stroke-linecap="round"/></svg>Driver</button>
       <button class="status" id="status"><i></i><span>Online</span></button>
       <span class="clock" id="clock"></span>
       <div class="me" id="me"></div>
@@ -517,12 +528,12 @@ function lcHoursStatus(h, now) {
   </main>
 </div>
 
-<button class="fab-car hidden" id="fab-car" data-driver aria-label="Request Uber driver"><span class="car"><svg viewBox="0 0 64 40" width="34" height="22" aria-hidden="true"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9ffd8"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs><path d="M6 27c0-3 1.6-5.2 4.4-6l7.3-2.1 6.9-7.4C26.4 9.6 28.8 8.6 31.3 8.6h9.4c2.6 0 5 1.1 6.6 3.1l5.3 6.6 4.2 1.1c2.6.7 4.2 3 4.2 5.6V29c0 1.4-1.1 2.5-2.5 2.5H8.5C7.1 31.5 6 30.4 6 29z" fill="url(#cg)"/><path d="M22.5 18.6l5.4-5.6c.9-.9 2.1-1.4 3.4-1.4h3.9v7z" fill="#0a7a3f"/><path d="M38.2 11.6h2.5c1.6 0 3 .7 4 1.9l4.1 5.1H38.2z" fill="#0a7a3f"/><circle cx="18" cy="31" r="6.2" fill="#063" stroke="#fff" stroke-width="2.6"/><circle cx="48" cy="31" r="6.2" fill="#063" stroke="#fff" stroke-width="2.6"/><path d="M1 22h8M0 26.5h6" stroke="#b9ffd8" stroke-width="2.4" stroke-linecap="round"/></svg></span>Request driver</button>
+
 
 <nav class="bnav hidden" id="bnav">
   <button class="on" data-v="dash"><span class="ms">home</span>Home</button>
-  <button data-v="neworder"><span class="ms">add_call</span>New order</button>
   <button data-v="orders"><span class="ms">receipt_long</span>Orders<span class="cnt hidden" data-cnt="orders"></span></button>
+  <button data-v="neworder"><span class="ms">add_call</span>New order</button>
   <button data-v="drivers"><span class="ms">delivery_dining</span>Drivers</button>
   <button data-v="menu"><span class="ms">restaurant_menu</span>Menu</button>
   <button data-v="customers"><span class="ms">group</span>Customers</button>
@@ -558,7 +569,7 @@ function lcHoursStatus(h, now) {
     me = session.user;
     const { data: ok } = await sb.rpc('is_operator');
     if(!ok){ location.replace('operator.html'); return; }
-    $('gate').classList.add('hidden'); $('app').classList.remove('hidden'); $('bnav').classList.remove('hidden'); $('fab-car').classList.remove('hidden');
+    $('gate').classList.add('hidden'); $('app').classList.remove('hidden'); $('bnav').classList.remove('hidden');
     $('me').textContent = initials((me.user_metadata && me.user_metadata.name) || me.email);
     tick(); setInterval(tick, 15000);
     const v = (location.hash || '').slice(1); if(v && document.querySelector('[data-view="' + v + '"]')) go(v);
@@ -797,13 +808,36 @@ function lcHoursStatus(h, now) {
         renderDeliveries(); } catch(e){}
     });
   }
+  const maps = {};
+  function drawMaps(){
+    if(!window.L) return;
+    deliveries.forEach(d => {
+      const el = document.getElementById('map-' + d.id); if(!el || !d.live) return;
+      const pts = [], live = d.live, car = live.courier && live.courier.location;
+      if(maps[d.id] && maps[d.id].el !== el){ maps[d.id].map.remove(); delete maps[d.id]; }
+      if(!maps[d.id]){
+        const map = L.map(el, { zoomControl: false, attributionControl: true });
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '© OpenStreetMap © CARTO', maxZoom: 19 }).addTo(map);
+        maps[d.id] = { map, el, layer: L.layerGroup().addTo(map) };
+      }
+      const m = maps[d.id]; m.layer.clearLayers();
+      const icon = (cls, txt) => L.divIcon({ className: '', html: '<div class="pin ' + cls + '">' + txt + '</div>', iconSize: [36, 36], iconAnchor: [18, 18] });
+      if(live.pickup){ L.marker([live.pickup.lat, live.pickup.lng], { icon: icon('shop', 'LC') }).addTo(m.layer); pts.push([live.pickup.lat, live.pickup.lng]); }
+      if(live.dropoff){ L.marker([live.dropoff.lat, live.dropoff.lng], { icon: icon('home', '⌂') }).addTo(m.layer); pts.push([live.dropoff.lat, live.dropoff.lng]); }
+      if(car){ L.marker([car.lat, car.lng], { icon: icon('car', '🚗'), zIndexOffset: 1000 }).addTo(m.layer); pts.push([car.lat, car.lng]); }
+      if(pts.length > 1) m.map.fitBounds(pts, { padding: [28, 28], maxZoom: 16 }); else if(pts.length) m.map.setView(pts[0], 15);
+      setTimeout(() => m.map.invalidateSize(), 50);
+    });
+  }
   function renderDeliveries(){
     $('drv-list').innerHTML = deliveries.length ? deliveries.map(d => { const st = DSTAT[d.status] || [d.status || 'Requested', 'o'], c = d.live && d.live.courier;
       return '<div class="oc" style="margin-bottom:10px"><div class="oc-h"><div style="min-width:0"><div class="nm">' + esc(d.name) + '</div><div class="muted">' + esc(d.address) + '</div><div style="margin-top:6px"><span class="badge ' + st[1] + '">' + esc(st[0]).toUpperCase() + '</span></div></div><div class="tt">' + money(d.fee) + '<small>' + new Date(d.created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '</small></div></div>' +
         (c ? '<div class="muted">Driver: <b style="color:#fff">' + esc(c.name) + '</b>' + (c.vehicle ? ' · ' + esc(c.vehicle) : '') + (c.phone ? ' · <a class="lnk" href="tel:' + esc(c.phone) + '">call driver</a>' : '') + '</div>' : '') +
+        (d.live && ['pickup', 'pickup_complete', 'dropoff'].includes(d.status) ? '<div class="muted" style="font-size:12.5px"><span class="live-dot"></span>Live' + (d.live.dropoffEta ? ' · arrives about ' + new Date(d.live.dropoffEta).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '') + '</div><div class="dmap" id="map-' + esc(d.id) + '"></div>' : '') +
         (d.items ? '<div class="muted">' + esc(d.items) + '</div>' : '') +
         '<div class="acts">' + (d.tracking_url ? '<a class="btn" href="' + esc(d.tracking_url) + '" target="_blank" rel="noopener"><span class="ms">map</span>Track</a>' : '') + '<button class="btn" data-dtext="' + esc(d.id) + '"><span class="ms">sms</span>Text customer</button>' +
-        (['pending', 'pickup'].includes(d.status) ? '<button class="btn plain" data-dcancel="' + esc(d.id) + '">Cancel driver</button>' : '') + '</div></div>'; }).join('') : '<div class="empty">No drivers today. Tap "Request driver" for a phone order.</div>';
+        (['pending', 'pickup'].includes(d.status) ? '<button class="btn plain" data-dcancel="' + esc(d.id) + '">Cancel driver</button>' : '') + '</div></div>'; }).join('') : '<div class="empty">No drivers today. Delivery phone orders and "Request driver" show up here with a live map.</div>';
+    drawMaps();
   }
   $('drv-list').addEventListener('click', async e => {
     const t = e.target.closest('[data-dtext]'), c = e.target.closest('[data-dcancel]');
@@ -812,7 +846,7 @@ function lcHoursStatus(h, now) {
       try { await uber({ action: 'staff_cancel', deliveryId: d.uber_id }); await sb.from('deliveries').update({ status: 'canceled' }).eq('id', d.id); toast('Driver canceled'); loadDeliveries(); } catch(err){ toast(err.message); } }
   });
   $('drv-refresh').onclick = loadDeliveries;
-  setInterval(() => { if(!document.querySelector('[data-view="drivers"]').classList.contains('hidden')) loadDeliveries(); }, 30000);
+  setInterval(() => { if(!document.querySelector('[data-view="drivers"]').classList.contains('hidden')) loadDeliveries(); }, 15000);
 
   // ---------- tell the customer right away (text from this phone / iPad) ----------
   function notifyText(phone, text, title){
@@ -837,7 +871,7 @@ function lcHoursStatus(h, now) {
     $('po-cats').innerHTML = '<button data-c="all" class="' + (poCat === 'all' ? 'on' : '') + '">All</button>' + cats.map(c => '<button data-c="' + esc(c.id) + '" class="' + (poCat === c.id ? 'on' : '') + '">' + esc(c.label || c.id) + '</button>').join('');
     const q = $('po-q').value.trim().toLowerCase();
     const list = MENU_ALL.filter(i => (poCat === 'all' || i.category === poCat) && (!q || i.name.toLowerCase().includes(q)));
-    $('po-items').innerHTML = list.map(i => '<button class="po-it' + (soldOut.has(i.id) ? ' so' : '') + '" data-pi="' + esc(i.id) + '">' + (i.img ? '<img src="' + esc(i.img) + '" alt="" loading="lazy">' : '<span class="ph"></span>') + '<div><b>' + esc(i.name) + '</b><small>' + (soldOut.has(i.id) ? 'Sold out' : money(i.price)) + '</small></div></button>').join('') || '<div class="empty">No items.</div>';
+    $('po-items').innerHTML = list.map(i => '<button class="po-it' + (soldOut.has(i.id) ? ' so' : '') + '" data-pi="' + esc(i.id) + '">' + (i.img ? '<img src="' + esc(i.img) + '" alt="" loading="lazy" onerror="this.outerHTML=\'<span class=ph></span>\'">' : '<span class="ph"></span>') + '<div><b>' + esc(i.name) + '</b><small>' + (soldOut.has(i.id) ? 'Sold out' : money(i.price)) + '</small></div></button>').join('') || '<div class="empty">No items.</div>';
   }
   function poTotals(){
     const sub = po.lines.reduce((a, l) => a + l.price * l.qty, 0), tax = Math.round(sub * 0.079 * 100) / 100;
@@ -1011,7 +1045,7 @@ function lcHoursStatus(h, now) {
     const q = $('menu-q').value.trim().toLowerCase();
     const list = MENU_ALL.filter(i => (menuCat === 'all' || (menuCat === 'so' ? soldOut.has(i.id) : i.category === menuCat)) && (!q || i.name.toLowerCase().includes(q)));
     $('so-count').textContent = soldOut.size ? soldOut.size + ' sold out' : 'Everything available';
-    $('menu-list').innerHTML = list.length ? list.map(i => '<div class="mi' + (soldOut.has(i.id) ? ' so' : '') + '">' + (i.img ? '<img src="' + esc(i.img) + '" alt="" loading="lazy">' : '<div class="ph"></div>') + '<div class="l"><b>' + esc(i.name) + '</b><small>' + money(i.price) + (soldOut.has(i.id) ? ' · <span style="color:var(--rd);font-weight:800">Sold out</span>' : '') + '</small></div><label class="sw"><input type="checkbox" data-item="' + esc(i.id) + '"' + (soldOut.has(i.id) ? '' : ' checked') + '><span></span></label></div>').join('') : '<div class="empty">No items.</div>';
+    $('menu-list').innerHTML = list.length ? list.map(i => '<div class="mi' + (soldOut.has(i.id) ? ' so' : '') + '">' + (i.img ? '<img src="' + esc(i.img) + '" alt="" loading="lazy" onerror="this.outerHTML=\'<div class=ph></div>\'">' : '<div class="ph"></div>') + '<div class="l"><b>' + esc(i.name) + '</b><small>' + money(i.price) + (soldOut.has(i.id) ? ' · <span style="color:var(--rd);font-weight:800">Sold out</span>' : '') + '</small></div><label class="sw"><input type="checkbox" data-item="' + esc(i.id) + '"' + (soldOut.has(i.id) ? '' : ' checked') + '><span></span></label></div>').join('') : '<div class="empty">No items.</div>';
   }
   $('menu-cats').addEventListener('click', e => { const b = e.target.closest('[data-c]'); if(!b) return; menuCat = b.dataset.c; renderMenu(); });
   $('menu-q').oninput = renderMenu;

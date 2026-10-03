@@ -118,8 +118,7 @@ const MENU = [
   "name": "Bacon Double Stack Cheeseburger",
   "price": 19.99,
   "category": "burgers",
-  "desc": "Two juicy beef patties, double cheese, bacon, lettuce, tomato, onions. With fries.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/Doublestackbaconcheeseburger.png?v=1753579786"
+  "desc": "Two juicy beef patties, double cheese, bacon, lettuce, tomato, onions. With fries."
  },
  {
   "id": "burger-jalapeno",
@@ -278,7 +277,7 @@ const MENU = [
   "price": 23.99,
   "category": "steak",
   "desc": "Grilled steak, chorizo, chicharrón, fried egg, beans, rice, sweet plantains and arepita.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/bandejapaisaedited.png?v=1753664504",
+  "img": "images/menu/bandeja-paisa.jpg",
   "badge": "Signature",
   "specialty": true
  },
@@ -298,7 +297,7 @@ const MENU = [
   "price": 29.99,
   "category": "steak",
   "desc": "Accompanied with rice, salad and fries.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/churrascoedited.png?v=1753668510",
+  "img": "images/menu/churrasco-a-la-parrilla.jpg",
   "specialty": true
  },
  {
@@ -307,7 +306,7 @@ const MENU = [
   "price": 22.99,
   "category": "steak",
   "desc": "Grilled steak with rice, beans, salad and french fries.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/CarneAsadaWEBSITEresized-24.jpg?v=1753580454",
+  "img": "images/menu/carne-asada.jpg",
   "specialty": true
  },
  {
@@ -316,7 +315,7 @@ const MENU = [
   "price": 24.99,
   "category": "steak",
   "desc": "Grilled steak topped with salsa criolla and fried egg, with rice, salad and sweet plantains.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/bistecacaballoedited_69349b5e-6d21-4492-99f6-c8fc02ca3817.png?v=1753662808",
+  "img": "images/menu/bistec-acaballo.jpg",
   "specialty": true
  },
  {
@@ -338,7 +337,8 @@ const MENU = [
   "name": "Cazuela de Frijol",
   "price": 21.99,
   "category": "steak",
-  "desc": "Colombian bean stew with chorizo, chicharrón, sweet plantains, hogao, arepitas and rice."
+  "desc": "Colombian bean stew with chorizo, chicharrón, sweet plantains, hogao, arepitas and rice.",
+  "img": "images/menu/cazuela-frijol.jpg"
  },
  {
   "id": "lengua-criolla",
@@ -353,7 +353,7 @@ const MENU = [
   "price": 21.99,
   "category": "steak",
   "desc": "Breaded steak with rice, salad and french fries.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/MilanesadeCarneWEBSITEresized-20_grande.jpg?v=1753655230"
+  "img": "images/menu/milanesa-de-carne.jpg"
  },
  {
   "id": "parrillada-la-cabana",
@@ -361,7 +361,7 @@ const MENU = [
   "price": 99.99,
   "category": "steak",
   "desc": "Full fried mojarra, grilled chicken breast, churrasco, picaña, chorizo, morcilla, fries, rice, beans and salad.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/surfandturfedited_grande.png?v=1753662944",
+  "img": "images/menu/parrillada-la-cabana.jpg",
   "badge": "Signature",
   "specialty": true
  },
@@ -394,7 +394,7 @@ const MENU = [
   "price": 23.99,
   "category": "chicken",
   "desc": "Chicken with mushrooms, rice and salad.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/PolloconChampinonesWEBSITEresized-36_1_grande.jpg?v=1753655327"
+  "img": "images/menu/pollo-con-champinones.jpg"
  },
  {
   "id": "chicken-waffle",
@@ -402,7 +402,7 @@ const MENU = [
   "price": 23.99,
   "category": "chicken",
   "desc": "Homemade waffles with crispy fried chicken topped with powdered sugar.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/DFC07DC5-4F7B-49E1-BF1E-6636C089F134_grande.png?v=1753680800"
+  "img": "images/menu/chicken-waffle.jpg"
  },
  {
   "id": "pollo-asado-la-cabana",
@@ -433,7 +433,7 @@ const MENU = [
   "price": 29.99,
   "category": "seafood",
   "desc": "Whole fried fish with rice, tostones and salad.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/mojarraedited_0372a674-00e9-421b-b1a7-d358f5accf1d.png?v=1753663383",
+  "img": "images/menu/mojarra-frita.jpg",
   "badge": "Signature",
   "specialty": true
  },
@@ -451,7 +451,7 @@ const MENU = [
   "price": 19.99,
   "category": "seafood",
   "desc": "Grilled fish filet with rice, tostones and salad.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/PescadoalaparillaWEBSITEresized_grande.jpg?v=1753656552"
+  "img": "images/menu/pescado-a-la-parilla.jpg"
  },
  {
   "id": "jalea-mixta",
@@ -469,7 +469,7 @@ const MENU = [
   "price": 21.99,
   "category": "seafood",
   "desc": "Fish filet cooked in traditional Colombian sauce.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/PescadoalacriollaWEBSITEresized-18_grande.jpg?v=1753656729"
+  "img": "images/menu/pescado-a-la-criolla.jpg"
  },
  {
   "id": "pescado-apanado",
@@ -484,7 +484,7 @@ const MENU = [
   "price": 32.99,
   "category": "seafood",
   "desc": "Fish filet in a mixed seafood sauce with rice, salad and tostones.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/pescado_con_salsa_de_marisco_edited_grande.png?v=1753664069",
+  "img": "images/menu/pescado-en-salsa-de-mariscos.jpg",
   "specialty": true
  },
  {
@@ -493,7 +493,7 @@ const MENU = [
   "price": 23.99,
   "category": "seafood",
   "desc": "Grilled salmon with rice, tostones and salad.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/SalmonalaparillaWEBSITEresized-23_grande.jpg?v=1753655390"
+  "img": "images/menu/salmon.jpg"
  },
  {
   "id": "cazuela-mariscos",
@@ -511,7 +511,7 @@ const MENU = [
   "price": 23.99,
   "category": "seafood",
   "desc": "7 shrimp in garlic, wine and butter sauce with rice, salad and tostones.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/CamaronalAjilloWEBSITEresized-22.jpg?v=1753656870",
+  "img": "images/menu/camaron-al-ajillo.jpg",
   "specialty": true
  },
  {
@@ -537,7 +537,7 @@ const MENU = [
   "price": 23.99,
   "category": "rice",
   "desc": "Yellow rice with shrimp and vegetables, with salad and tostones.",
-  "img": "https://lacabanagrill.net/cdn/shop/files/arrozconcamaronedited.png?v=1753667469"
+  "img": "images/menu/arroz-con-camarones.jpg"
  },
  {
   "id": "arroz-a-la-marinera",
@@ -1041,7 +1041,7 @@ for (let i = MENU.length - 1; i >= 0; i--) if (DRAFT_IDS.includes(MENU[i].id)) M
 const PROMOS = [
   { id: "promo-2-mojarras", name: "2 Mojarras Fritas", price: 49.99, was: 59.98, deal: "2 for $49.99", category: "promo",
     desc: "Two whole crispy fried mojarras, Costeña style, each with rice, salad and fried plantains.",
-    img: "https://lacabanagrill.net/cdn/shop/files/mojarraedited_0372a674-00e9-421b-b1a7-d358f5accf1d.png?v=1753663383" },
+    img: "images/menu/mojarra-frita.jpg" },
   { id: "promo-2-pollos-apanados", name: "2 Pollos Apanados", price: 34.99, deal: "2 for $34.99", category: "promo",
     desc: "Two golden breaded chicken breasts, each with rice, salad and fries.",
     img: "images/menu/pollo-apanado.jpg" },
