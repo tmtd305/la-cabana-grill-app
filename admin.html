@@ -191,10 +191,11 @@
     <button class="nav" data-v="staff"><span class="ms">badge</span>Staff<span class="cnt hidden" data-cnt="staff"></span></button>
     <div class="grow"></div>
     <a class="site" href="home.html" target="_blank"><span class="ms">open_in_new</span>View website</a>
+    <button class="nav" id="signout2" style="margin-top:4px"><span class="ms">logout</span>Sign out</button>
   </aside>
 
   <main class="main">
-    <div class="mtop"><img src="icons/logo-transparent.png" alt=""><b>La Cabaña</b><button class="status" id="status-m"><i></i><span>Online</span></button></div>
+    <div class="mtop"><img src="icons/logo-transparent.png" alt=""><b>La Cabaña</b><button class="status" id="status-m"><i></i><span>Online</span></button><button class="btn sm" id="signout3" aria-label="Sign out" style="padding:0 10px"><span class="ms">logout</span></button></div>
     <div class="top">
       <h1 id="title">Dashboard</h1>
       <div class="search"><span class="ms">search</span><input id="q" placeholder="Search customers, phone, items…" autocomplete="off"></div>
@@ -305,7 +306,7 @@
       <div class="grid two">
         <div class="card"><div class="ch"><h2>Waiting for approval</h2></div><div id="pending"><div class="muted">Nobody waiting.</div></div></div>
         <div class="card"><div class="ch"><h2>Staff</h2></div><div id="staff"></div>
-          <p class="muted" style="margin-top:12px">New staff open <b style="color:#fff">lacabanagrill.net/operator.html</b>, tap "Create an account", then show up here to approve.</p>
+          <p class="muted" style="margin-top:12px">New staff open <b style="color:#fff">lacabanagrill.net/operator.html</b> and tap "Create an account". They show up under Waiting for approval. Only you (the owner) can approve or remove people. Anyone you don't approve stays locked out.</p>
           <button class="btn" id="signout" style="margin-top:6px"><span class="ms">logout</span>Sign out</button></div>
       </div>
     </section>
@@ -337,7 +338,7 @@
   function toast(m){ const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2400); }
   const CH_COLOR = { 'Website': '#f36310', 'In store (Square)': '#e5e7eb', 'Uber Eats': '#06C167', 'DoorDash': '#FF3008', 'Grubhub': '#F63440', 'Postmates': '#a3a3a3', 'Square Online': '#60a5fa' };
 
-  let me = null, session = null;
+  let me = null, session = null, isOwner = false;
   let all30 = [], loaded30 = false;          // every paid Square order, last 30 days
   let ordStatus = {}, ordReady = {};
   let customers = [], members = [];
@@ -353,8 +354,13 @@
     $('me').textContent = initials((me.user_metadata && me.user_metadata.name) || me.email);
     tick(); setInterval(tick, 15000);
     const v = (location.hash || '').slice(1); if(v && document.querySelector('[data-view="' + v + '"]')) go(v);
-    loadSettings(); loadAll(); loadCustomers(); loadMembers(); loadStaff(); renderMenu();
-    setInterval(loadAll, 20000); setInterval(loadStaff, 30000);
+    const { data: own } = await sb.rpc('is_owner'); isOwner = !!own;
+    // only the owner sees and manages staff
+    document.querySelectorAll('[data-v="staff"]').forEach(b => b.classList.toggle('hidden', !isOwner));
+    if(!isOwner && location.hash === '#staff') go('dash');
+    loadSettings(); loadAll(); loadCustomers(); loadMembers(); renderMenu();
+    setInterval(loadAll, 20000);
+    if(isOwner){ loadStaff(); setInterval(loadStaff, 30000); }
   })();
   sb.auth.onAuthStateChange((ev, s) => { if(s) session = s; if(ev === 'SIGNED_OUT') location.replace('operator.html'); });
   function tick(){ const d = new Date(); $('clock').textContent = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }) + '  ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
@@ -652,13 +658,13 @@
   async function loadStaff(){
     const [{ data }, pend] = await Promise.all([sb.rpc('staff_list'), sb.rpc('pending_staff')]);
     const mine = (me.email || '').toLowerCase();
-    $('staff').innerHTML = (data || []).map(r => '<div class="who" style="padding:10px 0;border-bottom:1px solid var(--line)"><div class="av">' + esc(initials(r.name || r.email)) + '</div><div style="flex:1;min-width:0"><b>' + esc(r.name || r.email) + (r.email === mine ? ' <span class="muted">(you)</span>' : '') + '</b><small>' + esc([fmtPhone(r.phone), r.email].filter(Boolean).join(' · ')) + '</small></div>' + (r.email === mine ? '' : '<button class="btn sm" data-rm="' + esc(r.email) + '">Remove</button>') + '</div>').join('');
+    $('staff').innerHTML = (data || []).map(r => '<div class="who" style="padding:10px 0;border-bottom:1px solid var(--line)"><div class="av">' + esc(initials(r.name || r.email)) + '</div><div style="flex:1;min-width:0"><b>' + esc(r.name || r.email) + (r.email === 'tmtd305@gmail.com' ? ' <span class="badge y">OWNER</span>' : '') + (r.email === mine ? ' <span class="muted">(you)</span>' : '') + '</b><small>' + esc([fmtPhone(r.phone), r.email].filter(Boolean).join(' · ')) + '</small></div>' + (r.email === mine || r.email === 'tmtd305@gmail.com' ? '' : '<button class="btn sm" data-rm="' + esc(r.email) + '">Remove</button>') + '</div>').join('');
     const pl = (pend && pend.data) || [];
     $('pending').innerHTML = pl.length ? pl.map(r => '<div class="who" style="padding:10px 0;border-bottom:1px solid var(--line)"><div class="av">' + esc(initials(r.name || r.email)) + '</div><div style="flex:1;min-width:0"><b>' + esc(r.name || r.email) + '</b><small>' + esc([fmtPhone(r.phone), r.email].filter(Boolean).join(' · ')) + '</small></div><button class="btn main sm" data-ok="' + esc(r.email) + '">Approve</button></div>').join('') : '<div class="muted">Nobody waiting.</div>';
     document.querySelectorAll('[data-cnt="staff"]').forEach(c => { c.textContent = pl.length; c.classList.toggle('hidden', !pl.length); });
   }
   $('pending').addEventListener('click', async e => { const b = e.target.closest('[data-ok]'); if(!b) return; b.disabled = true; const { error } = await sb.rpc('add_operator', { p_email: b.dataset.ok }); toast(error ? 'Couldn\'t approve' : 'Approved'); loadStaff(); });
   $('staff').addEventListener('click', async e => { const b = e.target.closest('[data-rm]'); if(!b) return; if(!confirm('Remove ' + b.dataset.rm + ' from staff?')) return; const { error } = await sb.rpc('remove_operator', { p_email: b.dataset.rm }); toast(error ? 'Couldn\'t remove' : 'Removed'); loadStaff(); });
-  $('signout').onclick = async () => { await sb.auth.signOut(); location.replace('operator.html'); };
+  $('signout').onclick = $('signout2').onclick = $('signout3').onclick = async () => { await sb.auth.signOut(); location.replace('operator.html'); };
 </script>
 </body></html>
