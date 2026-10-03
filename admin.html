@@ -330,6 +330,32 @@ function lcHoursStatus(h, now) {
   .pin.shop{background:#f36310} .pin.home{background:#111}
   .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#06C167;box-shadow:0 0 0 3px rgba(6,193,103,.25);margin-right:6px;animation:liveP 1.4s infinite}
   @keyframes liveP{50%{opacity:.35}}
+
+  /* loyalty: bright gold so it stands out */
+  .btn.gold{background:linear-gradient(135deg,#ffd84d,#ffb000);border-color:transparent;color:#1a1200;box-shadow:0 6px 20px rgba(255,190,0,.35)}
+  .btn.gold:hover{filter:brightness(1.06)}
+  .gold-card{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:18px 20px;border-radius:20px;background:linear-gradient(120deg,#ffd84d 0%,#ffb000 55%,#ff8a00 100%);color:#1a1200;box-shadow:0 14px 34px rgba(255,176,0,.25)}
+  .gold-card .gc-ic{width:52px;height:52px;border-radius:16px;background:rgba(26,18,0,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .gold-card .gc-ic .ms{font-size:30px;color:#1a1200}
+  .gold-card .gc-txt{flex:1;min-width:200px}
+  .gold-card .gc-txt b{display:block;font-family:Outfit;font-size:20px}
+  .gold-card .gc-txt small{display:block;font-size:13px;font-weight:700;opacity:.75}
+  .gold-card .gc-stats{display:flex;gap:18px}
+  .gold-card .gc-stats div{text-align:center}
+  .gold-card .gc-stats b{display:block;font-family:Outfit;font-size:24px;line-height:1}
+  .gold-card .gc-stats small{font-size:11px;font-weight:800;opacity:.7;text-transform:uppercase;letter-spacing:.04em}
+  .gold-card .gc-btns{display:flex;gap:8px;flex-wrap:wrap}
+  .gold-card .btn.gold{background:#1a1200;color:#ffd84d;box-shadow:none}
+  .gold-card .gc-open{border-color:rgba(26,18,0,.35);color:#1a1200}
+  [data-view="loyalty"] .banner{background:linear-gradient(110deg,#ffd84d,#ffb000 55%,#ff8a00)}
+  [data-view="loyalty"] .banner .btn.main{background:#1a1200;color:#ffd84d;border-color:#1a1200}
+  .nav-gold{color:#ffd84d}
+  .nav-gold .star{margin-left:auto;color:#ffd84d;font-size:13px}
+  .nav-gold.on{background:linear-gradient(135deg,#ffd84d,#ffb000);color:#1a1200}
+  .nav-gold.on .star{color:#1a1200}
+  .bnav .bn-gold{color:#ffd84d}
+  @media (max-width:700px){.top .btn.gold{display:none}.gold-card{padding:16px}.gold-card .gc-stats{width:100%;justify-content:space-around}.gold-card .gc-btns{width:100%}.gold-card .gc-btns .btn{flex:1}}
+  @media (min-width:701px) and (max-width:1100px){.nav-gold .star{position:absolute;top:4px;right:10px}}
 </style>
 </head>
 <body>
@@ -344,7 +370,7 @@ function lcHoursStatus(h, now) {
     <button class="nav" data-v="drivers"><span class="ms">delivery_dining</span>Drivers</button>
     <button class="nav" data-v="menu"><span class="ms">restaurant_menu</span>Menu &amp; Sold out</button>
     <button class="nav" data-v="customers"><span class="ms">group</span>Customers</button>
-    <button class="nav" data-v="loyalty"><span class="ms">redeem</span>Marketing &amp; Loyalty</button>
+    <button class="nav nav-gold" data-v="loyalty"><span class="ms">redeem</span>Loyalty &amp; Marketing<span class="star">★</span></button>
     <button class="nav" data-v="analytics"><span class="ms">bar_chart</span>Analytics</button>
     <button class="nav" data-v="channels"><span class="ms">hub</span>Channels</button>
     <button class="nav" data-v="staff"><span class="ms">badge</span>Staff<span class="cnt hidden" data-cnt="staff"></span></button>
@@ -354,10 +380,11 @@ function lcHoursStatus(h, now) {
   </aside>
 
   <main class="main">
-    <div class="mtop"><img src="icons/logo-transparent.png" alt=""><b>La Cabaña</b><button class="status" id="status-m"><i></i><span>Online</span></button><button class="btn sm" id="signout3" aria-label="Sign out" style="padding:0 10px"><span class="ms">logout</span></button></div>
+    <div class="mtop"><img src="icons/logo-transparent.png" alt=""><b>La Cabaña</b><button class="btn gold sm" data-newcard aria-label="Create member card" style="padding:0 10px"><span class="ms">add_card</span></button><button class="status" id="status-m"><i></i><span>Online</span></button><button class="btn sm" id="signout3" aria-label="Sign out" style="padding:0 10px"><span class="ms">logout</span></button></div>
     <div class="top">
       <h1 id="title">Dashboard</h1>
       <div class="search"><span class="ms">search</span><input id="q" placeholder="Search customers, phone, items…" autocomplete="off"></div>
+      <button class="btn gold" data-newcard><span class="ms">add_card</span>Member card</button>
       <button class="status" id="status"><i></i><span>Online</span></button>
       <span class="clock" id="clock"></span>
       <div class="me" id="me"></div>
@@ -366,7 +393,6 @@ function lcHoursStatus(h, now) {
     <!-- DASHBOARD -->
     <section data-view="dash">
       <div class="grid kpis" id="kpis"></div>
-      <div class="banner"><h3>Loyalty program</h3><p>Reward your customers. Bring them back.</p><button class="btn main" data-go="loyalty"><span class="ms">add_card</span>Create member card</button></div>
       <div class="grid two">
         <div class="card"><div class="ch"><h2>Sales today by hour</h2><span class="muted" id="hour-tot"></span></div><div class="cols" id="hours"></div></div>
         <div class="card"><div class="ch"><h2>Where sales come from</h2><div class="seg" id="ch-days"><button class="on" data-d="1">Today</button><button data-d="7">7d</button><button data-d="30">30d</button></div></div><div id="chan"></div></div>
@@ -375,6 +401,12 @@ function lcHoursStatus(h, now) {
         <div class="card"><div class="ch"><h2>Live website orders</h2><button class="btn sm" data-go="orders">Open</button></div><div id="dash-orders"></div></div>
         <div class="card"><div class="ch"><h2>Top items (7 days)</h2></div><div id="top-items"></div></div>
         <div class="card"><div class="ch"><h2>Top customers</h2><button class="btn sm" data-go="customers">View all</button></div><div id="top-cust"></div></div>
+      </div>
+      <div class="gold-card" style="margin-top:14px">
+        <div class="gc-ic"><span class="ms">card_membership</span></div>
+        <div class="gc-txt"><b>Loyalty &amp; member cards</b><small>Give regulars a QR card. Every new customer they bring = $1.</small></div>
+        <div class="gc-stats" id="gc-stats"></div>
+        <div class="gc-btns"><button class="btn gold" data-newcard><span class="ms">add_card</span>Create member card</button><button class="btn gc-open" data-go="loyalty">Open loyalty</button></div>
       </div>
     </section>
 
@@ -537,7 +569,7 @@ function lcHoursStatus(h, now) {
   <button data-v="drivers"><span class="ms">delivery_dining</span>Drivers</button>
   <button data-v="menu"><span class="ms">restaurant_menu</span>Menu</button>
   <button data-v="customers"><span class="ms">group</span>Customers</button>
-  <button data-v="loyalty"><span class="ms">redeem</span>Loyalty</button>
+  <button data-v="loyalty" class="bn-gold"><span class="ms">redeem</span>Loyalty</button>
   <button data-v="analytics"><span class="ms">bar_chart</span>Analytics</button>
   <button data-v="channels"><span class="ms">hub</span>Channels</button>
   <button data-v="staff"><span class="ms">badge</span>Staff<span class="cnt hidden" data-cnt="staff"></span></button>
@@ -585,7 +617,7 @@ function lcHoursStatus(h, now) {
   function tick(){ const d = new Date(); $('clock').textContent = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }) + '  ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
 
   // ---------- navigation ----------
-  const TITLES = { neworder: 'New phone order', dash: 'Dashboard', orders: 'Orders', drivers: 'Uber drivers', menu: 'Hours, Menu & Sold out', customers: 'Customers', loyalty: 'Marketing & Loyalty', analytics: 'Analytics', channels: 'Channels', staff: 'Staff' };
+  const TITLES = { neworder: 'New phone order', dash: 'Dashboard', orders: 'Orders', drivers: 'Uber drivers', menu: 'Hours, Menu & Sold out', customers: 'Customers', loyalty: 'Loyalty & Marketing', analytics: 'Analytics', channels: 'Channels', staff: 'Staff' };
   function go(v){
     document.querySelectorAll('[data-view]').forEach(s => s.classList.toggle('hidden', s.dataset.view !== v));
     document.querySelectorAll('.nav[data-v],.bnav [data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
@@ -1058,7 +1090,7 @@ function lcHoursStatus(h, now) {
 
   // ---------- customers ----------
   let custF = 'all';
-  async function loadCustomers(){ const { data } = await sb.from('customers').select('*').order('last_order_at', { ascending: false }).limit(2000); customers = data || []; renderCustomers(); renderCustomerKpis(); renderTopCust(); }
+  async function loadCustomers(){ const { data } = await sb.from('customers').select('*').order('last_order_at', { ascending: false }).limit(2000); customers = data || []; renderCustomers(); renderCustomerKpis(); renderTopCust(); renderGoldStats(); }
   const custStatus = c => { const days = c.last_order_at ? (Date.now() - new Date(c.last_order_at)) / 864e5 : 999; return c.orders >= 5 ? 'VIP' : days > 30 ? 'Inactive' : c.orders <= 1 ? 'New' : 'Active'; };
   const custBadge = s => '<span class="badge ' + (s === 'VIP' ? 'y' : s === 'New' ? 'o' : s === 'Inactive' ? '' : 'g') + '">' + s + '</span>';
   function renderCustomerKpis(){
@@ -1082,6 +1114,13 @@ function lcHoursStatus(h, now) {
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'la-cabana-customers.csv'; a.click();
   };
 
+
+  document.addEventListener('click', e => { if(e.target.closest('[data-newcard]')){ go('loyalty'); setTimeout(() => $('add-member').click(), 60); } });
+  function renderGoldStats(){
+    const el = $('gc-stats'); if(!el) return;
+    const pts = members.reduce((a, x) => a + (x.points || 0), 0);
+    el.innerHTML = '<div><b>' + members.length + '</b><small>Cards</small></div><div><b>' + pts + '</b><small>Points</small></div><div><b>' + customers.filter(c => c.marketing).length + '</b><small>Opted in</small></div>';
+  }
   // ---------- loyalty / ambassadors ----------
   const cardUrl = code => location.origin + '/card.html?c=' + code;
   const refUrl = code => location.origin + '/home.html?ref=' + code;
@@ -1091,7 +1130,7 @@ function lcHoursStatus(h, now) {
       sb.from('referrals').select('code,created_at'),
       sb.from('loyalty_ledger').select('*').order('created_at', { ascending: false }).limit(25)
     ]);
-    members = m || []; const refs = r || [];
+    members = m || []; const refs = r || []; renderGoldStats();
     const cnt = {}; refs.forEach(x => cnt[x.code] = (cnt[x.code] || 0) + 1);
     const month = startOf(new Date().getDate() - 1);
     $('loy-kpis').innerHTML = kpi('card_membership', 'Member cards', members.length) + kpi('person_add', 'New customers brought', refs.length, '<span class="muted">' + refs.filter(x => new Date(x.created_at) >= month).length + ' this month</span>') +
