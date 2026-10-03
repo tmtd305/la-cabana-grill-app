@@ -31,9 +31,11 @@ async function createSquareOrder({ accessToken, locationId, apiHost, order, ref 
   const phone = String(order.phone || "").replace(/\D/g, "");
   const recipient = { display_name: String(order.name || "App customer").slice(0, 80) };
   if (phone.length === 10) recipient.phone_number = "+1" + phone;
+  else if (phone.length === 11 && phone[0] === "1") recipient.phone_number = "+" + phone;
+  if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(order.email || ""))) recipient.email_address = String(order.email).trim().slice(0, 120);
   const fulfillment = order.fulfillment === "delivery"
     ? { type: "DELIVERY", state: "PROPOSED", delivery_details: { recipient: { ...recipient, address: order.address ? { address_line_1: String(order.address.street || "").slice(0, 120), address_line_2: order.address.apt ? String(order.address.apt).slice(0, 60) : undefined, locality: order.address.city || "Miami Beach", administrative_district_level_1: "FL", postal_code: String(order.address.zip || ""), country: "US" } : undefined }, schedule_type: "ASAP", note: order.notes ? String(order.notes).slice(0, 500) : "Uber Direct delivery" } }
-    : { type: "PICKUP", state: "PROPOSED", pickup_details: { recipient, schedule_type: "ASAP", prep_time_duration: "PT20M", note: "App order" } };
+    : { type: "PICKUP", state: "PROPOSED", pickup_details: { recipient, schedule_type: "ASAP", prep_time_duration: "PT20M", note: "App order" + (order.marketing ? " · OK to text deals" : "") } };
   const o = { location_id: locationId, reference_id: ref, source: { name: "La Cabana App" }, line_items: lines, fulfillments: [fulfillment],
     taxes: [{ uid: "sales-tax", name: "Sales tax", percentage: "7.9", scope: "ORDER" }] };
   if (cents(order.discount) > 0) o.discounts = [{ uid: "promo", name: "Free juice promo", amount_money: { amount: cents(order.discount), currency: "USD" }, scope: "ORDER" }];
@@ -46,6 +48,18 @@ async function createSquareOrder({ accessToken, locationId, apiHost, order, ref 
   const d = await r.json();
   if (!r.ok || !d.order) { console.error("Square order failed", JSON.stringify(d.errors || d)); return null; }
   return d.order;
+}
+
+// Customer list for the staff dashboard / marketing (needs LC_SUPABASE_SECRET_KEY). Never blocks the sale.
+async function saveCustomer(order, ref, total) {
+  try {
+    const key = process.env.LC_SUPABASE_SECRET_KEY; if (!key) return;
+    const h = { apikey: key, "Content-Type": "application/json", Prefer: "return=minimal" };
+    if (!key.startsWith("sb_")) h.Authorization = "Bearer " + key;
+    await fetch(LC_SUPABASE_URL + "/rest/v1/rpc/record_customer_order", { method: "POST", headers: h, body: JSON.stringify({
+      p_name: String(order.name || "").slice(0, 80), p_phone: String(order.phone || "").slice(0, 30), p_email: String(order.email || "").slice(0, 120),
+      p_marketing: !!order.marketing, p_ref: ref, p_total: total }) });
+  } catch (e) { console.error("saveCustomer", e.message); }
 }
 
 export default async function handler(req, res) {
@@ -95,6 +109,7 @@ export default async function handler(req, res) {
           idempotencyKey: ref + "-" + String(sourceId).slice(-16), note: "La Cabana Grill app order " + ref });
         if (!r2.ok) { res.status(r2.status).json({ error: r2.data.errors ? r2.data.errors[0].detail : "Payment failed" }); return; }
         const p = r2.data.payment;
+        await saveCustomer(order, ref, (p.total_money ? p.total_money.amount : p.amount_money.amount) / 100);
         res.status(200).json({ success: true, paymentId: p.id, status: p.status, squareOrderId: sq.id, reference: ref, charged: (p.total_money ? p.total_money.amount : p.amount_money.amount) / 100 });
         return;
       }
