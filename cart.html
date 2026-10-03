@@ -308,6 +308,9 @@
 
   function checkReady() {
     if (cartLines().length === 0) { showToast('Your cart is empty'); return false; }
+    if (window.LC_PAUSED) { showToast(window.LC_PAUSED_MSG || 'Online ordering is paused right now. Call us to order.'); return false; }
+    const so = cartLines().filter(l => window.LC_SOLD_OUT && LC_SOLD_OUT.has(l.id));
+    if (so.length) { showToast(so[0].item.name + ' is sold out. Remove it to continue.'); return false; }
     const needInfo = (m) => { showToast(m); document.getElementById('infoCard').scrollIntoView({ behavior: 'smooth', block: 'center' }); return false; };
     if (!val('c-name')) return needInfo('Add your name');
     if (val('c-phone').replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '').length !== 10) return needInfo('Add your 10-digit phone number');
@@ -352,7 +355,7 @@
         body: JSON.stringify({ sourceId: tokenResult.token, amount: total, order: {
           lines: lines.map(l => ({ name: l.item.name, qty: l.qty, price: l.unit, note: optsSummary(l.opts) })),
           discount: totals.discount, tip: currentTip, deliveryFee: deliveryFee(), fulfillment,
-          name: val('c-name'), phone: val('c-phone'), email: val('c-email'), marketing: document.getElementById('c-mkt').checked,
+          name: val('c-name'), phone: val('c-phone'), email: val('c-email'), marketing: document.getElementById('c-mkt').checked, referral: (function(){ try { return localStorage.getItem('lc_ref') || ''; } catch(e){ return ''; } })(),
           address: fulfillment === 'delivery' ? deliveryAddress() : null, notes: fulfillment === 'delivery' ? val('d-notes') : '' } })
       });
       const data = await res.json();

@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="robots" content="noindex"/>
+<title>La Cabaña Grill — Dashboard</title>
+<link rel="icon" type="image/png" href="icons/favicon-64.png?v=2"/><link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-title" content="Cabaña Admin"/><meta name="theme-color" content="#0c0c0c"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="data.js"></script>
+<style>
+  :root{--bg:#0c0c0c;--side:#111;--card:#171717;--card2:#1f1f1f;--line:rgba(255,255,255,.07);--fg:#f5f5f5;--fg2:#9a9a9a;--or:#f36310;--or2:#ffb596;--gr:#22c55e;--rd:#f87171;--yl:#fbbf24}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--fg);font-family:Manrope,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font-family:inherit}
+  .ms{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;font-size:22px;line-height:1;display:inline-block;white-space:nowrap;-webkit-font-feature-settings:'liga';font-feature-settings:'liga'}
+  .hidden{display:none!important}
+  /* layout */
+  .app{display:flex;min-height:100vh}
+  .side{width:236px;flex-shrink:0;background:var(--side);border-right:1px solid var(--line);padding:calc(env(safe-area-inset-top) + 18px) 12px 18px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
+  .brand{display:flex;flex-direction:column;align-items:center;padding:4px 0 18px}
+  .brand img{height:58px}
+  .brand small{font-size:10.5px;letter-spacing:.14em;color:var(--or2);font-weight:800;margin-top:6px}
+  .nav{all:unset;cursor:pointer;display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;font-weight:700;font-size:14.5px;color:#d4d4d4}
+  .nav:hover{background:#1a1a1a}
+  .nav.on{background:var(--or);color:#fff}
+  .nav .cnt{margin-left:auto;min-width:22px;height:22px;border-radius:100px;background:#dc2626;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;padding:0 6px}
+  .nav.on .cnt{background:#fff;color:var(--or)}
+  .side .grow{flex:1}
+  .side a.site{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;border:1px solid #2a2a2a;font-weight:700;font-size:13.5px;color:#d4d4d4}
+  .main{flex:1;min-width:0;padding:calc(env(safe-area-inset-top) + 16px) 22px 40px}
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .top h1{font-family:Outfit,sans-serif;font-size:24px;margin:0;flex:1;min-width:0}
+  .search{flex:1;max-width:420px;position:relative}
+  .search input{width:100%;height:42px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:#fff;padding:0 14px 0 40px;font-size:14px;outline:none}
+  .search .ms{position:absolute;left:12px;top:10px;font-size:20px;color:var(--fg2)}
+  .status{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;border-radius:100px;font-weight:800;font-size:13px;border:1px solid rgba(34,197,94,.5);color:var(--gr)}
+  .status i{width:9px;height:9px;border-radius:50%;background:var(--gr);box-shadow:0 0 0 3px rgba(34,197,94,.2)}
+  .status.off{border-color:rgba(248,113,113,.5);color:var(--rd)} .status.off i{background:var(--rd);box-shadow:0 0 0 3px rgba(248,113,113,.2)}
+  .clock{color:var(--fg2);font-size:13px;font-weight:700;white-space:nowrap}
+  .me{width:38px;height:38px;border-radius:50%;background:#262626;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+  .mtop{display:none}
+  @media (max-width:900px){
+    .side{display:none}
+    .main{padding:calc(env(safe-area-inset-top) + 10px) 14px 96px}
+    .mtop{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+    .mtop img{height:34px}
+    .mtop b{font-family:Outfit,sans-serif;font-size:18px;flex:1}
+    .top .search,.top .clock,.top .me,.top .status{display:none}
+    .banner{padding:16px}.banner h3{font-size:22px}.banner p{flex-basis:100%;font-size:11.5px}
+    .top h1{font-size:21px}
+    .bnav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(17,17,17,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;overflow-x:auto;scrollbar-width:none;padding:6px 6px calc(env(safe-area-inset-bottom) + 6px)}
+    .bnav::-webkit-scrollbar{display:none}
+    .bnav button{all:unset;cursor:pointer;flex:0 0 auto;min-width:68px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px;border-radius:12px;font-size:11px;font-weight:800;color:var(--fg2);position:relative}
+    .bnav button.on{color:var(--or)}
+    .bnav .cnt{position:absolute;top:2px;right:12px;min-width:16px;height:16px;border-radius:100px;background:#dc2626;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+  }
+  @media (min-width:901px){.bnav{display:none}}
+  /* pieces */
+  .grid{display:grid;gap:14px}
+  .kpis{grid-template-columns:repeat(5,minmax(0,1fr))}
+  @media (max-width:1200px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media (max-width:640px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:flex;gap:12px;align-items:center;min-width:0}
+  .kpi .ic{width:46px;height:46px;border-radius:14px;background:var(--or);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .kpi .ic .ms{color:#fff;font-size:26px}
+  .kpi small{display:block;color:var(--fg2);font-size:12.5px;font-weight:700}
+  .kpi b{display:block;font-family:Outfit,sans-serif;font-size:24px;line-height:1.15;white-space:nowrap}
+  .kpi em{font-style:normal;font-size:12px;font-weight:800}
+  .up{color:var(--gr)} .dn{color:var(--rd)} .flat{color:var(--fg2)}
+  @media (max-width:640px){.kpi{padding:12px}.kpi .ic{width:38px;height:38px;border-radius:12px}.kpi .ic .ms{font-size:22px}.kpi b{font-size:20px}}
+  .two{grid-template-columns:1.4fr 1fr}
+  .three{grid-template-columns:repeat(3,minmax(0,1fr))}
+  @media (max-width:1100px){.two,.three{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;min-width:0}
+  .ch{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .ch h2{font-family:Outfit,sans-serif;font-size:17px;letter-spacing:.02em;margin:0;flex:1;text-transform:uppercase;color:var(--or2)}
+  .muted{color:var(--fg2);font-size:13px}
+  .btn{all:unset;box-sizing:border-box;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;padding:0 16px;border-radius:100px;font-weight:800;font-size:13.5px;border:1px solid #333;color:#fff;white-space:nowrap}
+  .btn.main{background:#fff;color:#111;border-color:#fff}
+  .btn.or{background:var(--or);border-color:var(--or)}
+  .btn.plain{border-color:transparent;color:var(--fg2)}
+  .btn.sm{height:32px;padding:0 12px;font-size:12.5px}
+  .btn .ms{font-size:18px}
+  .btn[disabled]{opacity:.4;pointer-events:none}
+  .seg{display:inline-flex;gap:4px;background:#111;border:1px solid var(--line);border-radius:100px;padding:3px}
+  .seg button{all:unset;cursor:pointer;padding:6px 12px;border-radius:100px;font-size:12.5px;font-weight:800;color:var(--fg2)}
+  .seg button.on{background:#fff;color:#111}
+  .field{width:100%;height:42px;border-radius:12px;background:#111;border:1px solid #2a2a2a;color:#fff;padding:0 12px;font-size:15px;outline:none}
+  .field:focus{border-color:var(--or)}
+  .empty{text-align:center;color:var(--fg2);padding:30px 10px;font-size:14px}
+  .badge{display:inline-flex;align-items:center;font-size:11px;font-weight:800;padding:3px 9px;border-radius:100px;border:1px solid #3a3a3a;color:#ddd;white-space:nowrap}
+  .badge.o{border-color:var(--or);color:var(--or2)} .badge.g{border-color:rgba(34,197,94,.6);color:var(--gr)} .badge.r{border-color:rgba(248,113,113,.6);color:var(--rd)} .badge.y{border-color:rgba(251,191,36,.6);color:var(--yl)}
+  /* bars */
+  .chr{padding:10px 0}
+  .chr+.chr{border-top:1px solid var(--line)}
+  .chr .r1{display:flex;gap:8px;align-items:baseline}
+  .chr .r1 b{flex:1;font-size:14.5px}
+  .chr .r1 span{font-family:Outfit,sans-serif;font-weight:700}
+  .chr .r2{display:flex;justify-content:space-between;color:var(--fg2);font-size:12px;margin-top:2px}
+  .bar{height:6px;border-radius:6px;background:#262626;margin-top:7px;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:6px;background:var(--or)}
+  .cols{display:flex;align-items:flex-end;gap:4px;height:170px;padding-top:10px}
+  .cols div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0}
+  .cols i{display:block;width:100%;max-width:26px;border-radius:6px 6px 2px 2px;background:var(--or);min-height:2px}
+  .cols i.web{background:var(--or)} .cols i.zero{background:#262626}
+  .cols span{font-size:10px;color:var(--fg2);margin-top:6px;white-space:nowrap}
+  /* tables */
+  .tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+  .tbl th{text-align:left;color:var(--fg2);font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:8px 8px;border-bottom:1px solid var(--line)}
+  .tbl td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .tbl tr:last-child td{border-bottom:0}
+  .av{width:36px;height:36px;border-radius:50%;background:#262626;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:12.5px;color:#ddd;flex-shrink:0}
+  .who{display:flex;align-items:center;gap:10px;min-width:0}
+  .who b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .who small{display:block;color:var(--fg2);font-size:12px}
+  .scroll{overflow-x:auto}
+  a.lnk{color:#fff}
+  /* orders */
+  .ordlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
+  .oc{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
+  .oc.new{border-color:var(--or);box-shadow:0 0 0 1px var(--or) inset,0 0 24px rgba(243,99,16,.18)}
+  .oc.ready{border-color:rgba(34,197,94,.6)} .oc.done{opacity:.55}
+  .oc-h{display:flex;gap:10px;align-items:flex-start}
+  .oc-h .nm{font-family:Outfit,sans-serif;font-weight:700;font-size:19px}
+  .oc-h .tt{margin-left:auto;text-align:right;font-family:Outfit,sans-serif;font-weight:700;font-size:19px;white-space:nowrap}
+  .oc-h .tt small{display:block;font-family:Manrope;font-size:11.5px;color:var(--fg2)}
+  .items{background:#111;border-radius:12px;padding:8px 12px}
+  .items .ln{display:flex;gap:10px;padding:6px 0;font-size:14.5px}
+  .items .ln+.ln{border-top:1px solid rgba(255,255,255,.06)}
+  .items .q{font-weight:800;min-width:26px;color:var(--or2)}
+  .items .nt{display:block;color:var(--fg2);font-size:12.5px}
+  .accept{background:rgba(243,99,16,.08);border:1px solid rgba(243,99,16,.35);border-radius:14px;padding:12px}
+  .mins{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
+  .mins button{all:unset;cursor:pointer;text-align:center;padding:10px 0;border-radius:12px;background:#fff;color:#111;font-family:Outfit;font-weight:700;font-size:18px;line-height:1}
+  .mins button small{display:block;font-family:Manrope;font-size:10.5px;color:#555;margin-top:3px}
+  .eta{display:flex;align-items:center;gap:8px;background:#111;border-radius:14px;padding:10px 12px}
+  .eta>div{flex:1}
+  .eta small{display:block;color:var(--fg2);font-size:11.5px;font-weight:700}
+  .eta b{display:block;font-family:Outfit;font-size:24px;color:var(--or2)}
+  .eta.late b{color:var(--rd)}
+  .acts{display:flex;gap:8px;flex-wrap:wrap}
+  .acts .btn.main{margin-left:auto}
+  /* menu */
+  .mi{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .mi img,.mi .ph{width:46px;height:46px;border-radius:12px;object-fit:cover;background:#222;flex-shrink:0}
+  .mi .l{flex:1;min-width:0}
+  .mi .l b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mi .l small{color:var(--fg2);font-size:12.5px}
+  .mi.so .l b{color:var(--fg2);text-decoration:line-through}
+  .sw{position:relative;width:48px;height:28px;flex-shrink:0}
+  .sw input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer;z-index:2}
+  .sw span{position:absolute;inset:0;border-radius:100px;background:var(--gr);transition:.2s}
+  .sw span::after{content:"";position:absolute;top:3px;left:23px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+  .sw input:not(:checked)+span{background:#3a3a3a}
+  .sw input:not(:checked)+span::after{left:3px}
+  .chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-bottom:6px}
+  .chips::-webkit-scrollbar{display:none}
+  .chips button{all:unset;cursor:pointer;flex-shrink:0;padding:7px 12px;border-radius:100px;border:1px solid #333;font-size:12.5px;font-weight:800;color:var(--fg2)}
+  .chips button.on{border-color:#fff;color:#fff}
+  /* loyalty */
+  .banner{position:relative;overflow:hidden;border-radius:18px;background:linear-gradient(100deg,#f36310,#ff8a3d 55%,#2a1206);padding:22px 22px;margin:14px 0;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .banner h3{font-family:Outfit;font-weight:800;font-size:34px;letter-spacing:-.01em;margin:0;color:#111;text-transform:uppercase}
+  .banner p{margin:0;color:#1a0a00;font-weight:800;font-size:13px;letter-spacing:.04em;text-transform:uppercase;flex:1}
+  .banner img{position:absolute;right:-20px;top:-30px;height:150px;opacity:.35;pointer-events:none}
+  .qrbox{background:#fff;border-radius:14px;padding:10px;display:inline-block}
+  .modal{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:16px}
+  .modal .box{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;width:100%;max-width:440px;max-height:90vh;overflow:auto}
+  .modal h3{font-family:Outfit;margin:0 0 4px;font-size:20px}
+  .row{display:flex;gap:8px;align-items:center}
+  .stack>*+*{margin-top:10px}
+  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 90px);transform:translateX(-50%);background:#fff;color:#111;font-weight:800;font-size:14px;padding:10px 18px;border-radius:100px;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .gate{max-width:420px;margin:15vh auto;text-align:center;padding:20px}
+</style>
+</head>
+<body>
+<div class="gate" id="gate"><img src="icons/logo-transparent.png" alt="" style="height:70px"><p class="muted">Loading your dashboard…</p></div>
+
+<div class="app hidden" id="app">
+  <aside class="side">
+    <div class="brand"><img src="icons/logo-transparent.png" alt="La Cabaña Grill"><small>MIAMI BEACH</small></div>
+    <button class="nav on" data-v="dash"><span class="ms">home</span>Dashboard</button>
+    <button class="nav" data-v="orders"><span class="ms">receipt_long</span>Orders<span class="cnt hidden" data-cnt="orders"></span></button>
+    <button class="nav" data-v="menu"><span class="ms">restaurant_menu</span>Menu &amp; Sold out</button>
+    <button class="nav" data-v="customers"><span class="ms">group</span>Customers</button>
+    <button class="nav" data-v="loyalty"><span class="ms">redeem</span>Marketing &amp; Loyalty</button>
+    <button class="nav" data-v="analytics"><span class="ms">bar_chart</span>Analytics</button>
+    <button class="nav" data-v="channels"><span class="ms">hub</span>Channels</button>
+    <button class="nav" data-v="staff"><span class="ms">badge</span>Staff<span class="cnt hidden" data-cnt="staff"></span></button>
+    <div class="grow"></div>
+    <a class="site" href="home.html" target="_blank"><span class="ms">open_in_new</span>View website</a>
+  </aside>
+
+  <main class="main">
+    <div class="mtop"><img src="icons/logo-transparent.png" alt=""><b>La Cabaña</b><button class="status" id="status-m"><i></i><span>Online</span></button></div>
+    <div class="top">
+      <h1 id="title">Dashboard</h1>
+      <div class="search"><span class="ms">search</span><input id="q" placeholder="Search customers, phone, items…" autocomplete="off"></div>
+      <button class="status" id="status"><i></i><span>Online</span></button>
+      <span class="clock" id="clock"></span>
+      <div class="me" id="me"></div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <section data-view="dash">
+      <div class="grid kpis" id="kpis"></div>
+      <div class="banner"><h3>Loyalty program</h3><p>Reward your customers. Bring them back.</p><button class="btn main" data-go="loyalty"><span class="ms">add_card</span>Create member card</button></div>
+      <div class="grid two">
+        <div class="card"><div class="ch"><h2>Sales today by hour</h2><span class="muted" id="hour-tot"></span></div><div class="cols" id="hours"></div></div>
+        <div class="card"><div class="ch"><h2>Where sales come from</h2><div class="seg" id="ch-days"><button class="on" data-d="1">Today</button><button data-d="7">7d</button><button data-d="30">30d</button></div></div><div id="chan"></div></div>
+      </div>
+      <div class="grid three" style="margin-top:14px">
+        <div class="card"><div class="ch"><h2>Live website orders</h2><button class="btn sm" data-go="orders">Open</button></div><div id="dash-orders"></div></div>
+        <div class="card"><div class="ch"><h2>Top items (7 days)</h2></div><div id="top-items"></div></div>
+        <div class="card"><div class="ch"><h2>Top customers</h2><button class="btn sm" data-go="customers">View all</button></div><div id="top-cust"></div></div>
+      </div>
+    </section>
+
+    <!-- ORDERS -->
+    <section data-view="orders" class="hidden">
+      <div class="row" style="margin-bottom:12px;flex-wrap:wrap">
+        <div class="seg" id="ord-filter"><button class="on" data-f="open">Open</button><button data-f="done">Completed</button><button data-f="all">All</button></div>
+        <span class="muted" style="flex:1">Website orders. New ones ding and glow orange.</span>
+        <button class="btn sm" id="ord-refresh"><span class="ms">refresh</span>Refresh</button>
+      </div>
+      <div id="orders"><div class="empty">Loading…</div></div>
+    </section>
+
+    <!-- MENU -->
+    <section data-view="menu" class="hidden">
+      <div class="card" style="margin-bottom:14px">
+        <div class="row" style="flex-wrap:wrap">
+          <div style="flex:1;min-width:200px"><b style="font-size:16px">Online ordering</b><div class="muted" id="pause-sub">Customers can order on the website right now.</div></div>
+          <label class="sw"><input type="checkbox" id="pause-sw" checked><span></span></label>
+        </div>
+        <input class="field" id="pause-msg" placeholder="Message when paused (optional), e.g. Back at 5 PM" style="margin-top:12px" maxlength="120">
+      </div>
+      <div class="card">
+        <div class="ch"><h2>Menu items</h2><span class="muted" id="so-count"></span></div>
+        <p class="muted" style="margin:-4px 0 10px">Switch an item off to mark it <b>sold out</b>. Customers see "Sold out" and can't add it.</p>
+        <input class="field" id="menu-q" placeholder="Search the menu" style="margin-bottom:10px">
+        <div class="chips" id="menu-cats"></div>
+        <div id="menu-list"></div>
+      </div>
+    </section>
+
+    <!-- CUSTOMERS -->
+    <section data-view="customers" class="hidden">
+      <div class="grid kpis" id="cust-kpis" style="margin-bottom:14px"></div>
+      <div class="card">
+        <div class="ch"><h2>Customer list</h2><div class="seg" id="cust-f"><button class="on" data-f="all">All</button><button data-f="vip">VIP</button><button data-f="new">New</button><button data-f="inactive">Inactive</button><button data-f="mkt">Opted in</button></div><button class="btn sm" id="cust-csv"><span class="ms">download</span>Export</button></div>
+        <div class="scroll"><table class="tbl" id="cust-tbl"></table></div>
+        <p class="muted" style="margin:12px 0 0">Customers are saved when they pay on the website (name, phone, email). VIP = 5+ orders. Inactive = no order in 30 days.</p>
+      </div>
+    </section>
+
+    <!-- LOYALTY -->
+    <section data-view="loyalty" class="hidden">
+      <div class="grid kpis" id="loy-kpis"></div>
+      <div class="banner"><h3>Ambassador cards</h3><p>Give a regular a QR card. Every new customer they bring = 1 point = $1.</p><button class="btn main" id="add-member"><span class="ms">add_card</span>New member card</button></div>
+      <div class="grid two">
+        <div class="card">
+          <div class="ch"><h2>Members</h2></div>
+          <div class="scroll"><table class="tbl" id="mem-tbl"></table></div>
+        </div>
+        <div class="card">
+          <div class="ch"><h2>How it works</h2></div>
+          <div class="stack muted" style="font-size:14px;line-height:1.5">
+            <div><b style="color:#fff">1.</b> Tap <b style="color:#fff">New member card</b> and type their name and phone.</div>
+            <div><b style="color:#fff">2.</b> Send them their card link. They save it to their phone's home screen and show the QR.</div>
+            <div><b style="color:#fff">3.</b> People scan the QR, it opens our website, and when they place their <b style="color:#fff">first order</b> the member gets <b style="color:#fff">1 point ($1)</b>. Same person only counts once.</div>
+            <div><b style="color:#fff">4.</b> Walk-in they sent? Tap <b style="color:#fff">+1</b>. Paying them out? Tap <b style="color:#fff">Redeem</b>.</div>
+          </div>
+          <div class="ch" style="margin-top:18px"><h2>Points from orders</h2></div>
+          <div class="muted" style="font-size:14px;line-height:1.5">Every website customer also earns <b style="color:#fff">1 point per $1</b> spent. You can see their points in Customers.</div>
+          <div class="ch" style="margin-top:18px"><h2>Text &amp; email campaigns</h2></div>
+          <div class="muted" style="font-size:14px;line-height:1.5">Sending texts and emails from here needs Twilio (texts) and Resend (emails) connected. Until then, use <b style="color:#fff">Export</b> in Customers to get everyone who opted in.</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px"><div class="ch"><h2>Recent points activity</h2></div><div id="ledger"></div></div>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section data-view="analytics" class="hidden">
+      <div class="row" style="margin-bottom:12px"><div class="seg" id="an-days"><button data-d="7">7 days</button><button class="on" data-d="30">30 days</button></div><span class="muted" id="an-sub"></span></div>
+      <div class="grid kpis" id="an-kpis" style="margin-bottom:14px"></div>
+      <div class="card" style="margin-bottom:14px"><div class="ch"><h2>Sales per day</h2></div><div class="cols" id="an-days-chart" style="height:200px"></div></div>
+      <div class="grid three">
+        <div class="card"><div class="ch"><h2>By channel</h2></div><div id="an-chan"></div></div>
+        <div class="card"><div class="ch"><h2>Best sellers</h2></div><div id="an-items"></div></div>
+        <div class="card"><div class="ch"><h2>Busiest hours</h2></div><div class="cols" id="an-hours"></div><div class="ch" style="margin-top:16px"><h2>Busiest days</h2></div><div class="cols" id="an-wd" style="height:120px"></div></div>
+      </div>
+    </section>
+
+    <!-- CHANNELS -->
+    <section data-view="channels" class="hidden">
+      <p class="muted" style="margin:0 0 14px">Every sale that reaches Square is counted by channel. Delivery apps only show up here when they send their orders into Square.</p>
+      <div class="grid three" id="integr"></div>
+    </section>
+
+    <!-- STAFF -->
+    <section data-view="staff" class="hidden">
+      <div class="grid two">
+        <div class="card"><div class="ch"><h2>Waiting for approval</h2></div><div id="pending"><div class="muted">Nobody waiting.</div></div></div>
+        <div class="card"><div class="ch"><h2>Staff</h2></div><div id="staff"></div>
+          <p class="muted" style="margin-top:12px">New staff open <b style="color:#fff">lacabanagrill.net/operator.html</b>, tap "Create an account", then show up here to approve.</p>
+          <button class="btn" id="signout" style="margin-top:6px"><span class="ms">logout</span>Sign out</button></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<nav class="bnav hidden" id="bnav">
+  <button class="on" data-v="dash"><span class="ms">home</span>Home</button>
+  <button data-v="orders"><span class="ms">receipt_long</span>Orders<span class="cnt hidden" data-cnt="orders"></span></button>
+  <button data-v="menu"><span class="ms">restaurant_menu</span>Menu</button>
+  <button data-v="customers"><span class="ms">group</span>Customers</button>
+  <button data-v="loyalty"><span class="ms">redeem</span>Loyalty</button>
+  <button data-v="analytics"><span class="ms">bar_chart</span>Analytics</button>
+  <button data-v="channels"><span class="ms">hub</span>Channels</button>
+  <button data-v="staff"><span class="ms">badge</span>Staff<span class="cnt hidden" data-cnt="staff"></span></button>
+</nav>
+
+<script>
+  const SB_URL = 'https://qzluvwpjtgeccfojutbt.supabase.co', SB_KEY = 'sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ';
+  const sb = supabase.createClient(SB_URL, SB_KEY);
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const money = n => '$' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const money0 = n => '$' + Math.round(Number(n || 0)).toLocaleString('en-US');
+  const fmtPhone = p => { const d = String(p || '').replace(/\D/g, '').replace(/^1(?=\d{10}$)/, ''); return d.length === 10 ? '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6) : (p || ''); };
+  const initials = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0] || '').join('').toUpperCase() || '?';
+  const dayKey = d => { const x = new Date(d); return x.getFullYear() + '-' + (x.getMonth() + 1) + '-' + x.getDate(); };
+  const startOf = (daysAgo) => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - daysAgo); return d; };
+  function toast(m){ const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2400); }
+  const CH_COLOR = { 'Website': '#f36310', 'In store (Square)': '#e5e7eb', 'Uber Eats': '#06C167', 'DoorDash': '#FF3008', 'Grubhub': '#F63440', 'Postmates': '#a3a3a3', 'Square Online': '#60a5fa' };
+
+  let me = null, session = null;
+  let all30 = [], loaded30 = false;          // every paid Square order, last 30 days
+  let ordStatus = {}, ordReady = {};
+  let customers = [], members = [];
+
+  // ---------- auth: staff only ----------
+  (async function gate(){
+    const { data } = await sb.auth.getSession(); session = data.session;
+    if(!session){ location.replace('operator.html'); return; }
+    me = session.user;
+    const { data: ok } = await sb.rpc('is_operator');
+    if(!ok){ location.replace('operator.html'); return; }
+    $('gate').classList.add('hidden'); $('app').classList.remove('hidden'); $('bnav').classList.remove('hidden');
+    $('me').textContent = initials((me.user_metadata && me.user_metadata.name) || me.email);
+    tick(); setInterval(tick, 15000);
+    const v = (location.hash || '').slice(1); if(v && document.querySelector('[data-view="' + v + '"]')) go(v);
+    loadSettings(); loadAll(); loadCustomers(); loadMembers(); loadStaff(); renderMenu();
+    setInterval(loadAll, 20000); setInterval(loadStaff, 30000);
+  })();
+  sb.auth.onAuthStateChange((ev, s) => { if(s) session = s; if(ev === 'SIGNED_OUT') location.replace('operator.html'); });
+  function tick(){ const d = new Date(); $('clock').textContent = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }) + '  ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
+
+  // ---------- navigation ----------
+  const TITLES = { dash: 'Dashboard', orders: 'Orders', menu: 'Menu & Sold out', customers: 'Customers', loyalty: 'Marketing & Loyalty', analytics: 'Analytics', channels: 'Channels', staff: 'Staff' };
+  function go(v){
+    document.querySelectorAll('[data-view]').forEach(s => s.classList.toggle('hidden', s.dataset.view !== v));
+    document.querySelectorAll('.nav[data-v],.bnav [data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+    $('title').textContent = TITLES[v]; history.replaceState(null, '', '#' + v); window.scrollTo(0, 0);
+    if(v === 'analytics') renderAnalytics(); if(v === 'channels') renderChannels(); if(v === 'loyalty') loadMembers(); if(v === 'customers') loadCustomers();
+  }
+  document.addEventListener('click', e => { const b = e.target.closest('[data-v]'); if(b && (b.classList.contains('nav') || b.closest('.bnav'))) go(b.dataset.v); const g = e.target.closest('[data-go]'); if(g) go(g.dataset.go); });
+
+  // ---------- Square data ----------
+  async function api(days){
+    const { data } = await sb.auth.getSession(); session = data.session;
+    const r = await fetch('/api/orders?scope=all&days=' + days, { headers: { Authorization: 'Bearer ' + session.access_token } });
+    const j = await r.json(); if(!r.ok) throw new Error(j.error || 'error'); return j.orders || [];
+  }
+  let firstLoad = true, seenIds = new Set();
+  try { JSON.parse(localStorage.getItem('lc_seen_orders') || '[]').forEach(x => seenIds.add(x)); } catch(e){}
+  async function loadAll(){
+    try {
+      // today + yesterday first (fast), then 30 days in the background
+      const recent = await api(2);
+      mergeOrders(recent);
+      await loadStatus();
+      const web = all30.filter(o => o.channel === 'Website');
+      const fresh = web.filter(o => !seenIds.has(o.id));
+      if(!firstLoad && fresh.length) ding();
+      web.forEach(o => seenIds.add(o.id)); try { localStorage.setItem('lc_seen_orders', JSON.stringify([...seenIds].slice(-800))); } catch(e){}
+      renderDash(); renderOrders();
+      if(!loaded30){ loaded30 = true; api(30).then(o => { mergeOrders(o); renderDash(); renderOrders(); if(!$('tab-an-hidden')) renderAnalytics(); renderChannels(); renderCustomerKpis(); }).catch(() => { loaded30 = false; }); }
+      firstLoad = false;
+    } catch(e){ if(firstLoad) $('kpis').innerHTML = '<div class="card empty" style="grid-column:1/-1">Couldn\'t reach Square. Pull to refresh.</div>'; }
+  }
+  function mergeOrders(list){
+    const map = new Map(all30.map(o => [o.id, o]));
+    list.forEach(o => map.set(o.id, o));
+    const cut = startOf(30);
+    all30 = [...map.values()].filter(o => new Date(o.created) >= cut).sort((a, b) => new Date(b.created) - new Date(a.created));
+  }
+  const paid = list => list.filter(o => o.paid);
+  const inRange = (list, from, to) => list.filter(o => { const t = new Date(o.created); return t >= from && (!to || t < to); });
+  function pct(a, b){ if(!b) return a ? '<em class="up">new</em>' : '<em class="flat">—</em>'; const p = Math.round((a - b) / b * 100); return '<em class="' + (p > 0 ? 'up' : p < 0 ? 'dn' : 'flat') + '">' + (p > 0 ? '↑ ' : p < 0 ? '↓ ' : '') + Math.abs(p) + '%</em>'; }
+  function kpi(icon, label, val, cmp){ return '<div class="kpi"><div class="ic"><span class="ms">' + icon + '</span></div><div style="min-width:0"><small>' + label + '</small><b>' + val + '</b>' + (cmp || '') + '</div></div>'; }
+
+  let visits = [];
+  async function loadVisits(){ const { data } = await sb.rpc('visit_stats', { p_days: 31 }); visits = data || []; }
+  loadVisits(); setInterval(loadVisits, 60000);
+  const visitsOn = d => { const k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); const r = visits.find(v => v.day === k); return r ? +r.visitors : 0; };
+
+  // ---------- dashboard ----------
+  let chDays = 1;
+  function renderDash(){
+    const t0 = startOf(0), y0 = startOf(1), nowY = new Date(Date.now() - 864e5);
+    const today = paid(inRange(all30, t0)), yest = paid(inRange(all30, y0, nowY));   // yesterday up to this time
+    const sum = l => l.reduce((a, o) => a + o.total, 0);
+    const uniq = l => new Set(l.map(o => (o.phone || o.email || o.cardName || o.id))).size;
+    const vT = visitsOn(new Date()), vY = visitsOn(new Date(Date.now() - 864e5));
+    $('kpis').innerHTML = kpi('shopping_cart', 'Orders today', today.length, pct(today.length, yest.length) + ' <span class="muted">vs yesterday</span>') +
+      kpi('payments', 'Sales today', money(sum(today)), pct(sum(today), sum(yest))) +
+      kpi('group', 'Customers today', uniq(today), pct(uniq(today), uniq(yest))) +
+      kpi('language', 'Website visitors', vT, pct(vT, vY)) +
+      kpi('sell', 'Avg. order', money(today.length ? sum(today) / today.length : 0), pct(today.length ? sum(today) / today.length : 0, yest.length ? sum(yest) / yest.length : 0));
+    // hours
+    const hrs = Array(24).fill(0); today.forEach(o => hrs[new Date(o.created).getHours()] += o.total);
+    const open = hrs.findIndex(v => v > 0), lo = Math.min(open < 0 ? 10 : open, 10), hi = Math.max(21, hrs.length - 1 - [...hrs].reverse().findIndex(v => v > 0));
+    const span = hrs.slice(lo, Math.min(24, hi + 1)), mx = Math.max(1, ...span);
+    $('hours').innerHTML = span.map((v, i) => { const h = lo + i; return '<div title="' + money(v) + '"><i class="' + (v ? '' : 'zero') + '" style="height:' + Math.max(2, v / mx * 100) + '%"></i><span>' + ((h % 12) || 12) + (h < 12 ? 'a' : 'p') + '</span></div>'; }).join('');
+    $('hour-tot').textContent = money(sum(today));
+    renderChan('chan', paid(inRange(all30, startOf(chDays - 1))));
+    // live website orders
+    const open2 = all30.filter(o => o.channel === 'Website' && (ordStatus[o.id] || 'new') !== 'done').slice(0, 5);
+    $('dash-orders').innerHTML = open2.length ? open2.map(o => '<div class="who" style="padding:8px 0;border-bottom:1px solid var(--line)"><div class="av">' + esc(initials(o.name)) + '</div><div style="flex:1;min-width:0"><b>' + esc(o.name || 'Guest') + '</b><small>' + esc(statusLabel(o)) + ' · ' + new Date(o.created).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '</small></div><b style="font-family:Outfit">' + money(o.total) + '</b></div>').join('') : '<div class="empty">No open website orders.</div>';
+    // top items 7d
+    const items = {}; paid(inRange(all30, startOf(6))).forEach(o => o.items.forEach(i => { items[i.name] = items[i.name] || { q: 0 }; items[i.name].q += i.qty; }));
+    const top = Object.entries(items).sort((a, b) => b[1].q - a[1].q).slice(0, 6), tmx = top.length ? top[0][1].q : 1;
+    $('top-items').innerHTML = top.length ? top.map(([n, v]) => '<div class="chr"><div class="r1"><b>' + esc(n) + '</b><span>' + v.q + ' sold</span></div><div class="bar"><i style="width:' + (v.q / tmx * 100) + '%"></i></div></div>').join('') : '<div class="empty">No sales yet.</div>';
+    renderTopCust();
+    const openCount = all30.filter(o => o.channel === 'Website' && (ordStatus[o.id] || 'new') !== 'done').length;
+    document.querySelectorAll('[data-cnt="orders"]').forEach(c => { c.textContent = openCount; c.classList.toggle('hidden', !openCount); });
+  }
+  function renderChan(el, list){
+    const tot = list.reduce((a, o) => a + o.total, 0), by = {};
+    list.forEach(o => { const c = o.channel || 'Other'; by[c] = by[c] || { n: 0, s: 0 }; by[c].n++; by[c].s += o.total; });
+    ['Website', 'In store (Square)', 'Uber Eats', 'DoorDash'].forEach(c => by[c] = by[c] || { n: 0, s: 0 });
+    $(el).innerHTML = Object.entries(by).sort((a, b) => b[1].s - a[1].s).map(([c, v]) => { const p = tot ? Math.round(v.s / tot * 100) : 0;
+      return '<div class="chr"><div class="r1"><b>' + esc(c) + '</b><span>' + money(v.s) + '</span></div><div class="r2"><span>' + v.n + ' order' + (v.n === 1 ? '' : 's') + '</span><span>' + p + '%</span></div><div class="bar"><i style="width:' + p + '%;background:' + (CH_COLOR[c] || '#a78bfa') + '"></i></div></div>'; }).join('') +
+      '<div class="r2 muted" style="display:flex;justify-content:space-between;margin-top:8px"><b>Total</b><b style="color:#fff">' + money(tot) + '</b></div>';
+  }
+  $('ch-days').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if(!b) return; chDays = +b.dataset.d; $('ch-days').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); renderDash(); });
+
+  // ---------- orders (website) ----------
+  let ordFilter = 'open';
+  function ding(){ try { const a = new (window.AudioContext || window.webkitAudioContext)(); [0, .25, .5].forEach(t => { const o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.4, a.currentTime + t); g.gain.exponentialRampToValueAtTime(.01, a.currentTime + t + .22); o.start(a.currentTime + t); o.stop(a.currentTime + t + .22); }); } catch(e){} }
+  async function loadStatus(){
+    const ids = all30.filter(o => o.channel === 'Website').map(o => o.id); if(!ids.length) return;
+    const { data } = await sb.from('order_status').select('order_id,status,ready_at').in('order_id', ids.slice(0, 300));
+    (data || []).forEach(x => { ordStatus[x.order_id] = x.status; if(x.ready_at) ordReady[x.order_id] = x.ready_at; });
+  }
+  function statusLabel(o){ const s = ordStatus[o.id] || 'new'; return s === 'preparing' ? 'Preparing' : s === 'ready' ? 'Ready' : s === 'done' ? 'Done' : 'New'; }
+  function renderOrders(){
+    const web = all30.filter(o => o.channel === 'Website'), stOf = o => ordStatus[o.id] || 'new';
+    const list = ordFilter === 'open' ? web.filter(o => stOf(o) !== 'done') : ordFilter === 'done' ? web.filter(o => stOf(o) === 'done') : web;
+    if(!list.length){ $('orders').innerHTML = '<div class="empty">' + (ordFilter === 'open' ? 'No open website orders. New ones show up here with a sound.' : 'Nothing here.') + '</div>'; return; }
+    const today = new Date().toDateString();
+    $('orders').innerHTML = '<div class="ordlist">' + list.map(o => {
+      const st = stOf(o), t = new Date(o.created), mins = Math.round((Date.now() - t) / 60000);
+      const when = t.toDateString() === today ? (mins < 1 ? 'just now' : mins < 60 ? mins + ' min ago' : t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })) : t.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ', ' + t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      const ra = ordReady[o.id] ? new Date(ordReady[o.id]) : null, left = ra ? Math.round((ra - Date.now()) / 60000) : null;
+      const timer = st === 'new' ? '<div class="accept"><div class="muted" style="font-weight:800">Accept: ready in</div><div class="mins">' + [10, 15, 20, 30, 45].map(m => '<button data-acc="' + m + '" data-id="' + esc(o.id) + '">' + m + '<small>min</small></button>').join('') + '</div></div>'
+        : st === 'preparing' && ra ? '<div class="eta' + (left < 0 ? ' late' : '') + '"><div><small>' + (left < 0 ? 'Late by' : 'Ready in') + '</small><b>' + Math.abs(left) + ' min</b><small>at ' + ra.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '</small></div><button class="btn sm" data-add="5" data-id="' + esc(o.id) + '">+5 min</button><button class="btn sm" data-add="10" data-id="' + esc(o.id) + '">+10</button></div>' : '';
+      const next = st === 'ready' ? ['done', 'Picked up'] : st === 'done' ? ['new', 'Reopen'] : ['ready', 'Mark ready'];
+      return '<div class="oc ' + st + '"><div class="oc-h"><div style="min-width:0"><div class="nm">' + esc(o.name || 'Guest') + '</div><div class="muted">#' + esc((o.ref || o.id).replace(/^APP-/, '').slice(-5)) + ' · ' + esc(when) + '</div><div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">' +
+        (o.type === 'DELIVERY' ? '<span class="badge o">DELIVERY</span>' : '<span class="badge">PICKUP</span>') + '<span class="badge ' + (st === 'ready' ? 'g' : st === 'done' ? '' : 'o') + '">' + statusLabel(o).toUpperCase() + '</span>' + (o.paid ? '' : '<span class="badge r">NOT PAID</span>') + '</div></div>' +
+        '<div class="tt">' + money(o.total) + (o.tip ? '<small>incl. ' + money(o.tip) + ' tip</small>' : '') + '</div></div>' + timer +
+        '<div class="items">' + o.items.map(i => '<div class="ln"><span class="q">' + i.qty + '×</span><span>' + esc(i.name) + ((i.mods || i.note) ? '<span class="nt">' + esc([i.mods, i.note].filter(Boolean).join(' · ')) + '</span>' : '') + '</span></div>').join('') + '</div>' +
+        '<div class="muted" style="line-height:1.6">' + (o.phone ? '<b style="color:#fff">' + esc(fmtPhone(o.phone)) + '</b>' : 'No phone') + (o.email ? ' · ' + esc(o.email) : '') + (o.address ? '<br>' + esc(o.address) : '') + (o.card ? '<br>' + esc(o.card) + (o.cardName ? ' · ' + esc(o.cardName) : '') : '') + '</div>' +
+        '<div class="acts">' + (o.phone ? '<a class="btn" href="tel:' + esc(o.phone) + '"><span class="ms">call</span>Call</a><a class="btn" href="sms:' + esc(o.phone) + '"><span class="ms">sms</span>Text</a>' : '') +
+        (st === 'new' ? '' : '<button class="btn ' + (st === 'done' ? 'plain' : 'main') + '" data-st="' + next[0] + '" data-id="' + esc(o.id) + '">' + next[1] + '</button>') + '</div></div>';
+    }).join('') + '</div>';
+  }
+  async function saveStatus(id, st, ra){ const row = { order_id: id, status: st, updated_at: new Date().toISOString(), updated_by: me.email }; if(ra !== undefined) row.ready_at = ra; const { error } = await sb.from('order_status').upsert(row); if(error) toast('Couldn\'t save'); }
+  $('orders').addEventListener('click', async e => {
+    const acc = e.target.closest('[data-acc]'), add = e.target.closest('[data-add]');
+    if(acc || add){ const id = (acc || add).dataset.id; const base = add && ordReady[id] ? Math.max(Date.now(), new Date(ordReady[id]).getTime()) : Date.now();
+      const ra = new Date(base + (+(acc ? acc.dataset.acc : add.dataset.add)) * 60000).toISOString(); ordStatus[id] = 'preparing'; ordReady[id] = ra; renderOrders(); renderDash(); await saveStatus(id, 'preparing', ra); return; }
+    const b = e.target.closest('[data-st]'); if(!b) return; const id = b.dataset.id, st = b.dataset.st;
+    ordStatus[id] = st; if(st === 'new') delete ordReady[id]; renderOrders(); renderDash(); await saveStatus(id, st, st === 'new' ? null : undefined);
+  });
+  $('ord-filter').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if(!b) return; ordFilter = b.dataset.f; $('ord-filter').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); renderOrders(); });
+  $('ord-refresh').onclick = loadAll;
+  setInterval(() => { if(!$('app').classList.contains('hidden')) renderOrders(); }, 30000);
+
+  // ---------- settings: pause online ordering ----------
+  let paused = false;
+  async function loadSettings(){
+    const { data } = await sb.from('app_settings').select('value').eq('key', 'ordering').maybeSingle();
+    const v = (data && data.value) || {}; paused = !!v.paused; $('pause-msg').value = v.message || ''; showPause();
+  }
+  function showPause(){
+    ['status', 'status-m'].forEach(id => { const b = $(id); b.classList.toggle('off', paused); b.querySelector('span').textContent = paused ? 'Paused' : 'Online'; });
+    $('pause-sw').checked = !paused;
+    $('pause-sub').textContent = paused ? 'Paused. Customers can\'t place orders on the website.' : 'Customers can order on the website right now.';
+  }
+  async function setPaused(p){
+    paused = p; showPause();
+    const { error } = await sb.from('app_settings').upsert({ key: 'ordering', value: { paused: p, message: $('pause-msg').value.trim() }, updated_at: new Date().toISOString() });
+    toast(error ? 'Couldn\'t save' : p ? 'Online ordering paused' : 'Online ordering is on');
+  }
+  $('pause-sw').onchange = () => setPaused(!$('pause-sw').checked);
+  ['status', 'status-m'].forEach(id => $(id).onclick = () => { if(confirm(paused ? 'Turn online ordering back on?' : 'Pause online ordering? Customers won\'t be able to order on the website.')) setPaused(!paused); });
+  $('pause-msg').onchange = () => setPaused(paused);
+
+  // ---------- menu / sold out ----------
+  let soldOut = new Set(), menuCat = 'all';
+  const MENU_ALL = (typeof MENU !== 'undefined' ? MENU : []).concat(typeof JUICES !== 'undefined' ? JUICES : [], typeof SIDES_MENU !== 'undefined' ? SIDES_MENU : []);
+  async function loadSoldOut(){ const { data } = await sb.from('menu_status').select('item_id,sold_out'); soldOut = new Set((data || []).filter(x => x.sold_out).map(x => x.item_id)); renderMenu(); }
+  loadSoldOut();
+  function renderMenu(){
+    const cats = (typeof CATEGORIES !== 'undefined' ? CATEGORIES : []).filter(c => MENU_ALL.some(i => i.category === c.id));
+    $('menu-cats').innerHTML = '<button data-c="all" class="' + (menuCat === 'all' ? 'on' : '') + '">All</button><button data-c="so" class="' + (menuCat === 'so' ? 'on' : '') + '">Sold out (' + soldOut.size + ')</button>' + cats.map(c => '<button data-c="' + esc(c.id) + '" class="' + (menuCat === c.id ? 'on' : '') + '">' + esc(c.label || c.id) + '</button>').join('');
+    const q = $('menu-q').value.trim().toLowerCase();
+    const list = MENU_ALL.filter(i => (menuCat === 'all' || (menuCat === 'so' ? soldOut.has(i.id) : i.category === menuCat)) && (!q || i.name.toLowerCase().includes(q)));
+    $('so-count').textContent = soldOut.size ? soldOut.size + ' sold out' : 'Everything available';
+    $('menu-list').innerHTML = list.length ? list.map(i => '<div class="mi' + (soldOut.has(i.id) ? ' so' : '') + '">' + (i.img ? '<img src="' + esc(i.img) + '" alt="" loading="lazy">' : '<div class="ph"></div>') + '<div class="l"><b>' + esc(i.name) + '</b><small>' + money(i.price) + (soldOut.has(i.id) ? ' · <span style="color:var(--rd);font-weight:800">Sold out</span>' : '') + '</small></div><label class="sw"><input type="checkbox" data-item="' + esc(i.id) + '"' + (soldOut.has(i.id) ? '' : ' checked') + '><span></span></label></div>').join('') : '<div class="empty">No items.</div>';
+  }
+  $('menu-cats').addEventListener('click', e => { const b = e.target.closest('[data-c]'); if(!b) return; menuCat = b.dataset.c; renderMenu(); });
+  $('menu-q').oninput = renderMenu;
+  $('menu-list').addEventListener('change', async e => {
+    const c = e.target.closest('[data-item]'); if(!c) return; const id = c.dataset.item, so = !c.checked;
+    so ? soldOut.add(id) : soldOut.delete(id); renderMenu();
+    const { error } = await sb.from('menu_status').upsert({ item_id: id, sold_out: so, updated_at: new Date().toISOString(), updated_by: me.email });
+    const it = MENU_ALL.find(x => x.id === id); toast(error ? 'Couldn\'t save' : (it ? it.name : 'Item') + (so ? ' marked sold out' : ' is back'));
+  });
+
+  // ---------- customers ----------
+  let custF = 'all';
+  async function loadCustomers(){ const { data } = await sb.from('customers').select('*').order('last_order_at', { ascending: false }).limit(2000); customers = data || []; renderCustomers(); renderCustomerKpis(); renderTopCust(); }
+  const custStatus = c => { const days = c.last_order_at ? (Date.now() - new Date(c.last_order_at)) / 864e5 : 999; return c.orders >= 5 ? 'VIP' : days > 30 ? 'Inactive' : c.orders <= 1 ? 'New' : 'Active'; };
+  const custBadge = s => '<span class="badge ' + (s === 'VIP' ? 'y' : s === 'New' ? 'o' : s === 'Inactive' ? '' : 'g') + '">' + s + '</span>';
+  function renderCustomerKpis(){
+    const n = customers.length, vip = customers.filter(c => c.orders >= 5).length, mkt = customers.filter(c => c.marketing).length, rep = customers.filter(c => c.orders > 1).length;
+    $('cust-kpis').innerHTML = kpi('group', 'Website customers', n) + kpi('star', 'VIP (5+ orders)', vip) + kpi('repeat', 'Came back', n ? Math.round(rep / n * 100) + '%' : '—') + kpi('campaign', 'Opted in to deals', mkt) + kpi('payments', 'Total spent', money0(customers.reduce((a, c) => a + +c.spent, 0)));
+  }
+  function renderCustomers(){
+    const q = $('q').value.trim().toLowerCase();
+    const list = customers.filter(c => { const s = custStatus(c); return (custF === 'all' || (custF === 'vip' && s === 'VIP') || (custF === 'new' && s === 'New') || (custF === 'inactive' && s === 'Inactive') || (custF === 'mkt' && c.marketing)) && (!q || [c.name, c.phone, c.email].join(' ').toLowerCase().includes(q)); });
+    $('cust-tbl').innerHTML = '<tr><th>Customer</th><th>Orders</th><th>Spent</th><th>Points</th><th>Last order</th><th>Status</th><th></th></tr>' + (list.length ? list.map(c => '<tr><td><div class="who"><div class="av">' + esc(initials(c.name)) + '</div><div style="min-width:0"><b>' + esc(c.name || 'No name') + '</b><small><a class="lnk" href="tel:' + esc(c.phone) + '">' + esc(fmtPhone(c.phone)) + '</a>' + (c.email ? ' · ' + esc(c.email) : '') + '</small></div></div></td><td>' + c.orders + '</td><td>' + money(c.spent) + '</td><td>' + (c.points || 0) + '</td><td class="muted">' + (c.last_order_at ? new Date(c.last_order_at).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '—') + '</td><td>' + custBadge(custStatus(c)) + (c.marketing ? ' <span class="badge">Deals ✓</span>' : '') + '</td><td><a class="btn sm" href="sms:' + esc(c.phone) + '"><span class="ms">sms</span></a></td></tr>').join('') : '<tr><td colspan="7"><div class="empty">' + (customers.length ? 'No match.' : 'No website customers yet. They show up after their first paid order.') + '</div></td></tr>');
+  }
+  function renderTopCust(){
+    const top = [...customers].sort((a, b) => b.spent - a.spent).slice(0, 5);
+    $('top-cust').innerHTML = top.length ? top.map((c, i) => '<div class="who" style="padding:8px 0;border-bottom:1px solid var(--line)"><div class="av">' + esc(initials(c.name)) + '</div><div style="flex:1;min-width:0"><b>' + esc(c.name || fmtPhone(c.phone)) + '</b><small>' + c.orders + ' order' + (c.orders === 1 ? '' : 's') + '</small></div><b style="font-family:Outfit">' + money(c.spent) + '</b></div>').join('') : '<div class="empty">Shows up after website orders.</div>';
+  }
+  $('cust-f').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if(!b) return; custF = b.dataset.f; $('cust-f').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); renderCustomers(); });
+  $('q').addEventListener('input', () => { if($('q').value.trim() && !document.querySelector('[data-view="customers"]:not(.hidden)')) go('customers'); renderCustomers(); });
+  $('cust-csv').onclick = () => {
+    const rows = [['Name', 'Phone', 'Email', 'Orders', 'Spent', 'Points', 'Opted in', 'Last order']].concat(customers.map(c => [c.name || '', fmtPhone(c.phone), c.email || '', c.orders, c.spent, c.points || 0, c.marketing ? 'yes' : 'no', c.last_order_at ? c.last_order_at.slice(0, 10) : '']));
+    const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'la-cabana-customers.csv'; a.click();
+  };
+
+  // ---------- loyalty / ambassadors ----------
+  const cardUrl = code => location.origin + '/card.html?c=' + code;
+  const refUrl = code => location.origin + '/home.html?ref=' + code;
+  async function loadMembers(){
+    const [{ data: m }, { data: r }, { data: l }] = await Promise.all([
+      sb.from('loyalty_members').select('*').order('points', { ascending: false }),
+      sb.from('referrals').select('code,created_at'),
+      sb.from('loyalty_ledger').select('*').order('created_at', { ascending: false }).limit(25)
+    ]);
+    members = m || []; const refs = r || [];
+    const cnt = {}; refs.forEach(x => cnt[x.code] = (cnt[x.code] || 0) + 1);
+    const month = startOf(new Date().getDate() - 1);
+    $('loy-kpis').innerHTML = kpi('card_membership', 'Member cards', members.length) + kpi('person_add', 'New customers brought', refs.length, '<span class="muted">' + refs.filter(x => new Date(x.created_at) >= month).length + ' this month</span>') +
+      kpi('stars', 'Points owed', members.reduce((a, x) => a + x.points, 0), '<span class="muted">= ' + money0(members.reduce((a, x) => a + x.points, 0)) + '</span>') + kpi('loyalty', 'Customer points', customers.reduce((a, c) => a + (c.points || 0), 0)) + kpi('campaign', 'Opted in to deals', customers.filter(c => c.marketing).length);
+    $('mem-tbl').innerHTML = '<tr><th>Member</th><th>Brought</th><th>Points</th><th></th></tr>' + (members.length ? members.map(x => '<tr><td><div class="who"><div class="av">' + esc(initials(x.name)) + '</div><div style="min-width:0"><b>' + esc(x.name) + '</b><small>' + esc(fmtPhone(x.phone)) + (x.note ? ' · ' + esc(x.note) : '') + ' · ' + esc(x.code) + '</small></div></div></td><td>' + (cnt[x.code] || 0) + '</td><td><b style="font-family:Outfit;font-size:16px">' + x.points + '</b> <span class="muted">' + money0(x.points) + '</span></td><td style="white-space:nowrap"><button class="btn sm" data-card="' + esc(x.id) + '"><span class="ms">qr_code_2</span>Card</button> <button class="btn sm" data-pt="1" data-mid="' + esc(x.id) + '">+1</button> <button class="btn sm" data-redeem="' + esc(x.id) + '">Redeem</button></td></tr>').join('') : '<tr><td colspan="4"><div class="empty">No member cards yet. Tap "New member card".</div></td></tr>');
+    $('ledger').innerHTML = (l || []).length ? l.map(x => { const mm = members.find(y => y.id === x.member_id); return '<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><b style="font-family:Outfit;width:44px;color:' + (x.delta > 0 ? 'var(--gr)' : 'var(--rd)') + '">' + (x.delta > 0 ? '+' : '') + x.delta + '</b><div style="flex:1;min-width:0"><b style="font-size:14px">' + esc(mm ? mm.name : 'Member') + '</b><div class="muted">' + esc(x.reason || '') + (x.by_email ? ' · by ' + esc(x.by_email) : '') + '</div></div><span class="muted">' + new Date(x.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' }) + '</span></div>'; }).join('') : '<div class="empty">No points yet.</div>';
+  }
+  function modal(html){ const m = document.createElement('div'); m.className = 'modal'; m.innerHTML = '<div class="box">' + html + '</div>'; m.addEventListener('click', e => { if(e.target === m || e.target.closest('[data-close]')) m.remove(); }); document.body.appendChild(m); return m; }
+  $('add-member').onclick = () => {
+    const m = modal('<h3>New member card</h3><p class="muted" style="margin:0 0 14px">For a regular who sends you customers, like a hotel manager or doorman.</p><div class="stack"><input class="field" id="nm-name" placeholder="Name" autocapitalize="words"><input class="field" id="nm-phone" type="tel" placeholder="Phone"><input class="field" id="nm-note" placeholder="Where they work (optional), e.g. Hotel Victor"></div><div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn plain" data-close>Cancel</button><button class="btn main" id="nm-save">Create card</button></div>');
+    m.querySelector('#nm-name').focus();
+    m.querySelector('#nm-save').onclick = async () => {
+      const name = m.querySelector('#nm-name').value.trim(); if(!name){ toast('Add a name'); return; }
+      const code = (name.replace(/[^A-Za-z]/g, '').slice(0, 4).toUpperCase() || 'LC') + Math.floor(100 + Math.random() * 900);
+      const { data, error } = await sb.from('loyalty_members').insert({ code, name, phone: m.querySelector('#nm-phone').value.trim() || null, note: m.querySelector('#nm-note').value.trim() || null }).select().single();
+      if(error){ toast('Couldn\'t create: ' + error.message); return; }
+      m.remove(); await loadMembers(); showCard(data);
+    };
+  };
+  function showCard(x){
+    const m = modal('<h3>' + esc(x.name) + '</h3><p class="muted" style="margin:0 0 14px">Member code <b style="color:#fff">' + esc(x.code) + '</b> · ' + x.points + ' points</p><div style="text-align:center"><div class="qrbox" id="qr"></div><p class="muted">People scan this to order. Their first order gives ' + esc(x.name.split(' ')[0]) + ' 1 point ($1).</p></div>' +
+      '<div class="stack" style="margin-top:12px"><button class="btn main" id="c-share" style="width:100%"><span class="ms">ios_share</span>Send card to ' + esc(x.name.split(' ')[0]) + '</button><button class="btn" id="c-copy" style="width:100%"><span class="ms">link</span>Copy card link</button><button class="btn plain" data-close style="width:100%">Close</button></div>' +
+      '<p class="muted" style="font-size:12px;margin-top:10px">They open the link and tap Share → Add to Home Screen to keep the card on their phone. Apple Wallet cards need an Apple Developer account.</p>');
+    new QRCode(m.querySelector('#qr'), { text: refUrl(x.code), width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M });
+    const link = cardUrl(x.code);
+    m.querySelector('#c-copy').onclick = async () => { try { await navigator.clipboard.writeText(link); toast('Link copied'); } catch(e){ prompt('Copy this link', link); } };
+    m.querySelector('#c-share').onclick = () => { const txt = 'Your La Cabaña Grill member card: ' + link; if(navigator.share) navigator.share({ title: 'La Cabaña member card', text: txt, url: link }).catch(() => {}); else if(x.phone) location.href = 'sms:' + x.phone + '?&body=' + encodeURIComponent(txt); else m.querySelector('#c-copy').click(); };
+  }
+  $('mem-tbl').addEventListener('click', async e => {
+    const c = e.target.closest('[data-card]'), p = e.target.closest('[data-pt]'), r = e.target.closest('[data-redeem]');
+    if(c){ showCard(members.find(x => x.id === c.dataset.card)); return; }
+    if(p){ p.disabled = true; await sb.rpc('adjust_points', { p_member: p.dataset.mid, p_delta: 1, p_reason: 'Walk-in customer' }); toast('+1 point'); loadMembers(); return; }
+    if(r){ const x = members.find(y => y.id === r.dataset.redeem); const n = parseInt(prompt('How many points to redeem? ' + x.name + ' has ' + x.points + ' ($' + x.points + ').', x.points), 10);
+      if(!(n > 0)) return; if(n > x.points){ toast('They only have ' + x.points); return; }
+      await sb.rpc('adjust_points', { p_member: x.id, p_delta: -n, p_reason: 'Redeemed $' + n }); toast('Redeemed $' + n); loadMembers(); }
+  });
+
+  // ---------- analytics ----------
+  let anDays = 30;
+  function renderAnalytics(){
+    const list = paid(inRange(all30, startOf(anDays - 1))), prev = anDays <= 15 ? paid(inRange(all30, startOf(anDays * 2 - 1), startOf(anDays - 1))) : null;
+    const sum = l => l.reduce((a, o) => a + o.total, 0);
+    $('an-sub').textContent = loaded30 ? '' : 'Loading 30 days from Square…';
+    const web = list.filter(o => o.channel === 'Website');
+    $('an-kpis').innerHTML = kpi('payments', 'Sales', money0(sum(list)), prev ? pct(sum(list), sum(prev)) + ' <span class="muted">vs before</span>' : '') + kpi('shopping_cart', 'Orders', list.length, prev ? pct(list.length, prev.length) : '') +
+      kpi('sell', 'Avg. order', money(list.length ? sum(list) / list.length : 0)) + kpi('language', 'Website share', list.length ? Math.round(sum(web) / Math.max(1, sum(list)) * 100) + '%' : '—', '<span class="muted">' + money0(sum(web)) + '</span>') +
+      kpi('volunteer_activism', 'Tips', money0(list.reduce((a, o) => a + (o.tip || 0), 0)));
+    const days = []; for(let i = anDays - 1; i >= 0; i--) days.push(startOf(i));
+    const byDay = {}; list.forEach(o => { const k = dayKey(o.created); byDay[k] = (byDay[k] || 0) + o.total; });
+    const mx = Math.max(1, ...days.map(d => byDay[dayKey(d)] || 0));
+    $('an-days-chart').innerHTML = days.map((d, i) => { const v = byDay[dayKey(d)] || 0; return '<div title="' + d.toLocaleDateString() + ': ' + money(v) + '"><i class="' + (v ? '' : 'zero') + '" style="height:' + Math.max(2, v / mx * 100) + '%"></i><span>' + (anDays <= 7 || i % 5 === 0 || i === days.length - 1 ? (d.getMonth() + 1) + '/' + d.getDate() : '') + '</span></div>'; }).join('');
+    renderChan('an-chan', list);
+    const items = {}; list.forEach(o => o.items.forEach(i => { items[i.name] = items[i.name] || { q: 0 }; items[i.name].q += i.qty; }));
+    const top = Object.entries(items).sort((a, b) => b[1].q - a[1].q).slice(0, 10), tmx = top.length ? top[0][1].q : 1;
+    $('an-items').innerHTML = top.length ? top.map(([n, v], i) => '<div class="chr"><div class="r1"><b>' + (i + 1) + '. ' + esc(n) + '</b><span>' + v.q + '</span></div><div class="bar"><i style="width:' + (v.q / tmx * 100) + '%"></i></div></div>').join('') : '<div class="empty">No sales yet.</div>';
+    const hrs = Array(24).fill(0); list.forEach(o => hrs[new Date(o.created).getHours()] += o.total);
+    const hmx = Math.max(1, ...hrs.slice(9, 23));
+    $('an-hours').innerHTML = hrs.slice(9, 23).map((v, i) => { const h = 9 + i; return '<div><i class="' + (v ? '' : 'zero') + '" style="height:' + Math.max(2, v / hmx * 100) + '%"></i><span>' + ((h % 12) || 12) + (h < 12 ? 'a' : 'p') + '</span></div>'; }).join('');
+    const wd = Array(7).fill(0); list.forEach(o => wd[new Date(o.created).getDay()] += o.total); const wmx = Math.max(1, ...wd);
+    $('an-wd').innerHTML = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((n, i) => '<div><i class="' + (wd[i] ? '' : 'zero') + '" style="height:' + Math.max(2, wd[i] / wmx * 100) + '%"></i><span>' + n + '</span></div>').join('');
+  }
+  $('an-days').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if(!b) return; anDays = +b.dataset.d; $('an-days').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); renderAnalytics(); });
+
+  // ---------- channels / integrations ----------
+  function renderChannels(){
+    const list = paid(all30), sum = c => list.filter(o => o.channel === c).reduce((a, o) => a + o.total, 0), n = c => list.filter(o => o.channel === c).length;
+    const CH = [
+      ['Website', 'language', 'Your own website and app. No commission. You get the customer\'s name, phone and email.', true],
+      ['In store (Square)', 'point_of_sale', 'Sales rung up on your Square register.', true],
+      ['Uber Eats', 'delivery_dining', 'Connect Uber Eats to Square so its orders and sales show up here: Square Dashboard → Apps (App Marketplace) → Uber Eats, or use Otter / Deliverect.'],
+      ['DoorDash', 'two_wheeler', 'Connect DoorDash to Square: Square Dashboard → Apps → DoorDash (or in DoorDash Merchant → Integrations → Square).'],
+      ['Grubhub', 'takeout_dining', 'Optional. Connect through Square Apps or Otter if you sell on Grubhub.']
+    ];
+    $('integr').innerHTML = CH.map(([c, ic, txt, own]) => { const on = own || n(c) > 0;
+      return '<div class="card"><div class="row" style="margin-bottom:10px"><div class="kpi" style="padding:0;border:0;background:none"><div class="ic" style="background:' + (CH_COLOR[c] || '#333') + '"><span class="ms" style="color:' + (c === 'In store (Square)' ? '#111' : '#fff') + '">' + ic + '</span></div></div><b style="font-size:16px;flex:1">' + c + '</b>' + (on ? '<span class="badge g">' + (own ? 'Connected' : 'Sending to Square') + '</span>' : '<span class="badge r">Not connected</span>') + '</div>' +
+        '<div class="row" style="gap:18px;margin-bottom:10px"><div><small class="muted">30 days</small><div style="font-family:Outfit;font-size:22px;font-weight:700">' + money0(sum(c)) + '</div></div><div><small class="muted">Orders</small><div style="font-family:Outfit;font-size:22px;font-weight:700">' + n(c) + '</div></div></div>' +
+        '<div class="muted" style="font-size:13px;line-height:1.5">' + (on && !own ? 'Orders are coming into Square, so they\'re counted here. Customer phones and emails are hidden by the app.' : txt) + '</div></div>'; }).join('');
+  }
+
+  // ---------- staff ----------
+  async function loadStaff(){
+    const [{ data }, pend] = await Promise.all([sb.rpc('staff_list'), sb.rpc('pending_staff')]);
+    const mine = (me.email || '').toLowerCase();
+    $('staff').innerHTML = (data || []).map(r => '<div class="who" style="padding:10px 0;border-bottom:1px solid var(--line)"><div class="av">' + esc(initials(r.name || r.email)) + '</div><div style="flex:1;min-width:0"><b>' + esc(r.name || r.email) + (r.email === mine ? ' <span class="muted">(you)</span>' : '') + '</b><small>' + esc([fmtPhone(r.phone), r.email].filter(Boolean).join(' · ')) + '</small></div>' + (r.email === mine ? '' : '<button class="btn sm" data-rm="' + esc(r.email) + '">Remove</button>') + '</div>').join('');
+    const pl = (pend && pend.data) || [];
+    $('pending').innerHTML = pl.length ? pl.map(r => '<div class="who" style="padding:10px 0;border-bottom:1px solid var(--line)"><div class="av">' + esc(initials(r.name || r.email)) + '</div><div style="flex:1;min-width:0"><b>' + esc(r.name || r.email) + '</b><small>' + esc([fmtPhone(r.phone), r.email].filter(Boolean).join(' · ')) + '</small></div><button class="btn main sm" data-ok="' + esc(r.email) + '">Approve</button></div>').join('') : '<div class="muted">Nobody waiting.</div>';
+    document.querySelectorAll('[data-cnt="staff"]').forEach(c => { c.textContent = pl.length; c.classList.toggle('hidden', !pl.length); });
+  }
+  $('pending').addEventListener('click', async e => { const b = e.target.closest('[data-ok]'); if(!b) return; b.disabled = true; const { error } = await sb.rpc('add_operator', { p_email: b.dataset.ok }); toast(error ? 'Couldn\'t approve' : 'Approved'); loadStaff(); });
+  $('staff').addEventListener('click', async e => { const b = e.target.closest('[data-rm]'); if(!b) return; if(!confirm('Remove ' + b.dataset.rm + ' from staff?')) return; const { error } = await sb.rpc('remove_operator', { p_email: b.dataset.rm }); toast(error ? 'Couldn\'t remove' : 'Removed'); loadStaff(); });
+  $('signout').onclick = async () => { await sb.auth.signOut(); location.replace('operator.html'); };
+</script>
+</body></html>

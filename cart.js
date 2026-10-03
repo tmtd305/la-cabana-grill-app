@@ -182,3 +182,54 @@ function toggleFav(id) {
   document.dispatchEvent(new CustomEvent("lc-favs", { detail: { id, on: i < 0 } }));
   return i < 0;
 }
+
+// ---------- live store data from the staff dashboard ----------
+// Sold-out items, "ordering paused", ambassador links (?ref=CODE) and a daily visitor count.
+(function () {
+  var SB = "https://qzluvwpjtgeccfojutbt.supabase.co", KEY = "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ";
+  var H = { apikey: KEY, "Content-Type": "application/json" };
+  try {
+    var ref = new URLSearchParams(location.search).get("ref");
+    if (ref && /^[A-Za-z0-9]{4,12}$/.test(ref)) localStorage.setItem("lc_ref", ref.toUpperCase());
+    var vid = localStorage.getItem("lc_vid");
+    if (!vid) { vid = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem("lc_vid", vid); }
+    var today = new Date().toDateString();
+    if (localStorage.getItem("lc_vday") !== today) {
+      fetch(SB + "/rest/v1/rpc/log_visit", { method: "POST", headers: H, body: JSON.stringify({ p_vid: vid, p_page: location.pathname.slice(1) || "home", p_ref: localStorage.getItem("lc_ref") }) })
+        .then(function (r) { if (r.ok) localStorage.setItem("lc_vday", today); }).catch(function () {});
+    }
+  } catch (e) {}
+  window.LC_SOLD_OUT = new Set();
+  try { JSON.parse(localStorage.getItem("lc_soldout") || "[]").forEach(function (id) { LC_SOLD_OUT.add(id); }); } catch (e) {}
+  window.LC_PAUSED = false;
+  var css = document.createElement("style");
+  css.textContent = "[data-dish].lc-so{position:relative;filter:grayscale(1);opacity:.55}[data-dish].lc-so::after{content:'Sold out';position:absolute;top:8px;left:8px;z-index:5;background:#111;color:#fff;font:800 11px Manrope,sans-serif;padding:4px 9px;border-radius:100px;border:1px solid rgba(255,255,255,.3)}" +
+    "#lc-paused{position:fixed;left:12px;right:12px;top:calc(env(safe-area-inset-top) + 86px);z-index:60;background:#1f1f1f;border:1px solid #f36310;color:#fff;border-radius:14px;padding:12px 14px;font:700 14px Manrope,sans-serif;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.5)}";
+  document.head.appendChild(css);
+  function mark() {
+    document.querySelectorAll("[data-dish]").forEach(function (el) { el.classList.toggle("lc-so", LC_SOLD_OUT.has(el.getAttribute("data-dish"))); });
+    document.querySelectorAll("[data-add],[data-order]").forEach(function (el) { var id = el.getAttribute("data-add") || el.getAttribute("data-order"); if (LC_SOLD_OUT.has(id)) { el.setAttribute("aria-disabled", "true"); el.style.opacity = ".4"; } });
+    var b = document.getElementById("lc-paused");
+    if (LC_PAUSED && !b && document.body) { b = document.createElement("div"); b.id = "lc-paused"; document.body.appendChild(b); }
+    if (b) { b.style.display = LC_PAUSED ? "" : "none"; b.textContent = window.LC_PAUSED_MSG || "Online ordering is paused right now. Call us to order."; }
+  }
+  window.lcMarkSoldOut = mark;
+  // block adding sold-out items anywhere in the app
+  var _add = window.addToCart;
+  if (typeof _add === "function") window.addToCart = addToCart = function (id) {
+    if (LC_SOLD_OUT.has(id)) { if (window.showToast) showToast("Sorry, that's sold out right now"); return; }
+    return _add.apply(this, arguments);
+  };
+  Promise.all([
+    fetch(SB + "/rest/v1/menu_status?sold_out=eq.true&select=item_id", { headers: H }).then(function (r) { return r.ok ? r.json() : []; }),
+    fetch(SB + "/rest/v1/app_settings?key=eq.ordering&select=value", { headers: H }).then(function (r) { return r.ok ? r.json() : []; })
+  ]).then(function (res) {
+    LC_SOLD_OUT = new Set((res[0] || []).map(function (x) { return x.item_id; }));
+    try { localStorage.setItem("lc_soldout", JSON.stringify(Array.from(LC_SOLD_OUT))); } catch (e) {}
+    var v = res[1] && res[1][0] && res[1][0].value || {};
+    LC_PAUSED = !!v.paused; window.LC_PAUSED_MSG = v.message || "";
+    mark();
+  }).catch(function () {});
+  document.addEventListener("DOMContentLoaded", mark);
+  new MutationObserver(function () { clearTimeout(window.__lcMk); window.__lcMk = setTimeout(mark, 120); }).observe(document.documentElement, { childList: true, subtree: true });
+})();

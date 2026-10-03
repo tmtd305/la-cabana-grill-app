@@ -453,6 +453,7 @@
     let { data: ok } = await sb.rpc('is_operator');
     if(!ok){ const { data: owner } = await sb.rpc('claim_owner'); ok = !!owner; }
     if(!ok){ $('denied-email').textContent = 'Signed in as ' + me.email + '.'; show('v-denied'); setTimeout(boot, 15000); return; }
+    if(!/[?&]voice=1/.test(location.search) && !/reset|recovery/.test(location.hash + location.search)){ location.replace('admin.html'); return; }
     show('v-app');
     loadOrders(); loadQueue(); loadPaid(); loadStaff();
     listenDb();
