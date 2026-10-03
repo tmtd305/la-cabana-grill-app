@@ -1,0 +1,50 @@
+/* Desktop & laptop layout (1024px and wider). Phones and tablets never use these rules. */
+@media (min-width: 1024px) {
+  /* one centered column instead of stretching edge to edge */
+  header > div, main > div:first-child, main > section, main > form { max-width: 1180px; margin-left: auto; margin-right: auto; }
+  body[data-page="cart"] main > div:first-child, body[data-page="orders"] main > div:first-child, body[data-page="account"] main > div:first-child,
+  body[data-page="messages"] main > div:first-child, body[data-page="policies"] main > div:first-child { max-width: 760px; }
+  header > div { padding-left: 24px; padding-right: 24px; }
+  main > div:first-child { padding-left: 24px; padding-right: 24px; }
+  main { padding-bottom: 48px !important; }
+
+  /* bottom tab bar becomes a top menu in the header */
+  body > nav.fixed { top: 0; bottom: auto; left: 50%; right: auto; width: auto; transform: translateX(-50%); background: transparent !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; padding: 0 !important; z-index: 60; }
+  body > nav.fixed > div { height: 80px; gap: 4px; padding: 0; }
+  body > nav.fixed a { flex-direction: row !important; min-width: 0 !important; height: 40px !important; padding: 0 14px; gap: 6px !important; border-radius: 999px; }
+  body > nav.fixed a:hover { background: rgba(255, 255, 255, .06); }
+  body > nav.fixed a .material-symbols-outlined { font-size: 20px !important; }
+  body > nav.fixed a span:last-child { font-size: 13px !important; letter-spacing: .02em; text-transform: none; }
+  body > nav.fixed a[aria-current="page"] { background: rgba(243, 99, 16, .12); }
+
+  /* home: welcome slideshow as a contained banner */
+  .lc-wel { margin: 20px 0 0 !important; height: 460px !important; border-radius: 28px !important; }
+  .lc-wel-body { left: 48px !important; right: auto !important; bottom: 40px !important; width: 520px; }
+  .lc-wel-cap { top: 20px; right: 20px; }
+
+  /* side-scrolling rows stop bleeding off the edges */
+  .lc-reel-row, .lc-promo-row, .lc-picks-row { margin-left: 0 !important; margin-right: 0 !important; padding-left: 0 !important; padding-right: 0 !important; }
+  .lc-reel { flex: 0 0 250px !important; }
+  .lc-promo { flex: 0 0 calc((100% - 24px) / 3) !important; }
+  .lc-promo-pic { height: 190px; }
+  .lc-pick { flex: 0 0 150px; }
+
+  /* menu: 4 dishes per row, list items in two columns */
+  .lc-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 18px !important; }
+  .lc-rows { display: grid !important; grid-template-columns: 1fr 1fr; column-gap: 32px; }
+
+  /* menu page: dishes in a 3-column grid, section titles across the top */
+  #dish-feed { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px !important; align-items: start; }
+  #dish-feed > :not([data-dish]) { grid-column: 1 / -1; }
+  #dish-feed > [data-dish] img { max-height: 220px; }
+
+  /* home: address + phone strip uses the full width */
+  .lc-info-strip { max-width: none !important; }
+
+  /* the dish sheet opens as a centered card instead of a full-screen phone sheet */
+  #dish, #upsell { align-items: center !important; }
+  #dish .d-panel { border-radius: 24px !important; max-height: 88vh !important; }
+}
+@media (min-width: 1280px) {
+  .lc-grid { grid-template-columns: repeat(5, 1fr) !important; }
+}
