@@ -262,6 +262,11 @@
     <h2 style="font-family:Outfit,sans-serif;margin:0 0 6px;" id="denied-title">You're all set</h2>
     <p class="muted" id="denied-email"></p>
     <p class="muted" id="denied-msg"></p>
+    <div id="req-box" class="hidden" style="text-align:left;margin:14px 0 6px;">
+      <input class="field" id="rq-name" type="text" placeholder="Full name" autocomplete="name" autocapitalize="words">
+      <input class="field" id="rq-phone" type="tel" placeholder="Phone number" autocomplete="tel" inputmode="tel" style="margin-top:10px;">
+      <button class="btn pri" id="bRequest" style="width:100%;margin-top:12px;">Request staff access</button>
+    </div>
     <button class="btn" onclick="signOut()">Sign out</button>
   </div>
 
@@ -465,7 +470,10 @@
       const isStaffSignup = !!(me.user_metadata && me.user_metadata.staff);
       $('denied-title').textContent = isStaffSignup ? 'You\'re all set' : 'Not a staff account';
       $('denied-email').textContent = 'Signed in as ' + me.email + '.';
-      $('denied-msg').textContent = isStaffSignup ? 'The owner just needs to approve you. This page opens by itself once they do.' : 'This account doesn\'t have staff access. If you work at La Cabaña, ask the owner for an invite link.';
+      $('denied-title').textContent = isStaffSignup ? 'You\'re all set' : 'Request staff access';
+      $('denied-msg').textContent = isStaffSignup ? 'The owner just needs to approve you. This page opens by itself once they do.' : 'Add your name and phone so the owner knows it\'s you. You get in once they approve.';
+      $('req-box').classList.toggle('hidden', isStaffSignup);
+      if(!isStaffSignup){ const md = me.user_metadata || {}; $('rq-name').value = md.name || ''; $('rq-phone').value = md.phone || ''; }
       show('v-denied'); if(isStaffSignup) setTimeout(boot, 15000); return;
     }
     if(!/[?&]voice=1/.test(location.search) && !/reset|recovery/.test(location.hash + location.search)){ location.replace('admin.html'); return; }
@@ -961,6 +969,18 @@
   $('sl-list').addEventListener('click', ev => { if(ev.target.id === 'sl-clear'){ slPick = null; renderSales(); } });
   $('sl-days').addEventListener('click', ev => { const b = ev.target.closest('[data-d]'); if(!b) return; slDays = +b.dataset.d; slPick = null; $('sl-days').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); loadSales(); });
 
+  // an existing (non-staff) account asks to join the staff; the owner still approves it
+  $('bRequest').onclick = async () => {
+    const name = $('rq-name').value.trim(), phone = $('rq-phone').value.trim();
+    if(!name){ alert('Enter your name.'); return; }
+    if(phone.replace(/\D/g, '').length < 10){ alert('Enter your phone number.'); return; }
+    $('bRequest').disabled = true; $('bRequest').textContent = 'Sending…';
+    const { error } = await sb.auth.updateUser({ data: { name, phone, staff: true } });
+    $('bRequest').disabled = false; $('bRequest').textContent = 'Request staff access';
+    if(error){ alert('Couldn\'t send: ' + error.message); return; }
+    await sb.auth.refreshSession();
+    boot();
+  };
   window.answer = answer; window.addLine = addLine; window.signOut = signOut; window.show = show;
   sb.auth.onAuthStateChange((ev) => { if(ev === 'SIGNED_OUT') show('v-login'); });
   boot();
