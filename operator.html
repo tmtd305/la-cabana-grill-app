@@ -75,6 +75,21 @@
   .po{padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
   .po b{font-size:14.5px}
   .hidden{display:none!important}
+  .chr{all:unset;cursor:pointer;display:block;width:100%;box-sizing:border-box;padding:12px 0}
+  .chr+.chr{border-top:1px solid var(--line)}
+  .chr .r1{display:flex;align-items:baseline;gap:8px}
+  .chr .r1 b{font-size:15.5px;flex:1}
+  .chr .r1 span{font-family:Outfit,sans-serif;font-weight:700;font-size:16px}
+  .chr .r2{display:flex;justify-content:space-between;color:var(--fg2);font-size:12.5px;margin-top:2px}
+  .chr .bar{height:6px;border-radius:6px;background:#262626;margin-top:8px;overflow:hidden}
+  .chr .bar i{display:block;height:100%;border-radius:6px}
+  .chr.on .r1 b{color:var(--or2)}
+  .sr{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:8px}
+  .sr .l{flex:1;min-width:0}
+  .sr .l b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sr .l small{display:block;color:var(--fg2);font-size:12.5px;margin-top:2px}
+  .sr .t{font-family:Outfit,sans-serif;font-weight:700;font-size:15px}
+  .sr a{color:#fff}
   .tabs{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:14px}
   .tabs button{all:unset;cursor:pointer;flex:1;text-align:center;padding:10px 0;border-radius:10px;font-weight:800;font-size:14.5px;color:var(--fg2);display:flex;align-items:center;justify-content:center;gap:6px}
   .tabs button.on{background:#fff;color:#111}
@@ -237,12 +252,18 @@
 
   <!-- console -->
   <div id="v-app" class="hidden">
-    <div class="tabs" id="tabs"><button class="on" data-tab="orders">Orders <span id="new-count" class="cnt hidden"></span></button><button data-tab="staff">Staff <span id="pend-count" class="cnt hidden"></span></button></div>
+    <div class="tabs" id="tabs"><button class="on" data-tab="orders">Orders <span id="new-count" class="cnt hidden"></span></button><button data-tab="sales">Sales</button><button data-tab="staff">Staff <span id="pend-count" class="cnt hidden"></span></button></div>
     <div id="tab-orders">
       <div class="stats"><div class="stat"><small>Orders today</small><b id="st-n">–</b></div><div class="stat"><small>Sales today</small><b id="st-s">–</b></div></div>
       <div class="seg" id="ord-filter"><button class="on" data-f="open">Open</button><button data-f="done">Completed</button><button data-f="all">All</button></div>
       <div id="orders"><div class="empty">Loading orders…</div></div>
       <div style="display:flex;justify-content:center;gap:8px;margin-top:16px;"><select id="ord-days" class="field" style="width:auto;height:38px;font-size:13.5px;padding:0 12px;"><option value="1">Today</option><option value="2" selected>Last 2 days</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select><button class="btn" id="ord-refresh" style="padding:8px 14px;font-size:13px;">Refresh</button></div>
+    </div>
+    <div id="tab-sales" class="hidden">
+      <div class="seg" id="sl-days"><button class="on" data-d="1">Today</button><button data-d="7">7 days</button><button data-d="30">30 days</button></div>
+      <div class="stats"><div class="stat"><small>Total sales</small><b id="sl-tot">–</b></div><div class="stat"><small>Orders</small><b id="sl-n">–</b></div></div>
+      <div class="card" style="padding:6px 16px;"><div id="sl-ch"><div class="empty">Loading…</div></div></div>
+      <div id="sl-list" style="margin-top:14px;"></div>
     </div>
     <div id="tab-staff" class="hidden">
         <div class="card">
@@ -860,10 +881,43 @@
     if(error) alert('Couldn\'t save: ' + error.message);
   });
   $('ord-filter').addEventListener('click', ev => { const b = ev.target.closest('[data-f]'); if(!b) return; ordFilter = b.dataset.f; $('ord-filter').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); renderOrders(); });
-  $('tabs').addEventListener('click', ev => { const b = ev.target.closest('[data-tab]'); if(!b) return; $('tabs').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); $('tab-orders').classList.toggle('hidden', b.dataset.tab !== 'orders'); $('tab-staff').classList.toggle('hidden', b.dataset.tab !== 'staff'); });
+  $('tabs').addEventListener('click', ev => { const b = ev.target.closest('[data-tab]'); if(!b) return; $('tabs').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); $('tab-orders').classList.toggle('hidden', b.dataset.tab !== 'orders'); $('tab-staff').classList.toggle('hidden', b.dataset.tab !== 'staff'); $('tab-sales').classList.toggle('hidden', b.dataset.tab !== 'sales'); if(b.dataset.tab === 'sales') loadSales(); });
   $('ord-refresh').onclick = loadOrders; $('ord-days').onchange = loadOrders;
   setInterval(() => { if(me && !$('v-app').classList.contains('hidden')) loadOrders(); }, 15000);
   setInterval(() => { if(ordList.length) renderOrders(); }, 60000);
+
+  // ---------- sales by channel ----------
+  const CH_COLOR = { 'Website': '#f36310', 'In store (Square)': '#e5e7eb', 'Uber Eats': '#06C167', 'DoorDash': '#FF3008', 'Grubhub': '#F63440', 'Postmates': '#a3a3a3', 'Square Online': '#60a5fa' };
+  let slDays = 1, slOrders = [], slPick = null;
+  async function loadSales(){
+    const { data: { session } } = await sb.auth.getSession(); if(!session) return;
+    $('sl-ch').innerHTML = '<div class="empty">Loading…</div>'; $('sl-list').innerHTML = '';
+    let j;
+    try { const r = await fetch('/api/orders?scope=all&days=' + slDays, { headers: { Authorization: 'Bearer ' + session.access_token } }); j = await r.json(); if(!r.ok) throw new Error(j.error || 'error'); }
+    catch(e){ $('sl-ch').innerHTML = '<div class="empty">Couldn\'t load sales. Try again.</div>'; return; }
+    const start = new Date(); start.setHours(0, 0, 0, 0); if(slDays > 1) start.setDate(start.getDate() - (slDays - 1));
+    slOrders = (j.orders || []).filter(o => o.paid && new Date(o.created) >= start);
+    renderSales();
+  }
+  function renderSales(){
+    const tot = slOrders.reduce((a, o) => a + o.total, 0);
+    $('sl-tot').textContent = money(tot); $('sl-n').textContent = slOrders.length;
+    const by = {};
+    slOrders.forEach(o => { const c = o.channel || 'Other'; (by[c] = by[c] || { n: 0, s: 0 }); by[c].n++; by[c].s += o.total; });
+    ['Website', 'In store (Square)', 'Uber Eats', 'DoorDash'].forEach(c => by[c] = by[c] || { n: 0, s: 0 });
+    const rows = Object.entries(by).sort((a, b) => b[1].s - a[1].s);
+    $('sl-ch').innerHTML = rows.map(([c, v]) => { const pct = tot ? Math.round(v.s / tot * 100) : 0;
+      return '<button class="chr' + (slPick === c ? ' on' : '') + '" data-ch="' + esc(c) + '"><div class="r1"><b>' + esc(c) + '</b><span>' + money(v.s) + '</span></div><div class="r2"><span>' + v.n + ' order' + (v.n === 1 ? '' : 's') + '</span><span>' + pct + '%</span></div><div class="bar"><i style="width:' + pct + '%;background:' + (CH_COLOR[c] || '#a78bfa') + '"></i></div></button>'; }).join('');
+    const list = slOrders.filter(o => !slPick || o.channel === slPick);
+    $('sl-list').innerHTML = '<div class="sec" style="margin:0 2px 2px;">' + esc(slPick || 'All channels') + ' · ' + list.length + ' order' + (list.length === 1 ? '' : 's') + (slPick ? ' <button class="pillb plain" id="sl-clear" style="height:28px;padding:0 10px;">Show all</button>' : '') + '</div>' +
+      (list.length ? list.map(o => { const t = new Date(o.created);
+        const contact = [o.phone ? '<a href="tel:' + esc(o.phone) + '">' + esc(fmtPhone(o.phone)) + '</a>' : '', o.email ? '<a href="mailto:' + esc(o.email) + '">' + esc(o.email) + '</a>' : ''].filter(Boolean).join(' · ');
+        return '<div class="sr"><div class="l"><b>' + esc(o.name || o.cardName || 'No name') + '</b><small>' + esc(o.channel) + ' · ' + t.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ', ' + t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '</small><small>' + (contact || 'No contact info') + '</small></div><div class="t">' + money(o.total) + '</div></div>'; }).join('')
+      : '<div class="empty">No sales here yet.</div>');
+  }
+  $('sl-ch').addEventListener('click', ev => { const b = ev.target.closest('[data-ch]'); if(!b) return; slPick = slPick === b.dataset.ch ? null : b.dataset.ch; renderSales(); });
+  $('sl-list').addEventListener('click', ev => { if(ev.target.id === 'sl-clear'){ slPick = null; renderSales(); } });
+  $('sl-days').addEventListener('click', ev => { const b = ev.target.closest('[data-d]'); if(!b) return; slDays = +b.dataset.d; slPick = null; $('sl-days').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); loadSales(); });
 
   window.answer = answer; window.addLine = addLine; window.signOut = signOut; window.show = show;
   sb.auth.onAuthStateChange((ev) => { if(ev === 'SIGNED_OUT') show('v-login'); });
