@@ -75,6 +75,11 @@
   .po{padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
   .po b{font-size:14.5px}
   .hidden{display:none!important}
+  .pwrap{position:relative}
+  .pwrap .field{padding-right:48px}
+  .eye{all:unset;cursor:pointer;position:absolute;right:6px;top:50%;transform:translateY(-50%);width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--fg2);border-radius:10px}
+  .eye.on{color:var(--or2)}
+  .linkbtn{all:unset;cursor:pointer;display:block;margin:14px auto 0;font-size:13.5px;color:var(--fg2);text-decoration:underline}
   .av{width:72px;height:72px;border-radius:50%;background:#2a2a2a center/cover;display:flex;align-items:center;justify-content:center;font:800 26px Outfit,sans-serif;color:#9CA3AF;flex-shrink:0;box-shadow:0 0 0 3px #2a2a2a;transition:box-shadow .15s}
   .av.talk{box-shadow:0 0 0 4px var(--gr),0 0 28px rgba(34,197,94,.55);animation:avp 1s infinite}
   @keyframes avp{50%{box-shadow:0 0 0 7px rgba(34,197,94,.35),0 0 34px rgba(34,197,94,.35)}}
@@ -161,20 +166,34 @@
   <!-- sign in / create staff login -->
   <div id="v-login" class="card hidden" style="max-width:420px;margin:30px auto;">
     <h2 style="font-family:Outfit,sans-serif;margin:0 0 6px;" id="l-title">Staff sign in</h2>
-    <p class="muted" style="margin:0 0 14px;" id="l-sub">Only approved La Cabaña staff emails can take voice orders.</p>
-    <input class="field" id="em" type="email" placeholder="Staff email" autocomplete="username" autocapitalize="none">
-    <input class="field" id="pw" type="password" placeholder="Password" autocomplete="current-password" style="margin-top:10px;">
-    <input class="field hidden" id="pw2" type="password" placeholder="Confirm password" autocomplete="new-password" style="margin-top:10px;">
-    <div id="lerr" class="muted" style="color:var(--rd);margin-top:10px;display:none;"></div>
-    <button class="btn pri" id="bLogin" style="width:100%;margin-top:14px;">Sign in</button>
-    <button class="btn pri hidden" id="bSignup" style="width:100%;margin-top:14px;">Create staff login</button>
-    <button class="btn" id="bMode" style="width:100%;margin-top:8px;">New staff? Create a login</button>
+    <p class="muted" style="margin:0 0 14px;" id="l-sub">Sign in to see orders.</p>
+    <form id="lform" autocomplete="on" onsubmit="return false">
+      <div id="new-fields" class="hidden">
+        <input class="field" id="nm" type="text" placeholder="Full name" autocomplete="name" autocapitalize="words">
+        <input class="field" id="ph" type="tel" placeholder="Phone number" autocomplete="tel" inputmode="tel" style="margin-top:10px;">
+      </div>
+      <input class="field" id="em" type="email" placeholder="Email" autocomplete="username" autocapitalize="none" inputmode="email" style="margin-top:10px;">
+      <div class="pwrap" style="margin-top:10px;"><input class="field" id="pw" type="password" placeholder="Password" autocomplete="current-password"><button type="button" class="eye" aria-label="Show password"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
+      <div id="lerr" class="muted" style="color:var(--rd);margin-top:10px;display:none;"></div>
+      <button type="submit" class="btn pri" id="bLogin" style="width:100%;margin-top:14px;">Sign in</button>
+      <button type="submit" class="btn pri hidden" id="bSignup" style="width:100%;margin-top:14px;">Create account</button>
+    </form>
+    <button class="btn" id="bMode" style="width:100%;margin-top:8px;">New here? Create an account</button>
+    <button class="linkbtn" id="bForgot">Forgot password?</button>
+  </div>
+
+  <!-- check email -->
+  <div id="v-check" class="card hidden" style="max-width:420px;margin:30px auto;text-align:center;">
+    <h2 style="font-family:Outfit,sans-serif;margin:0 0 6px;">Check your email</h2>
+    <p class="muted" id="check-txt"></p>
+    <button class="btn" onclick="show('v-login')">Back to sign in</button>
   </div>
 
   <!-- not allowed -->
   <div id="v-denied" class="card hidden" style="max-width:420px;margin:30px auto;text-align:center;">
-    <h2 style="font-family:Outfit,sans-serif;margin:0 0 6px;">Not a staff account</h2>
+    <h2 style="font-family:Outfit,sans-serif;margin:0 0 6px;">You're all set</h2>
     <p class="muted" id="denied-email"></p>
+    <p class="muted">Your manager just needs to approve you. This page opens by itself once they do.</p>
     <button class="btn" onclick="signOut()">Sign out</button>
   </div>
 
@@ -198,8 +217,8 @@
         </div>
         <div class="card" style="margin-top:14px;">
           <div class="sec">Staff</div>
-          <p class="muted" style="margin:0 0 10px;font-size:13px;">Add a staff email here, then they tap “New staff? Create a login” on this page with that email.</p>
-          <div style="display:flex;gap:8px;"><input class="field" id="st-em" type="email" placeholder="new.staff@email.com" autocapitalize="none" style="flex:1;min-width:0;"><button class="btn pri" id="bAddStaff">Add</button></div>
+          <div id="pend-box" class="hidden"><div class="muted" style="font-weight:800;color:var(--or2);margin-bottom:6px;">Waiting for approval</div><div id="pending"></div></div>
+          <p class="muted" style="margin:6px 0 0;font-size:13px;">New staff open this page and tap “Create an account”. They show up here for you to approve.</p>
           <div id="st-msg" class="muted" style="margin-top:8px;display:none;"></div>
           <div id="staff" style="margin-top:6px;"></div>
         </div>
@@ -281,50 +300,79 @@
   let me = null, onDuty = false, opsChan = null, dbChan = null, active = null, callChan = null, lines = [], sentOrder = null, holding = false, cat = 'all';
   const queue = new Map();
 
-  function show(v){ ['v-login','v-denied','v-app'].forEach(x => $(x).classList.toggle('hidden', x !== v)); }
+  function show(v){ ['v-login','v-check','v-denied','v-app'].forEach(x => $(x).classList.toggle('hidden', x !== v)); }
   async function signOut(){ await goOffDuty(); await sb.auth.signOut(); location.reload(); }
 
   // ---------- auth ----------
   function lmsg(t, ok){ $('lerr').style.color = ok ? 'var(--gr)' : 'var(--rd)'; $('lerr').textContent = t; $('lerr').style.display = t ? 'block' : 'none'; }
   let createMode = false;
+  document.querySelectorAll('.eye').forEach(b => b.onclick = () => { const i = b.previousElementSibling, on = i.type === 'password'; i.type = on ? 'text' : 'password'; b.classList.toggle('on', on); b.setAttribute('aria-label', on ? 'Hide password' : 'Show password'); });
+  const backUrl = location.origin + '/operator.html';
   $('bMode').onclick = () => {
     createMode = !createMode; lmsg('');
-    $('l-title').textContent = createMode ? 'Create staff login' : 'Staff sign in';
-    $('l-sub').textContent = createMode ? 'Use the email your manager added to the staff list. Pick a password (8+ characters).' : 'Only approved La Cabaña staff emails can take voice orders.';
+    $('l-title').textContent = createMode ? 'Create your account' : 'Staff sign in';
+    $('l-sub').textContent = createMode ? 'Takes 30 seconds. We email you one link to confirm.' : 'Sign in to see orders.';
     $('pw').autocomplete = createMode ? 'new-password' : 'current-password';
-    $('pw2').classList.toggle('hidden', !createMode);
+    $('pw').placeholder = createMode ? 'Make a password (6+ characters)' : 'Password';
+    $('new-fields').classList.toggle('hidden', !createMode);
+    $('em').style.marginTop = createMode ? '10px' : '0';
     $('bLogin').classList.toggle('hidden', createMode);
     $('bSignup').classList.toggle('hidden', !createMode);
-    $('bMode').textContent = createMode ? 'Already have a login? Sign in' : 'New staff? Create a login';
+    $('bForgot').classList.toggle('hidden', createMode);
+    $('bMode').textContent = createMode ? 'Already have an account? Sign in' : 'New here? Create an account';
+    (createMode ? $('nm') : $('em')).focus();
   };
-  $('bLogin').onclick = async () => {
+  $('em').style.marginTop = '0';
+  $('lform').onsubmit = () => { (createMode ? signup : login)(); return false; };
+  async function login(){
     const email = $('em').value.trim(), password = $('pw').value;
     lmsg('');
+    if(!email || !password){ lmsg('Enter your email and password.'); return; }
+    $('bLogin').disabled = true; $('bLogin').textContent = 'Signing in…';
     const { error } = await sb.auth.signInWithPassword({ email, password });
-    if(error){ lmsg(/confirm/i.test(error.message) ? 'Confirm your email first — open the link we emailed you, then sign in.' : 'Wrong email or password.'); return; }
+    $('bLogin').disabled = false; $('bLogin').textContent = 'Sign in';
+    if(error){ lmsg(/confirm/i.test(error.message) ? 'Open the link we emailed you first, then sign in.' : 'Wrong email or password. Tap the eye to check it.'); return; }
     boot();
-  };
-  $('bSignup').onclick = async () => {
-    const email = $('em').value.trim(), password = $('pw').value;
+  }
+  async function signup(){
+    const name = $('nm').value.trim(), phone = $('ph').value.trim(), email = $('em').value.trim(), password = $('pw').value;
     lmsg('');
+    if(!name){ lmsg('Enter your name.'); return; }
+    if(phone.replace(/\D/g, '').length < 10){ lmsg('Enter your phone number.'); return; }
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ lmsg('Enter a valid email.'); return; }
-    if(password.length < 8){ lmsg('Password needs 8+ characters.'); return; }
-    if(password !== $('pw2').value){ lmsg('Passwords don\'t match.'); return; }
-    $('bSignup').disabled = true;
-    const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: location.origin + '/operator.html' } });
-    $('bSignup').disabled = false;
-    if(error){ lmsg(/registered|exists/i.test(error.message) ? 'That email already has a login — sign in instead.' : error.message); return; }
-    if(data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0){ lmsg('That email already has a login — sign in instead (or check your inbox for the confirmation link).'); return; }
+    if(password.length < 6){ lmsg('Password needs 6+ characters.'); return; }
+    $('bSignup').disabled = true; $('bSignup').textContent = 'Creating…';
+    const { data, error } = await sb.auth.signUp({ email, password, options: { emailRedirectTo: backUrl, data: { name, phone, staff: true } } });
+    $('bSignup').disabled = false; $('bSignup').textContent = 'Create account';
+    if(error){ lmsg(/registered|exists/i.test(error.message) ? 'That email already has an account. Sign in instead.' : error.message); return; }
+    if(data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0){ lmsg('That email already has an account. Sign in instead.'); return; }
     if(data.session){ boot(); return; }
-    lmsg('Almost done! Open the confirmation link we sent to ' + email + ', then come back here and sign in.', true);
+    $('check-txt').innerHTML = 'We sent a link to <b>' + esc(email) + '</b>. Tap it and you\'re in.';
+    show('v-check');
+  }
+  $('bForgot').onclick = async () => {
+    const email = $('em').value.trim();
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ lmsg('Type your email above, then tap Forgot password.'); return; }
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: backUrl + '#reset' });
+    if(error){ lmsg(error.message); return; }
+    $('check-txt').innerHTML = 'We sent a reset link to <b>' + esc(email) + '</b>.';
+    show('v-check');
   };
+  // after the reset link: pick a new password
+  sb.auth.onAuthStateChange(async (ev) => {
+    if(ev !== 'PASSWORD_RECOVERY') return;
+    const pw = prompt('Type your new password (6+ characters)');
+    if(pw && pw.length >= 6){ const { error } = await sb.auth.updateUser({ password: pw }); alert(error ? error.message : 'Password updated.'); }
+    boot();
+  });
 
   async function boot(){
     const { data: { session } } = await sb.auth.getSession();
     if(!session){ show('v-login'); return; }
     me = session.user;
-    const { data: ok } = await sb.rpc('is_operator');
-    if(!ok){ $('denied-email').textContent = me.email + ' isn\'t on the staff list.'; show('v-denied'); return; }
+    let { data: ok } = await sb.rpc('is_operator');
+    if(!ok){ const { data: owner } = await sb.rpc('claim_owner'); ok = !!owner; }
+    if(!ok){ $('denied-email').textContent = 'Signed in as ' + me.email + '.'; show('v-denied'); setTimeout(boot, 15000); return; }
     show('v-app');
     loadQueue(); loadPaid(); loadStaff();
     listenDb();
@@ -677,12 +725,24 @@
   // ---------- staff list ----------
   function smsg(t, ok){ $('st-msg').style.color = ok ? 'var(--gr)' : 'var(--rd)'; $('st-msg').textContent = t; $('st-msg').style.display = t ? 'block' : 'none'; }
   async function loadStaff(){
-    const { data, error } = await sb.rpc('list_operators');
+    const [{ data, error }, pend] = await Promise.all([sb.rpc('staff_list'), sb.rpc('pending_staff')]);
     if(error){ $('staff').innerHTML = '<div class="muted">Couldn\'t load staff.</div>'; return; }
     const mine = (me.email || '').toLowerCase();
-    $('staff').innerHTML = (data || []).map(e => '<div class="po" style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;">' + esc(e) + (e === mine ? ' <span class="muted">(you)</span>' : '') + '</span>' +
-      (e === mine ? '' : '<button class="btn" style="padding:6px 12px;font-size:12.5px;" data-rm="' + esc(e) + '">Remove</button>') + '</div>').join('');
+    const who = (r) => '<span style="min-width:0;overflow:hidden;text-overflow:ellipsis;"><b>' + esc(r.name || r.email) + '</b>' + (r.email === mine ? ' <span class="muted">(you)</span>' : '') + '<div class="muted" style="font-size:12.5px;">' + esc([r.phone, r.name ? r.email : ''].filter(Boolean).join(' · ')) + '</div></span>';
+    $('staff').innerHTML = (data || []).map(r => '<div class="po" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">' + who(r) +
+      (r.email === mine ? '' : '<button class="btn" style="padding:6px 12px;font-size:12.5px;" data-rm="' + esc(r.email) + '">Remove</button>') + '</div>').join('');
+    const pl = (pend && pend.data) || [];
+    $('pend-box').classList.toggle('hidden', !pl.length);
+    $('pending').innerHTML = pl.map(r => '<div class="po" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">' + who(r) + '<button class="btn pri" style="padding:6px 14px;font-size:12.5px;" data-ok="' + esc(r.email) + '">Approve</button></div>').join('');
   }
+  $('pending').addEventListener('click', async ev => {
+    const b = ev.target.closest('[data-ok]'); if(!b) return;
+    b.disabled = true;
+    const { error } = await sb.rpc('add_operator', { p_email: b.getAttribute('data-ok') });
+    if(error){ smsg('Couldn\'t approve: ' + error.message); b.disabled = false; return; }
+    smsg('Approved.', true); loadStaff();
+  });
+  setInterval(() => { if(me && !$('v-app').classList.contains('hidden')) loadStaff(); }, 20000);
   $('staff').addEventListener('click', async ev => {
     const b = ev.target.closest('[data-rm]'); if(!b) return;
     const e = b.getAttribute('data-rm');
@@ -691,16 +751,7 @@
     if(error){ smsg('Couldn\'t remove: ' + error.message); return; }
     smsg(e + ' removed.', true); loadStaff();
   });
-  $('bAddStaff').onclick = async () => {
-    const e = $('st-em').value.trim().toLowerCase();
-    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){ smsg('Enter a valid email.'); return; }
-    const { error } = await sb.rpc('add_operator', { p_email: e });
-    if(error){ smsg('Couldn\'t add: ' + error.message); return; }
-    $('st-em').value = '';
-    smsg(e + ' added. Send them this page — they tap “New staff? Create a login”.', true); loadStaff();
-  };
-
-  window.answer = answer; window.addLine = addLine; window.signOut = signOut;
+  window.answer = answer; window.addLine = addLine; window.signOut = signOut; window.show = show;
   sb.auth.onAuthStateChange((ev) => { if(ev === 'SIGNED_OUT') show('v-login'); });
   boot();
 </script>
