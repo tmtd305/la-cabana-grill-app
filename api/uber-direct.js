@@ -191,7 +191,11 @@ export default async function handler(req, res) {
         const d = await r.json();
         if (!r.ok) { res.status(400).json({ error: d.message || "Uber error" }); return; }
         const c = d.courier || {};
-        res.status(200).json({ status: d.status, trackingUrl: d.tracking_url, courier: c.name ? { name: c.name, phone: c.phone_number || "", vehicle: [c.vehicle_make, c.vehicle_model, c.vehicle_color].filter(Boolean).join(" ") } : null, dropoffEta: d.dropoff_eta || null, pickupEta: d.pickup_eta || null });
+        const loc = (x) => x && x.lat != null && x.lng != null ? { lat: +x.lat, lng: +x.lng } : null;
+        res.status(200).json({ status: d.status, trackingUrl: d.tracking_url,
+          courier: c.name ? { name: c.name, phone: c.phone_number || "", vehicle: [c.vehicle_make, c.vehicle_model, c.vehicle_color].filter(Boolean).join(" "), photo: c.img_href || "", location: loc(c.location) } : null,
+          pickup: loc(d.pickup && d.pickup.location), dropoff: loc(d.dropoff && d.dropoff.location),
+          dropoffEta: d.dropoff_eta || null, pickupEta: d.pickup_eta || null });
         return;
       }
     }
