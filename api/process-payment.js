@@ -58,7 +58,7 @@ async function saveCustomer(order, ref, total) {
     if (!key.startsWith("sb_")) h.Authorization = "Bearer " + key;
     await fetch(LC_SUPABASE_URL + "/rest/v1/rpc/record_customer_order", { method: "POST", headers: h, body: JSON.stringify({
       p_name: String(order.name || "").slice(0, 80), p_phone: String(order.phone || "").slice(0, 30), p_email: String(order.email || "").slice(0, 120),
-      p_marketing: !!order.marketing, p_ref: ref, p_total: total }) });
+      p_marketing: !!order.marketing, p_ref: ref, p_total: total, p_referral: /^[A-Za-z0-9]{4,12}$/.test(String(order.referral || "")) ? String(order.referral) : null }) });
   } catch (e) { console.error("saveCustomer", e.message); }
 }
 
