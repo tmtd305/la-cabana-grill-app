@@ -285,6 +285,39 @@ function lcHoursStatus(h, now) {
     .hr-d{width:40px} .hr-d .dl{display:none} .hr-d .ds{display:inline}
     .hr-row .field{padding:0 8px;font-size:15px}
   }
+
+  /* phone order builder */
+  .po-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;align-items:start}
+  .po-ticket{position:sticky;top:12px}
+  .po-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-height:calc(100vh - 230px);overflow:auto}
+  .po-it{all:unset;cursor:pointer;background:#111;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent}
+  .po-it:active{transform:scale(.97)}
+  .po-it img,.po-it .ph{width:100%;aspect-ratio:16/10;object-fit:cover;background:#222;display:block}
+  .po-it div{padding:8px 10px}
+  .po-it b{display:block;font-size:13px;line-height:1.25}
+  .po-it small{color:var(--or2);font-weight:800;font-size:12.5px}
+  .po-it.so{opacity:.35;pointer-events:none}
+  .po-ln{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--line)}
+  .po-ln .q{display:flex;align-items:center;gap:6px}
+  .po-ln .q button{all:unset;cursor:pointer;width:30px;height:30px;border-radius:50%;border:1px solid #333;display:flex;align-items:center;justify-content:center;font-weight:800}
+  .po-ln .nm{flex:1;min-width:0;font-size:14px;font-weight:700}
+  .po-ln .nm input{all:unset;display:block;width:100%;font-size:12.5px;font-weight:600;color:var(--fg2);margin-top:3px}
+  .po-tot{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;font-size:14px}
+  .po-tot .r{display:flex;justify-content:space-between;padding:2px 0;color:var(--fg2)}
+  .po-tot .r.t{color:#fff;font-family:Outfit;font-size:22px;font-weight:700;margin-top:4px}
+  @media (max-width:1100px){.po-grid{grid-template-columns:1fr}.po-ticket{position:static}.po-items{max-height:none;grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}}
+  @media (max-width:700px){.po-items{grid-template-columns:1fr 1fr}}
+
+  .po-bar{display:none}
+  @media (max-width:1100px){
+    .po-bar{all:unset;box-sizing:border-box;cursor:pointer;position:sticky;bottom:calc(env(safe-area-inset-bottom) + 10px);z-index:30;display:flex;align-items:center;gap:10px;width:100%;height:54px;padding:0 18px;border-radius:100px;background:#fff;color:#111;font-weight:800;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+    .po-bar b{margin-left:auto;font-family:Outfit;font-size:18px}
+    .po-grid{display:block}
+    .po-grid>*{margin-bottom:14px}
+    .po-menu,.po-ticket{min-width:0;max-width:100%;overflow:hidden}
+  }
+  @media (max-width:700px){.po-bar{bottom:calc(env(safe-area-inset-bottom) + 78px)}}
+  body.v-neworder .fab-car{display:none}
 </style>
 </head>
 <body>
@@ -294,6 +327,7 @@ function lcHoursStatus(h, now) {
   <aside class="side">
     <div class="brand"><img src="icons/logo-transparent.png" alt="La Cabaña Grill"><small>MIAMI BEACH</small></div>
     <button class="nav on" data-v="dash"><span class="ms">home</span>Dashboard</button>
+    <button class="nav" data-v="neworder"><span class="ms">add_call</span>New phone order</button>
     <button class="nav" data-v="orders"><span class="ms">receipt_long</span>Orders<span class="cnt hidden" data-cnt="orders"></span></button>
     <button class="nav" data-v="drivers"><span class="ms">delivery_dining</span>Drivers</button>
     <button class="nav" data-v="menu"><span class="ms">restaurant_menu</span>Menu &amp; Sold out</button>
@@ -333,13 +367,46 @@ function lcHoursStatus(h, now) {
       </div>
     </section>
 
+    <!-- NEW PHONE ORDER -->
+    <section data-view="neworder" class="hidden">
+      <div class="po-grid">
+        <div class="card po-menu">
+          <input class="field" id="po-q" placeholder="Search the menu" autocomplete="off" style="margin-bottom:10px">
+          <div class="chips" id="po-cats"></div>
+          <div class="po-items" id="po-items"></div>
+        </div>
+        <button class="po-bar" id="po-bar"><span class="ms">receipt</span><span id="po-bar-t">Ticket is empty</span><b id="po-bar-p"></b></button>
+        <div class="card po-ticket" id="po-ticket">
+          <div class="ch"><h2>Ticket</h2><button class="btn sm plain" id="po-clear">Clear</button></div>
+          <div id="po-lines"><div class="empty" style="padding:16px">Tap menu items to add them.</div></div>
+          <div class="stack" style="margin-top:12px">
+            <div class="row"><input class="field" id="po-name" placeholder="Customer name" autocapitalize="words" style="flex:1"><input class="field" id="po-phone" type="tel" inputmode="tel" placeholder="Phone" style="flex:1"></div>
+            <div class="seg" id="po-kind" style="align-self:flex-start"><button class="on" data-k="pickup">Pickup</button><button data-k="delivery">Delivery (Uber)</button></div>
+            <div id="po-del" class="hidden stack">
+              <input class="field" id="po-street" placeholder="Street address">
+              <div class="row"><input class="field" id="po-apt" placeholder="Apt / room" style="flex:1"><input class="field" id="po-zip" placeholder="ZIP" inputmode="numeric" maxlength="5" style="width:100px"><button class="btn" id="po-quote">Get price</button></div>
+              <input class="field" id="po-dnote" placeholder="Note for the driver (gate code, hotel room…)" maxlength="200">
+              <div class="muted" id="po-qmsg"></div>
+            </div>
+            <div class="row" style="flex-wrap:wrap"><span class="muted">Tip</span><div class="seg" id="po-tip"><button class="on" data-t="0">None</button><button data-t="10">10%</button><button data-t="15">15%</button><button data-t="20">20%</button></div></div>
+          </div>
+          <div class="po-tot" id="po-tot"></div>
+          <div id="po-status"></div>
+          <div class="stack" id="po-actions" style="margin-top:12px">
+            <button class="btn main" id="po-link" style="width:100%;height:48px;font-size:15px"><span class="ms">sms</span>Text payment link</button>
+            <button class="btn" id="po-reg" style="width:100%">Paid at the register (cash / card)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ORDERS -->
     <section data-view="orders" class="hidden">
       <div class="row" style="margin-bottom:12px;flex-wrap:wrap">
         <div class="seg" id="ord-filter"><button class="on" data-f="open">Open</button><button data-f="done">Completed</button><button data-f="all">All</button></div>
         <span class="muted" style="flex:1">Website orders. New ones ding and glow orange.</span>
         <button class="btn sm" id="ord-refresh"><span class="ms">refresh</span>Refresh</button>
-        <button class="btn sm main" data-driver><span class="ms">delivery_dining</span>Request driver</button>
+        <button class="btn sm main" data-go="neworder"><span class="ms">add_call</span>New phone order</button>
       </div>
       <div id="orders"><div class="empty">Loading…</div></div>
     </section>
@@ -454,6 +521,7 @@ function lcHoursStatus(h, now) {
 
 <nav class="bnav hidden" id="bnav">
   <button class="on" data-v="dash"><span class="ms">home</span>Home</button>
+  <button data-v="neworder"><span class="ms">add_call</span>New order</button>
   <button data-v="orders"><span class="ms">receipt_long</span>Orders<span class="cnt hidden" data-cnt="orders"></span></button>
   <button data-v="drivers"><span class="ms">delivery_dining</span>Drivers</button>
   <button data-v="menu"><span class="ms">restaurant_menu</span>Menu</button>
@@ -476,7 +544,7 @@ function lcHoursStatus(h, now) {
   const dayKey = d => { const x = new Date(d); return x.getFullYear() + '-' + (x.getMonth() + 1) + '-' + x.getDate(); };
   const startOf = (daysAgo) => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - daysAgo); return d; };
   function toast(m){ const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2400); }
-  const CH_COLOR = { 'Website': '#f36310', 'Phone (Uber delivery)': '#19d06f', 'In store (Square)': '#e5e7eb', 'Uber Eats': '#06C167', 'DoorDash': '#FF3008', 'Grubhub': '#F63440', 'Postmates': '#a3a3a3', 'Square Online': '#60a5fa' };
+  const CH_COLOR = { 'Website': '#f36310', 'Phone order': '#fbbf24', 'Phone (Uber delivery)': '#19d06f', 'In store (Square)': '#e5e7eb', 'Uber Eats': '#06C167', 'DoorDash': '#FF3008', 'Grubhub': '#F63440', 'Postmates': '#a3a3a3', 'Square Online': '#60a5fa' };
 
   let me = null, session = null, isOwner = false;
   let all30 = [], loaded30 = false;          // every paid Square order, last 30 days
@@ -506,12 +574,13 @@ function lcHoursStatus(h, now) {
   function tick(){ const d = new Date(); $('clock').textContent = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }) + '  ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
 
   // ---------- navigation ----------
-  const TITLES = { dash: 'Dashboard', orders: 'Orders', drivers: 'Uber drivers', menu: 'Hours, Menu & Sold out', customers: 'Customers', loyalty: 'Marketing & Loyalty', analytics: 'Analytics', channels: 'Channels', staff: 'Staff' };
+  const TITLES = { neworder: 'New phone order', dash: 'Dashboard', orders: 'Orders', drivers: 'Uber drivers', menu: 'Hours, Menu & Sold out', customers: 'Customers', loyalty: 'Marketing & Loyalty', analytics: 'Analytics', channels: 'Channels', staff: 'Staff' };
   function go(v){
     document.querySelectorAll('[data-view]').forEach(s => s.classList.toggle('hidden', s.dataset.view !== v));
     document.querySelectorAll('.nav[data-v],.bnav [data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+    document.body.className = document.body.className.replace(/\bv-\S+/g, '').trim() + ' v-' + v;
     $('title').textContent = TITLES[v]; history.replaceState(null, '', '#' + v); window.scrollTo(0, 0);
-    if(v === 'drivers') loadDeliveries(); if(v === 'analytics') renderAnalytics(); if(v === 'channels') renderChannels(); if(v === 'loyalty') loadMembers(); if(v === 'customers') loadCustomers();
+    if(v === 'drivers') loadDeliveries(); if(v === 'neworder') poRenderMenu(); if(v === 'analytics') renderAnalytics(); if(v === 'channels') renderChannels(); if(v === 'loyalty') loadMembers(); if(v === 'customers') loadCustomers();
   }
   document.addEventListener('click', e => { const b = e.target.closest('[data-v]'); if(b && (b.classList.contains('nav') || b.closest('.bnav'))) go(b.dataset.v); const g = e.target.closest('[data-go]'); if(g) go(g.dataset.go); });
 
@@ -526,15 +595,15 @@ function lcHoursStatus(h, now) {
   async function loadAll(){
     try {
       // today + yesterday first (fast), then 30 days in the background
-      const recent = await api(2);
-      mergeOrders(recent);
+      const [recent] = await Promise.all([api(2), loadPhoneOrders()]);
+      mergeOrders(recent); applyPhoneOrders();
       await loadStatus();
-      const web = all30.filter(o => o.channel === 'Website');
+      const web = all30.filter(o => o.channel === 'Website' || o.channel === 'Phone order');
       const fresh = web.filter(o => !seenIds.has(o.id));
       if(!firstLoad && fresh.length) ding();
       web.forEach(o => seenIds.add(o.id)); try { localStorage.setItem('lc_seen_orders', JSON.stringify([...seenIds].slice(-800))); } catch(e){}
       renderDash(); renderOrders();
-      if(!loaded30){ loaded30 = true; api(30).then(o => { mergeOrders(o); renderDash(); renderOrders(); if(!$('tab-an-hidden')) renderAnalytics(); renderChannels(); renderCustomerKpis(); }).catch(() => { loaded30 = false; }); }
+      if(!loaded30){ loaded30 = true; api(30).then(o => { mergeOrders(o); applyPhoneOrders(); renderDash(); renderOrders(); if(!$('tab-an-hidden')) renderAnalytics(); renderChannels(); renderCustomerKpis(); }).catch(() => { loaded30 = false; }); }
       firstLoad = false;
     } catch(e){ if(firstLoad) $('kpis').innerHTML = '<div class="card empty" style="grid-column:1/-1">Couldn\'t reach Square. Pull to refresh.</div>'; }
   }
@@ -544,7 +613,7 @@ function lcHoursStatus(h, now) {
     const cut = startOf(30);
     all30 = [...map.values()].filter(o => new Date(o.created) >= cut).sort((a, b) => new Date(b.created) - new Date(a.created));
   }
-  const paid = list => list.filter(o => o.paid);
+  const paid = list => list.filter(o => o.paid && !o.noSales);
   const inRange = (list, from, to) => list.filter(o => { const t = new Date(o.created); return t >= from && (!to || t < to); });
   function pct(a, b){ if(!b) return a ? '<em class="up">new</em>' : '<em class="flat">—</em>'; const p = Math.round((a - b) / b * 100); return '<em class="' + (p > 0 ? 'up' : p < 0 ? 'dn' : 'flat') + '">' + (p > 0 ? '↑ ' : p < 0 ? '↓ ' : '') + Math.abs(p) + '%</em>'; }
   function kpi(icon, label, val, cmp){ return '<div class="kpi"><div class="ic"><span class="ms">' + icon + '</span></div><div style="min-width:0"><small>' + label + '</small><b>' + val + '</b>' + (cmp || '') + '</div></div>'; }
@@ -575,14 +644,14 @@ function lcHoursStatus(h, now) {
     $('hour-tot').textContent = money(sum(today));
     renderChan('chan', paid(inRange(all30, startOf(chDays - 1))));
     // live website orders
-    const open2 = all30.filter(o => o.channel === 'Website' && (ordStatus[o.id] || 'new') !== 'done').slice(0, 5);
+    const open2 = all30.filter(o => (o.channel === 'Website' || o.channel === 'Phone order') && (ordStatus[o.id] || 'new') !== 'done').slice(0, 5);
     $('dash-orders').innerHTML = open2.length ? open2.map(o => '<div class="who" style="padding:8px 0;border-bottom:1px solid var(--line)"><div class="av">' + esc(initials(o.name)) + '</div><div style="flex:1;min-width:0"><b>' + esc(o.name || 'Guest') + '</b><small>' + esc(statusLabel(o)) + ' · ' + new Date(o.created).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '</small></div><b style="font-family:Outfit">' + money(o.total) + '</b></div>').join('') : '<div class="empty">No open website orders.</div>';
     // top items 7d
     const items = {}; paid(inRange(all30, startOf(6))).forEach(o => o.items.forEach(i => { items[i.name] = items[i.name] || { q: 0 }; items[i.name].q += i.qty; }));
     const top = Object.entries(items).sort((a, b) => b[1].q - a[1].q).slice(0, 6), tmx = top.length ? top[0][1].q : 1;
     $('top-items').innerHTML = top.length ? top.map(([n, v]) => '<div class="chr"><div class="r1"><b>' + esc(n) + '</b><span>' + v.q + ' sold</span></div><div class="bar"><i style="width:' + (v.q / tmx * 100) + '%"></i></div></div>').join('') : '<div class="empty">No sales yet.</div>';
     renderTopCust();
-    const openCount = all30.filter(o => o.channel === 'Website' && (ordStatus[o.id] || 'new') !== 'done').length;
+    const openCount = all30.filter(o => (o.channel === 'Website' || o.channel === 'Phone order') && (ordStatus[o.id] || 'new') !== 'done').length;
     document.querySelectorAll('[data-cnt="orders"]').forEach(c => { c.textContent = openCount; c.classList.toggle('hidden', !openCount); });
   }
   function renderChan(el, list){
@@ -599,13 +668,13 @@ function lcHoursStatus(h, now) {
   let ordFilter = 'open';
   function ding(){ try { const a = new (window.AudioContext || window.webkitAudioContext)(); [0, .25, .5].forEach(t => { const o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.4, a.currentTime + t); g.gain.exponentialRampToValueAtTime(.01, a.currentTime + t + .22); o.start(a.currentTime + t); o.stop(a.currentTime + t + .22); }); } catch(e){} }
   async function loadStatus(){
-    const ids = all30.filter(o => o.channel === 'Website').map(o => o.id); if(!ids.length) return;
+    const ids = all30.filter(o => o.channel === 'Website' || o.channel === 'Phone order').map(o => o.id); if(!ids.length) return;
     const { data } = await sb.from('order_status').select('order_id,status,ready_at').in('order_id', ids.slice(0, 300));
     (data || []).forEach(x => { ordStatus[x.order_id] = x.status; if(x.ready_at) ordReady[x.order_id] = x.ready_at; });
   }
   function statusLabel(o){ const s = ordStatus[o.id] || 'new'; return s === 'preparing' ? 'Preparing' : s === 'ready' ? 'Ready' : s === 'done' ? 'Done' : 'New'; }
   function renderOrders(){
-    const web = all30.filter(o => o.channel === 'Website'), stOf = o => ordStatus[o.id] || 'new';
+    const web = all30.filter(o => o.channel === 'Website' || o.channel === 'Phone order'), stOf = o => ordStatus[o.id] || 'new';
     const list = ordFilter === 'open' ? web.filter(o => stOf(o) !== 'done') : ordFilter === 'done' ? web.filter(o => stOf(o) === 'done') : web;
     if(!list.length){ $('orders').innerHTML = '<div class="empty">' + (ordFilter === 'open' ? 'No open website orders. New ones show up here with a sound.' : 'Nothing here.') + '</div>'; return; }
     const today = new Date().toDateString();
@@ -617,7 +686,7 @@ function lcHoursStatus(h, now) {
         : st === 'preparing' && ra ? '<div class="eta' + (left < 0 ? ' late' : '') + '"><div><small>' + (left < 0 ? 'Late by' : 'Ready in') + '</small><b>' + Math.abs(left) + ' min</b><small>at ' + ra.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '</small></div><button class="btn sm" data-add="5" data-id="' + esc(o.id) + '">+5 min</button><button class="btn sm" data-add="10" data-id="' + esc(o.id) + '">+10</button></div>' : '';
       const next = st === 'ready' ? ['done', 'Picked up'] : st === 'done' ? ['new', 'Reopen'] : ['ready', 'Mark ready'];
       return '<div class="oc ' + st + '"><div class="oc-h"><div style="min-width:0"><div class="nm">' + esc(o.name || 'Guest') + '</div><div class="muted">#' + esc((o.ref || o.id).replace(/^APP-/, '').slice(-5)) + ' · ' + esc(when) + '</div><div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">' +
-        (o.type === 'DELIVERY' ? '<span class="badge o">DELIVERY</span>' : '<span class="badge">PICKUP</span>') + '<span class="badge ' + (st === 'ready' ? 'g' : st === 'done' ? '' : 'o') + '">' + statusLabel(o).toUpperCase() + '</span>' + (o.paid ? '' : '<span class="badge r">NOT PAID</span>') + '</div></div>' +
+        (o.channel === 'Phone order' ? '<span class="badge y">PHONE</span>' : '') + (o.type === 'DELIVERY' ? '<span class="badge o">DELIVERY</span>' : '<span class="badge">PICKUP</span>') + '<span class="badge ' + (st === 'ready' ? 'g' : st === 'done' ? '' : 'o') + '">' + statusLabel(o).toUpperCase() + '</span>' + (o.paid ? '' : '<span class="badge r">NOT PAID</span>') + '</div></div>' +
         '<div class="tt">' + money(o.total) + (o.tip ? '<small>incl. ' + money(o.tip) + ' tip</small>' : '') + '</div></div>' + timer +
         '<div class="items">' + o.items.map(i => '<div class="ln"><span class="q">' + i.qty + '×</span><span>' + esc(i.name) + ((i.mods || i.note) ? '<span class="nt">' + esc([i.mods, i.note].filter(Boolean).join(' · ')) + '</span>' : '') + '</span></div>').join('') + '</div>' +
         '<div class="muted" style="line-height:1.6">' + (o.phone ? '<b style="color:#fff">' + esc(fmtPhone(o.phone)) + '</b>' : 'No phone') + (o.email ? ' · ' + esc(o.email) : '') + (o.address ? '<br>' + esc(o.address) : '') + (o.card ? '<br>' + esc(o.card) + (o.cardName ? ' · ' + esc(o.cardName) : '') : '') + '</div>' +
@@ -755,6 +824,143 @@ function lcHoursStatus(h, now) {
     upd(); m.querySelector('#nt-msg').oninput = upd; go.onclick = () => setTimeout(() => m.remove(), 300);
   }
 
+
+  // ---------- new phone order (staff builds the ticket on the phone) ----------
+  let po = { lines: [], kind: 'pickup', tipPct: 0, quote: null, orderId: null, ref: null, paid: false, poll: null }, poCat = 'all';
+  async function phoneApi(body){
+    const { data } = await sb.auth.getSession(); session = data.session;
+    const r = await fetch('/api/phone-order', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + session.access_token }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({})); if(!r.ok) throw new Error(j.error || 'Error'); return j;
+  }
+  function poRenderMenu(){
+    const cats = (typeof CATEGORIES !== 'undefined' ? CATEGORIES : []).filter(c => MENU_ALL.some(i => i.category === c.id));
+    $('po-cats').innerHTML = '<button data-c="all" class="' + (poCat === 'all' ? 'on' : '') + '">All</button>' + cats.map(c => '<button data-c="' + esc(c.id) + '" class="' + (poCat === c.id ? 'on' : '') + '">' + esc(c.label || c.id) + '</button>').join('');
+    const q = $('po-q').value.trim().toLowerCase();
+    const list = MENU_ALL.filter(i => (poCat === 'all' || i.category === poCat) && (!q || i.name.toLowerCase().includes(q)));
+    $('po-items').innerHTML = list.map(i => '<button class="po-it' + (soldOut.has(i.id) ? ' so' : '') + '" data-pi="' + esc(i.id) + '">' + (i.img ? '<img src="' + esc(i.img) + '" alt="" loading="lazy">' : '<span class="ph"></span>') + '<div><b>' + esc(i.name) + '</b><small>' + (soldOut.has(i.id) ? 'Sold out' : money(i.price)) + '</small></div></button>').join('') || '<div class="empty">No items.</div>';
+  }
+  function poTotals(){
+    const sub = po.lines.reduce((a, l) => a + l.price * l.qty, 0), tax = Math.round(sub * 0.079 * 100) / 100;
+    const fee = po.kind === 'delivery' && po.quote ? po.quote.fee : 0, tip = Math.round(sub * po.tipPct) / 100;
+    return { sub, tax, fee, tip, total: +(sub + tax + fee + tip).toFixed(2) };
+  }
+  function poRender(){
+    $('po-lines').innerHTML = po.lines.length ? po.lines.map((l, i) => '<div class="po-ln"><div class="q"><button data-dec="' + i + '">−</button><b>' + l.qty + '</b><button data-inc="' + i + '">+</button></div><div class="nm">' + esc(l.name) + '<input data-note="' + i + '" placeholder="Add note (no onions, side…)" value="' + esc(l.note || '') + '"></div><b>' + money(l.price * l.qty) + '</b></div>').join('') : '<div class="empty" style="padding:16px">Tap menu items to add them.</div>';
+    const t = poTotals();
+    $('po-tot').innerHTML = '<div class="r"><span>Subtotal</span><span>' + money(t.sub) + '</span></div><div class="r"><span>Tax 7.9%</span><span>' + money(t.tax) + '</span></div>' +
+      (po.kind === 'delivery' ? '<div class="r"><span>Uber delivery</span><span>' + (po.quote ? money(t.fee) : '—') + '</span></div>' : '') + (t.tip ? '<div class="r"><span>Tip</span><span>' + money(t.tip) + '</span></div>' : '') +
+      '<div class="r t"><span>Total</span><span>' + money(t.total) + '</span></div>';
+    const locked = !!po.orderId;
+    $('po-actions').classList.toggle('hidden', locked);
+    const n = po.lines.reduce((a, l) => a + l.qty, 0); $('po-bar-t').textContent = n ? 'Ticket · ' + n + ' item' + (n === 1 ? '' : 's') : 'Ticket is empty'; $('po-bar-p').textContent = n ? money(t.total) : '';
+  }
+  $('po-items').addEventListener('click', e => { const b = e.target.closest('[data-pi]'); if(!b || po.orderId) return; const it = MENU_ALL.find(x => x.id === b.dataset.pi); const ex = po.lines.find(l => l.id === it.id && !l.note);
+    ex ? ex.qty++ : po.lines.push({ id: it.id, name: it.name, price: it.price, qty: 1, note: '' }); poRender(); });
+  $('po-lines').addEventListener('click', e => { if(po.orderId) return; const inc = e.target.closest('[data-inc]'), dec = e.target.closest('[data-dec]');
+    if(inc) po.lines[+inc.dataset.inc].qty++; if(dec){ const l = po.lines[+dec.dataset.dec]; l.qty--; if(l.qty < 1) po.lines.splice(+dec.dataset.dec, 1); } if(inc || dec) poRender(); });
+  $('po-lines').addEventListener('input', e => { const n = e.target.closest('[data-note]'); if(n) po.lines[+n.dataset.note].note = n.value; });
+  $('po-cats').addEventListener('click', e => { const b = e.target.closest('[data-c]'); if(!b) return; poCat = b.dataset.c; poRenderMenu(); });
+  $('po-q').oninput = poRenderMenu;
+  $('po-kind').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if(!b || po.orderId) return; po.kind = b.dataset.k; $('po-kind').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); $('po-del').classList.toggle('hidden', po.kind !== 'delivery'); poRender(); });
+  $('po-tip').addEventListener('click', e => { const b = e.target.closest('[data-t]'); if(!b || po.orderId) return; po.tipPct = +b.dataset.t; $('po-tip').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); poRender(); });
+  const poAddr = () => ({ street: $('po-street').value.trim(), apt: $('po-apt').value.trim(), city: 'Miami Beach', state: 'FL', zip: $('po-zip').value.trim() });
+  ['po-street', 'po-apt', 'po-zip'].forEach(id => $(id).oninput = () => { if(po.quote){ po.quote = null; $('po-qmsg').textContent = 'Address changed. Get the price again.'; poRender(); } });
+  $('po-quote').onclick = async () => {
+    if(!$('po-street').value.trim() || !/^\d{5}$/.test($('po-zip').value.trim())){ toast('Add the street and ZIP'); return; }
+    $('po-quote').disabled = true; $('po-qmsg').textContent = 'Asking Uber…';
+    try { po.quote = await uber({ action: 'quote', address: poAddr() }); $('po-qmsg').innerHTML = 'Uber: <b style="color:#fff">' + money(po.quote.fee) + '</b>' + (po.quote.etaMinutes ? ', about ' + po.quote.etaMinutes + ' min' : ''); }
+    catch(e){ po.quote = null; $('po-qmsg').innerHTML = '<span style="color:var(--rd)">' + esc(e.message) + '</span>'; }
+    $('po-quote').disabled = false; poRender();
+  };
+  function poCheck(){
+    if(!po.lines.length){ toast('Add items first'); return false; }
+    if(!$('po-name').value.trim()){ toast('Add the customer name'); return false; }
+    if($('po-phone').value.replace(/\D/g, '').length < 10){ toast('Add the customer phone'); return false; }
+    if(po.kind === 'delivery' && !po.quote){ toast('Get the Uber price for the address'); return false; }
+    return true;
+  }
+  async function poSave(extra){
+    const t = poTotals();
+    const row = Object.assign({ name: $('po-name').value.trim(), phone: $('po-phone').value.trim(), kind: po.kind, address: po.kind === 'delivery' ? Object.assign(poAddr(), { note: $('po-dnote').value.trim() }) : null,
+      items: po.lines, subtotal: t.sub, tax: t.tax, delivery_fee: t.fee, tip: t.tip, total: t.total, created_by: me.email }, extra);
+    const { error } = await sb.from('phone_orders').insert(row); if(error) toast('Saved to Square, but the dashboard copy failed');
+  }
+  $('po-link').onclick = async () => {
+    if(!poCheck()) return;
+    const b = $('po-link'); b.disabled = true; b.textContent = 'Making link…';
+    const t = poTotals();
+    try {
+      const r = await phoneApi({ action: 'link', order: { name: $('po-name').value.trim(), phone: $('po-phone').value.trim(), kind: po.kind, deliveryFee: t.fee, tip: t.tip, lines: po.lines.map(l => ({ name: l.name, qty: l.qty, price: l.price, note: l.note })) } });
+      po.orderId = r.orderId; po.ref = r.ref; po.url = r.url;
+      await poSave({ order_id: r.orderId, ref: r.ref, pay_method: 'link', pay_url: r.url, total: r.total || t.total });
+      poRender(); poShowStatus(r.total || t.total); poSendLink(r.total || t.total);
+      clearInterval(po.poll); po.poll = setInterval(poPoll, 5000);
+    } catch(e){ toast(e.message); }
+    b.disabled = false; b.innerHTML = '<span class="ms">sms</span>Text payment link';
+  };
+  function poSendLink(total){
+    notifyText($('po-phone').value.trim(), 'La Cabaña Grill: hi ' + $('po-name').value.trim().split(' ')[0] + ', here is your secure payment link for ' + money(total) + ': ' + po.url + (po.kind === 'delivery' ? ' . Your order goes out with an Uber driver as soon as it\'s paid.' : ' . We start cooking as soon as it\'s paid.'), 'Text the payment link');
+  }
+  function poShowStatus(total){
+    $('po-status').innerHTML = '<div class="card" style="background:#111;margin-top:12px;padding:12px"><div class="row"><div style="flex:1"><b style="font-size:15px">' + (po.paid ? 'Paid ' + money(total) : 'Waiting for payment…') + '</b><div class="muted">' + (po.paid ? (po.kind === 'delivery' ? 'Send the Uber driver when the food is almost ready.' : 'It\'s in Orders now. Accept it with a time.') : 'The customer pays with the link. This updates by itself.') + '</div></div>' + (po.paid ? '<span class="badge g">PAID</span>' : '<span class="badge y">UNPAID</span>') + '</div>' +
+      '<div class="acts" style="margin-top:10px">' + (po.paid ? '' : '<button class="btn sm" id="po-resend"><span class="ms">sms</span>Resend link</button>') +
+      (po.paid && po.kind === 'delivery' ? '<button class="btn green" id="po-driver" style="flex:1">Send Uber driver</button>' : '') + '<button class="btn sm plain" id="po-new">New order</button></div></div>';
+    const rs = $('po-resend'); if(rs) rs.onclick = () => poSendLink(total);
+    const dv = $('po-driver'); if(dv) dv.onclick = poDriver;
+    $('po-new').onclick = () => { if(!po.paid && !confirm('Start a new order? This one stays in Square as unpaid.')) return; poReset(); };
+  }
+  async function poPoll(){
+    if(!po.orderId || po.paid) return clearInterval(po.poll);
+    try { const st = await phoneApi({ action: 'check', orderId: po.orderId });
+      if(st.paid){ po.paid = true; clearInterval(po.poll); ding(); toast('Paid!'); await sb.from('phone_orders').update({ paid: true, paid_at: new Date().toISOString() }).eq('order_id', po.orderId); poShowStatus(st.cents / 100); loadAll(); }
+    } catch(e){}
+  }
+  async function poDriver(){
+    const b = $('po-driver'); b.disabled = true; b.textContent = 'Booking driver…';
+    try {
+      let q = po.quote;
+      try { var d = await uber({ action: 'staff_create', quote: q, address: poAddr(), name: $('po-name').value.trim(), phone: $('po-phone').value.trim(), notes: $('po-dnote').value.trim(), items: po.lines.map(l => l.qty + ' ' + l.name).join(', '), paidOrderId: po.orderId }); }
+      catch(e){ if(!/expired/i.test(e.message)) throw e; q = await uber({ action: 'quote', address: poAddr() }); d = await uber({ action: 'staff_create', quote: q, address: poAddr(), name: $('po-name').value.trim(), phone: $('po-phone').value.trim(), notes: $('po-dnote').value.trim(), items: po.lines.map(l => l.qty + ' ' + l.name).join(', '), paidOrderId: po.orderId }); }
+      const a = poAddr();
+      await sb.from('deliveries').insert({ uber_id: d.deliveryId, tracking_url: d.trackingUrl, status: d.status || 'pending', name: $('po-name').value.trim(), phone: $('po-phone').value.trim(), address: [a.street, a.apt, a.city, a.zip].filter(Boolean).join(', '), notes: $('po-dnote').value.trim(), items: po.lines.map(l => l.qty + ' ' + l.name).join(', '), fee: q.fee, eta_minutes: q.etaMinutes || null, created_by: me.email });
+      await sb.from('phone_orders').update({ delivery_id: d.deliveryId }).eq('order_id', po.orderId);
+      toast('Driver on the way'); notifyText($('po-phone').value.trim(), 'La Cabaña Grill: your order is on the way with Uber. Track your driver: ' + d.trackingUrl, 'Send the tracking link');
+      b.textContent = 'Driver requested ✓';
+    } catch(e){ toast(e.message); b.disabled = false; b.textContent = 'Send Uber driver'; }
+  }
+  $('po-reg').onclick = async () => {
+    if(!poCheck()) return;
+    if(!confirm('Mark this order as paid at the register? Ring it up on Square too so the money is counted.')) return;
+    po.orderId = 'REG-' + Date.now().toString(36).toUpperCase(); po.paid = true;
+    await poSave({ order_id: po.orderId, ref: po.orderId, pay_method: 'register', paid: true, paid_at: new Date().toISOString() });
+    poRender(); poShowStatus(poTotals().total); loadAll();
+  };
+  function poReset(){
+    clearInterval(po.poll); po = { lines: [], kind: 'pickup', tipPct: 0, quote: null, orderId: null, ref: null, paid: false, poll: null };
+    ['po-name', 'po-phone', 'po-street', 'po-apt', 'po-zip', 'po-dnote'].forEach(id => $(id).value = ''); $('po-qmsg').textContent = ''; $('po-status').innerHTML = '';
+    $('po-kind').querySelectorAll('button').forEach((x, i) => x.classList.toggle('on', i === 0)); $('po-del').classList.add('hidden');
+    $('po-tip').querySelectorAll('button').forEach((x, i) => x.classList.toggle('on', i === 0)); poRender();
+  }
+  $('po-clear').onclick = () => { if(po.orderId && !po.paid && !confirm('Start over? The payment link already sent stays unpaid in Square.')) return; poReset(); };
+  $('po-bar').onclick = () => $('po-ticket').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  poRender();
+
+  // phone orders show up in Orders: Square ones get the customer info, register ones are added for the kitchen (not counted as extra sales)
+  let phoneRows = [];
+  async function loadPhoneOrders(){
+    const { data } = await sb.from('phone_orders').select('*').gte('created_at', startOf(1).toISOString()).order('created_at', { ascending: false });
+    phoneRows = data || [];
+  }
+  function applyPhoneOrders(){
+    phoneRows.forEach(p => {
+      const sq = all30.find(o => o.id === p.order_id);
+      const addr = p.address ? [p.address.street, p.address.apt, p.address.zip].filter(Boolean).join(', ') : '';
+      if(sq){ sq.channel = 'Phone order'; sq.name = sq.name || p.name; sq.phone = sq.phone || p.phone; sq.address = sq.address || addr; sq.type = p.kind === 'delivery' ? 'DELIVERY' : 'PICKUP'; return; }
+      if(p.pay_method === 'register' && !all30.some(o => o.id === p.order_id))
+        all30.unshift({ id: p.order_id, ref: p.order_id, created: p.created_at, channel: 'Phone order', noSales: true, name: p.name, phone: p.phone, email: '', address: addr, type: p.kind === 'delivery' ? 'DELIVERY' : 'PICKUP', paid: true, total: +p.total, tip: +p.tip || 0, items: (p.items || []).map(l => ({ qty: l.qty, name: l.name, note: l.note || '' })) });
+    });
+  }
+
   // ---------- settings: pause online ordering ----------
   let paused = false;
   let hours = null;
@@ -811,7 +1017,7 @@ function lcHoursStatus(h, now) {
   $('menu-q').oninput = renderMenu;
   $('menu-list').addEventListener('change', async e => {
     const c = e.target.closest('[data-item]'); if(!c) return; const id = c.dataset.item, so = !c.checked;
-    so ? soldOut.add(id) : soldOut.delete(id); renderMenu();
+    so ? soldOut.add(id) : soldOut.delete(id); renderMenu(); poRenderMenu();
     const { error } = await sb.from('menu_status').upsert({ item_id: id, sold_out: so, updated_at: new Date().toISOString(), updated_by: me.email });
     const it = MENU_ALL.find(x => x.id === id); toast(error ? 'Couldn\'t save' : (it ? it.name : 'Item') + (so ? ' marked sold out' : ' is back'));
   });
