@@ -4,6 +4,9 @@
 //                                                        -> after the card is charged, books the driver; returns the tracking link
 // Vercel env vars (from the Uber Direct dashboard): UBER_DIRECT_CLIENT_ID, UBER_DIRECT_CLIENT_SECRET, UBER_DIRECT_CUSTOMER_ID.
 // Optional: DELIVERY_MARKUP (dollars added on top of Uber's fee, default 0).
+// 3) Staff dashboard (phone orders), signed-in staff only (Authorization: Bearer <Supabase token>):
+//    { action: "staff_create", quote, address, name, phone, notes, items } -> books a driver without a card payment
+//    { action: "staff_status", deliveryId } / { action: "staff_cancel", deliveryId }
 import crypto from "crypto";
 
 const PICKUP = {
@@ -31,6 +34,14 @@ function dropoff(a) {
   const street = [String(a.street).trim()];
   if (a.apt && String(a.apt).trim()) street.push(String(a.apt).trim());
   return { street_address: street, city: String(a.city || "Miami Beach").trim(), state: String(a.state || "FL").trim(), zip_code: String(a.zip).trim(), country: "US" };
+}
+
+const LC_SUPABASE_URL = process.env.LC_SUPABASE_URL || "https://qzluvwpjtgeccfojutbt.supabase.co";
+async function isStaff(req) {
+  const token = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+  if (!token) return false;
+  const r = await fetch(LC_SUPABASE_URL + "/rest/v1/rpc/is_operator", { method: "POST", headers: { apikey: "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ", Authorization: "Bearer " + token, "Content-Type": "application/json" }, body: "{}" });
+  return r.ok && (await r.json()) === true;
 }
 
 function e164(p) {
@@ -104,6 +115,46 @@ export default async function handler(req, res) {
       if (!r.ok) { res.status(400).json({ error: d.message || "Couldn't book the driver" }); return; }
       res.status(200).json({ deliveryId: d.id, trackingUrl: d.tracking_url, status: d.status });
       return;
+    }
+
+    // ---------- staff: phone orders from the dashboard ----------
+    if (String(body.action || "").startsWith("staff_")) {
+      if (!(await isStaff(req))) { res.status(401).json({ error: "Staff only" }); return; }
+      if (body.action === "staff_create") {
+        const qt = body.quote || {};
+        if (!qt.quoteId || sign(qt.quoteId, qt.feeCents, secret) !== qt.sig) { res.status(400).json({ error: "Price expired. Get a new price." }); return; }
+        const to = dropoff(body.address), phone = e164(body.phone);
+        if (!to || !phone || !body.name) { res.status(400).json({ error: "Add the customer's name, phone and address" }); return; }
+        const items = String(body.items || "Food order").split(/\n|,/).map((x) => x.trim()).filter(Boolean).slice(0, 30);
+        const r = await fetch(base + "/deliveries", {
+          method: "POST", headers,
+          body: JSON.stringify({
+            quote_id: qt.quoteId,
+            pickup_name: PICKUP.name, pickup_phone_number: PICKUP.phone, pickup_address: JSON.stringify(PICKUP.address),
+            pickup_notes: "Phone order for " + String(body.name).slice(0, 40) + " - ask at the counter",
+            dropoff_name: String(body.name).slice(0, 80), dropoff_phone_number: phone, dropoff_address: JSON.stringify(to),
+            dropoff_notes: String(body.notes || "").slice(0, 280),
+            manifest_items: (items.length ? items : ["Food order"]).map((n) => ({ name: n.slice(0, 80), quantity: 1, size: "small" })),
+            external_id: "PHONE-" + Date.now().toString(36).toUpperCase()
+          })
+        });
+        const d = await r.json();
+        if (!r.ok) { res.status(400).json({ error: d.message || "Couldn't book the driver" }); return; }
+        res.status(200).json({ deliveryId: d.id, trackingUrl: d.tracking_url, status: d.status, fee: qt.feeCents / 100 });
+        return;
+      }
+      if (body.action === "staff_status" || body.action === "staff_cancel") {
+        const did = encodeURIComponent(String(body.deliveryId || ""));
+        if (!did) { res.status(400).json({ error: "Missing delivery" }); return; }
+        const r = body.action === "staff_cancel"
+          ? await fetch(base + "/deliveries/" + did + "/cancel", { method: "POST", headers, body: "{}" })
+          : await fetch(base + "/deliveries/" + did, { headers });
+        const d = await r.json();
+        if (!r.ok) { res.status(400).json({ error: d.message || "Uber error" }); return; }
+        const c = d.courier || {};
+        res.status(200).json({ status: d.status, trackingUrl: d.tracking_url, courier: c.name ? { name: c.name, phone: c.phone_number || "", vehicle: [c.vehicle_make, c.vehicle_model, c.vehicle_color].filter(Boolean).join(" ") } : null, dropoffEta: d.dropoff_eta || null, pickupEta: d.pickup_eta || null });
+        return;
+      }
     }
 
     res.status(400).json({ error: "Unknown action" });
