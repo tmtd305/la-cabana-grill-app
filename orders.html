@@ -257,6 +257,19 @@
     }
   }
 
+  // live status + ready time the kitchen set on the staff dashboard
+  const lcEta = {}; let lcEtaTimer = null;
+  async function pollEta(id) {
+    try {
+      const r = await fetch('https://qzluvwpjtgeccfojutbt.supabase.co/rest/v1/rpc/order_eta', { method: 'POST', headers: { apikey: 'sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ', 'Content-Type': 'application/json' }, body: JSON.stringify({ p_order_id: id }) });
+      const rows = await r.json();
+      const row = Array.isArray(rows) ? rows[0] : null;
+      const prev = JSON.stringify(lcEta[id] || null);
+      lcEta[id] = row || null;
+      if (JSON.stringify(lcEta[id]) !== prev) renderActiveOrder();
+    } catch (e) {}
+  }
+
   function renderActiveOrder() {
     const orders = getOrders();
     const order = orders[0];
@@ -271,14 +284,21 @@
     empty.classList.add('hidden');
 
     const placed = new Date(order.placedAt);
-    const eta = new Date(placed.getTime() + 20 * 60000);
+    const live = order.squareOrderId ? lcEta[order.squareOrderId] : null;
+    const eta = live && live.ready_at ? new Date(live.ready_at) : new Date(placed.getTime() + 20 * 60000);
     const fmt = (d) => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
     const minsLeft = Math.max(0, Math.round((eta - new Date()) / 60000));
+    if (order.squareOrderId && !lcEtaTimer) { lcEtaTimer = setInterval(() => pollEta(order.squareOrderId), 20000); pollEta(order.squareOrderId); }
 
     document.getElementById('order-id-label').textContent = 'Order #' + order.id;
     document.getElementById('order-placed-label').textContent = '• Placed ' + fmt(placed);
     document.getElementById('order-eta-time').textContent = fmt(eta);
-    document.getElementById('order-eta-label').textContent = minsLeft > 0 ? ('Estimated Pickup • ' + minsLeft + ' mins left') : 'Ready for pickup now';
+    const st = live ? live.status : null;
+    document.getElementById('order-eta-label').textContent = st === 'ready' ? 'Ready for pickup now'
+      : st === 'done' ? 'Picked up. Enjoy!'
+      : order.squareOrderId && (!live || st === 'new') ? 'Waiting for the kitchen to accept'
+      : minsLeft > 0 ? ('Ready at ' + fmt(eta) + ' • ' + minsLeft + ' min left') : 'Almost ready';
+    if (order.squareOrderId && (!live || st === 'new')) document.getElementById('order-eta-time').textContent = '…';
     // delivery by Uber Direct: tracking link (or a note if the driver still needs to be booked)
     let dBox = document.getElementById('lc-delivery-box');
     if (!dBox) { dBox = document.createElement('div'); dBox.id = 'lc-delivery-box'; dBox.style.marginTop = '12px'; document.getElementById('order-eta-label').parentElement.appendChild(dBox); }

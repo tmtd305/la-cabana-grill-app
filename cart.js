@@ -151,7 +151,8 @@ function placeOrder(tipAmount, extra) {
     total,
     status: "queued",
     fulfillment: extra && extra.delivery ? "delivery" : "pickup",
-    delivery: extra && extra.delivery ? extra.delivery : null
+    delivery: extra && extra.delivery ? extra.delivery : null,
+    squareOrderId: extra && extra.squareOrderId ? extra.squareOrderId : null
   };
   const orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
   orders.unshift(order);

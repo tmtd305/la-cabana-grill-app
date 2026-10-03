@@ -90,6 +90,15 @@
   .sr .l small{display:block;color:var(--fg2);font-size:12.5px;margin-top:2px}
   .sr .t{font-family:Outfit,sans-serif;font-weight:700;font-size:15px}
   .sr a{color:#fff}
+  .accept{background:rgba(243,99,16,.08);border:1px solid rgba(243,99,16,.35);border-radius:14px;padding:12px}
+  .mins{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .mins button{all:unset;cursor:pointer;text-align:center;padding:10px 0;border-radius:12px;background:#fff;color:#111;font-family:Outfit,sans-serif;font-weight:700;font-size:18px;line-height:1}
+  .mins button small{display:block;font-family:Manrope,sans-serif;font-size:10.5px;font-weight:700;color:#555;margin-top:3px}
+  .eta{display:flex;align-items:center;gap:8px;background:#141414;border-radius:14px;padding:10px 12px}
+  .eta>div{flex:1}
+  .eta small{display:block;color:var(--fg2);font-size:11.5px;font-weight:700}
+  .eta b{display:block;font-family:Outfit,sans-serif;font-size:24px;line-height:1.1;color:var(--or2)}
+  .eta.late b{color:var(--rd)}
   .tabs{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:14px}
   .tabs button{all:unset;cursor:pointer;flex:1;text-align:center;padding:10px 0;border-radius:10px;font-weight:800;font-size:14.5px;color:var(--fg2);display:flex;align-items:center;justify-content:center;gap:6px}
   .tabs button.on{background:#fff;color:#111}
@@ -825,7 +834,7 @@
   });
   // ---------- orders (website orders from Square) ----------
   const seenKey = 'lc_seen_orders';
-  let ordFirst = true, ordList = [], ordStatus = {}, ordFilter = 'open';
+  let ordFirst = true, ordList = [], ordStatus = {}, ordReady = {}, ordFilter = 'open';
   const getSet = k => { try { return new Set(JSON.parse(localStorage.getItem(k) || '[]')); } catch(e){ return new Set(); } };
   const putSet = (k, st) => { try { localStorage.setItem(k, JSON.stringify([...st].slice(-500))); } catch(e){} };
   function ding(){ try { const a = new (window.AudioContext || window.webkitAudioContext)(); [0, .25, .5].forEach(t => { const o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.4, a.currentTime + t); g.gain.exponentialRampToValueAtTime(.01, a.currentTime + t + .22); o.start(a.currentTime + t); o.stop(a.currentTime + t + .22); }); } catch(e){} }
@@ -841,7 +850,8 @@
     ordList = j.orders || [];
     const ids = ordList.map(o => o.id);
     ordStatus = {};
-    if(ids.length){ const { data: st } = await sb.from('order_status').select('order_id,status').in('order_id', ids); (st || []).forEach(x => ordStatus[x.order_id] = x.status); }
+    ordReady = {};
+    if(ids.length){ const { data: st } = await sb.from('order_status').select('order_id,status,ready_at').in('order_id', ids); (st || []).forEach(x => { ordStatus[x.order_id] = x.status; if(x.ready_at) ordReady[x.order_id] = x.ready_at; }); }
     const seen = getSet(seenKey), fresh = ordList.filter(o => !seen.has(o.id));
     if(!ordFirst && fresh.length) ding();
     ordList.forEach(o => seen.add(o.id)); putSet(seenKey, seen); ordFirst = false;
@@ -860,31 +870,47 @@
       const when = t.toDateString() === today ? agoT(t) : t.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ', ' + t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
       const num = (o.ref || o.id).replace(/^APP-/, '').slice(-5);
       const badges = (o.type === 'DELIVERY' ? '<span class="badge o">DELIVERY</span>' : '<span class="badge">PICKUP</span>') +
-        (st === 'ready' ? '<span class="badge g">READY</span>' : st === 'done' ? '<span class="badge">DONE</span>' : '<span class="badge o">NEW</span>') +
+        (st === 'ready' ? '<span class="badge g">READY</span>' : st === 'done' ? '<span class="badge">DONE</span>' : st === 'preparing' ? '<span class="badge o">PREPARING</span>' : '<span class="badge o">NEW</span>') +
         (o.paid ? '' : '<span class="badge r">NOT PAID</span>');
-      const next = st === 'new' ? ['ready', 'Mark ready'] : st === 'ready' ? ['done', 'Picked up'] : ['new', 'Reopen'];
+      const next = st === 'preparing' || st === 'new' ? ['ready', 'Mark ready'] : st === 'ready' ? ['done', 'Picked up'] : ['new', 'Reopen'];
+      const ra = ordReady[o.id] ? new Date(ordReady[o.id]) : null, left = ra ? Math.round((ra - Date.now()) / 60000) : null;
+      const timer = st === 'new' ? '<div class="accept"><div class="muted" style="font-weight:700;margin-bottom:8px;">Accept: ready in</div><div class="mins">' + [10, 15, 20, 30, 45].map(m => '<button data-acc="' + m + '" data-id="' + esc(o.id) + '">' + m + '<small>min</small></button>').join('') + '</div></div>'
+        : st === 'preparing' && ra ? '<div class="eta' + (left < 0 ? ' late' : '') + '"><div><small>' + (left < 0 ? 'Late by' : 'Ready in') + '</small><b>' + Math.abs(left) + ' min</b><small>at ' + ra.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '</small></div><button class="pillb" data-add="5" data-id="' + esc(o.id) + '">+5 min</button><button class="pillb" data-add="10" data-id="' + esc(o.id) + '">+10</button></div>' : '';
       return '<div class="oc ' + st + '">' +
         '<div class="oc-h"><div style="min-width:0"><div class="nm">' + esc(o.name || 'Guest') + '</div><div class="meta">#' + esc(num) + ' · ' + esc(when) + '</div><div style="margin-top:6px">' + badges + '</div></div>' +
           '<div class="tt">' + money(o.total) + (o.tip ? '<small>incl. ' + money(o.tip) + ' tip</small>' : '') + '</div></div>' +
-        '<div class="items">' + o.items.map(i => '<div class="ln"><span class="q">' + i.qty + '×</span><span>' + esc(i.name) + ((i.mods || i.note) ? '<span class="nt">' + esc([i.mods, i.note].filter(Boolean).join(' · ')) + '</span>' : '') + '</span></div>').join('') + '</div>' +
+        timer + '<div class="items">' + o.items.map(i => '<div class="ln"><span class="q">' + i.qty + '×</span><span>' + esc(i.name) + ((i.mods || i.note) ? '<span class="nt">' + esc([i.mods, i.note].filter(Boolean).join(' · ')) + '</span>' : '') + '</span></div>').join('') + '</div>' +
         '<div class="ocw">' + (o.phone ? '<b>' + esc(fmtPhone(o.phone)) + '</b>' : 'No phone') + (o.email ? ' · ' + esc(o.email) : '') +
           (o.address ? '<br>' + esc(o.address) : '') + (o.card ? '<br>' + esc(o.card) + (o.cardName ? ' · ' + esc(o.cardName) : '') : '') + '</div>' +
         '<div class="acts">' + (o.phone ? '<a class="pillb" href="tel:' + esc(o.phone) + '">' + IC.call + 'Call</a><a class="pillb" href="sms:' + esc(o.phone) + '">' + IC.text + 'Text</a>' : '') +
-          '<button class="pillb ' + (st === 'done' ? 'plain' : 'main') + '" data-st="' + next[0] + '" data-id="' + esc(o.id) + '">' + next[1] + '</button></div></div>';
+          (st === 'new' ? '' : '<button class="pillb ' + (st === 'done' ? 'plain' : 'main') + '" data-st="' + next[0] + '" data-id="' + esc(o.id) + '">' + next[1] + '</button>') + '</div></div>';
     }).join('') + '</div>';
   }
+  async function saveStatus(id, st, readyAt){
+    const row = { order_id: id, status: st, updated_at: new Date().toISOString(), updated_by: me.email };
+    if(readyAt !== undefined) row.ready_at = readyAt;
+    const { error } = await sb.from('order_status').upsert(row);
+    if(error) alert('Couldn\'t save: ' + error.message);
+  }
   $('orders').addEventListener('click', async ev => {
+    const acc = ev.target.closest('[data-acc]'), add = ev.target.closest('[data-add]');
+    if(acc || add){
+      const id = (acc || add).getAttribute('data-id');
+      const base = add && ordReady[id] ? Math.max(Date.now(), new Date(ordReady[id]).getTime()) : Date.now();
+      const ra = new Date(base + (+(acc || add).getAttribute(acc ? 'data-acc' : 'data-add')) * 60000).toISOString();
+      ordStatus[id] = 'preparing'; ordReady[id] = ra; renderOrders();
+      await saveStatus(id, 'preparing', ra); return;
+    }
     const b = ev.target.closest('[data-st]'); if(!b) return;
     const id = b.getAttribute('data-id'), st = b.getAttribute('data-st');
-    b.disabled = true; ordStatus[id] = st; renderOrders();
-    const { error } = await sb.from('order_status').upsert({ order_id: id, status: st, updated_at: new Date().toISOString(), updated_by: me.email });
-    if(error) alert('Couldn\'t save: ' + error.message);
+    b.disabled = true; ordStatus[id] = st; if(st === 'new') delete ordReady[id]; renderOrders();
+    await saveStatus(id, st, st === 'new' ? null : undefined);
   });
   $('ord-filter').addEventListener('click', ev => { const b = ev.target.closest('[data-f]'); if(!b) return; ordFilter = b.dataset.f; $('ord-filter').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); renderOrders(); });
   $('tabs').addEventListener('click', ev => { const b = ev.target.closest('[data-tab]'); if(!b) return; $('tabs').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); $('tab-orders').classList.toggle('hidden', b.dataset.tab !== 'orders'); $('tab-staff').classList.toggle('hidden', b.dataset.tab !== 'staff'); $('tab-sales').classList.toggle('hidden', b.dataset.tab !== 'sales'); if(b.dataset.tab === 'sales') loadSales(); });
   $('ord-refresh').onclick = loadOrders; $('ord-days').onchange = loadOrders;
   setInterval(() => { if(me && !$('v-app').classList.contains('hidden')) loadOrders(); }, 15000);
-  setInterval(() => { if(ordList.length) renderOrders(); }, 60000);
+  setInterval(() => { if(ordList.length) renderOrders(); }, 30000);
 
   // ---------- sales by channel ----------
   const CH_COLOR = { 'Website': '#f36310', 'In store (Square)': '#e5e7eb', 'Uber Eats': '#06C167', 'DoorDash': '#FF3008', 'Grubhub': '#F63440', 'Postmates': '#a3a3a3', 'Square Online': '#60a5fa' };

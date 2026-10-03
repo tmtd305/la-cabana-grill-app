@@ -375,7 +375,7 @@
           else delivery.error = dd.error || 'Driver not booked yet';
         } catch (x) { delivery.error = 'Driver not booked yet'; }
       }
-      const order = placeOrder(currentTip, { delivery });
+      const order = placeOrder(currentTip, { delivery, squareOrderId: data.squareOrderId || null });
       if (order) window.location.href = 'orders.html';
     } catch (err) {
       errorsEl.textContent = err.message;
