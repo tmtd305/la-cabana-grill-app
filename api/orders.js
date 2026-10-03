@@ -46,6 +46,7 @@ export default async function handler(req, res) {
     // which channel the money came from
     const channel = (o) => {
       if (web(o)) return "Website";
+      if (/^PHONE-/.test(o.reference_id || "")) return "Phone order";
       if ((o.line_items || []).some((l) => /^Phone order/.test(l.name || ""))) return "Phone (Uber delivery)";
       const n = ((o.source && o.source.name) || "").toLowerCase();
       if (/uber/.test(n)) return "Uber Eats";
@@ -57,7 +58,7 @@ export default async function handler(req, res) {
       return o.source.name;
     };
     const scopeAll = req.query.scope === "all";
-    const out = (or.orders || []).filter((o) => o.state !== "DRAFT" && (scopeAll || web(o)) && (!scopeAll || o.state !== "CANCELED")).map((o) => {
+    const out = (or.orders || []).filter((o) => o.state !== "DRAFT" && (scopeAll || web(o) || /^PHONE-/.test(o.reference_id || "")) && (!scopeAll || o.state !== "CANCELED")).map((o) => {
       const p = pays["o:" + o.id] || {};
       const f = (o.fulfillments || [])[0] || {};
       const rec = (f.pickup_details && f.pickup_details.recipient) || (f.delivery_details && f.delivery_details.recipient) || {};
