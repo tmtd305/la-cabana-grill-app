@@ -120,9 +120,48 @@ export default async function handler(req, res) {
     // ---------- staff: phone orders from the dashboard ----------
     if (String(body.action || "").startsWith("staff_")) {
       if (!(await isStaff(req))) { res.status(401).json({ error: "Staff only" }); return; }
+      const sqToken = process.env.SQUARE_ACCESS_TOKEN, sqLoc = process.env.SQUARE_LOCATION_ID;
+      const sqHost = process.env.SQUARE_ENV === "production" ? "https://connect.squareup.com" : "https://connect.squareupsandbox.com";
+      const SQH = { "Square-Version": "2024-01-18", Authorization: "Bearer " + sqToken, "Content-Type": "application/json" };
+      const orderPaid = async (orderId) => {
+        const r = await fetch(sqHost + "/v2/orders/" + encodeURIComponent(orderId), { headers: SQH });
+        const o = r.ok ? (await r.json()).order : null;
+        if (!o) return { paid: false, cents: 0 };
+        const tendered = (o.tenders || []).reduce((a, t) => a + ((t.amount_money && t.amount_money.amount) || 0), 0);
+        const due = o.net_amount_due_money ? o.net_amount_due_money.amount : null;
+        return { paid: tendered > 0 && (due === null || due === 0), cents: tendered };
+      };
+      // 1) text the customer a Square payment link for food + delivery
+      if (body.action === "staff_paylink") {
+        const cents = Math.round(Number(body.amount || 0) * 100);
+        if (!(cents >= 100 && cents <= 200000)) { res.status(400).json({ error: "Enter the order total" }); return; }
+        const ph = e164(body.phone);
+        const r = await fetch(sqHost + "/v2/online-checkout/payment-links", { method: "POST", headers: SQH, body: JSON.stringify({
+          idempotency_key: "pl-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8),
+          quick_pay: { name: ("Phone order - " + String(body.name || "Customer")).slice(0, 255), price_money: { amount: cents, currency: "USD" }, location_id: sqLoc },
+          pre_populated_data: ph ? { buyer_phone_number: ph } : undefined,
+          payment_note: "La Cabana phone order with Uber delivery"
+        }) });
+        const d = await r.json();
+        if (!r.ok || !d.payment_link) { res.status(400).json({ error: (d.errors && d.errors[0] && d.errors[0].detail) || "Couldn't make the payment link" }); return; }
+        res.status(200).json({ url: d.payment_link.url, orderId: d.payment_link.order_id, linkId: d.payment_link.id });
+        return;
+      }
+      // 2) has the customer paid yet?
+      if (body.action === "staff_paycheck") {
+        if (!body.orderId) { res.status(400).json({ error: "Missing order" }); return; }
+        res.status(200).json(await orderPaid(body.orderId));
+        return;
+      }
       if (body.action === "staff_create") {
         const qt = body.quote || {};
         if (!qt.quoteId || sign(qt.quoteId, qt.feeCents, secret) !== qt.sig) { res.status(400).json({ error: "Price expired. Get a new price." }); return; }
+        // the customer pays first (Square payment link), unless staff confirms they already paid in store
+        if (!body.paidOffline) {
+          if (!body.paidOrderId) { res.status(402).json({ error: "The customer hasn't paid yet" }); return; }
+          const pd = await orderPaid(body.paidOrderId);
+          if (!pd.paid || pd.cents < qt.feeCents) { res.status(402).json({ error: "The customer hasn't paid yet" }); return; }
+        }
         const to = dropoff(body.address), phone = e164(body.phone);
         if (!to || !phone || !body.name) { res.status(400).json({ error: "Add the customer's name, phone and address" }); return; }
         const items = String(body.items || "Food order").split(/\n|,/).map((x) => x.trim()).filter(Boolean).slice(0, 30);

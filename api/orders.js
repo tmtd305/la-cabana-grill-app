@@ -46,6 +46,7 @@ export default async function handler(req, res) {
     // which channel the money came from
     const channel = (o) => {
       if (web(o)) return "Website";
+      if ((o.line_items || []).some((l) => /^Phone order/.test(l.name || ""))) return "Phone (Uber delivery)";
       const n = ((o.source && o.source.name) || "").toLowerCase();
       if (/uber/.test(n)) return "Uber Eats";
       if (/door ?dash/.test(n)) return "DoorDash";
