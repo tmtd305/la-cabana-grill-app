@@ -219,7 +219,7 @@
 <div class="wrap">
   <header>
     <img id="logo" alt="">
-    <h1>Orders</h1>
+    <h1>La Cabaña Staff</h1>
     <span class="pill" id="duty" style="display:none"><i></i><span>Off duty</span></span>
     <button class="btn" id="bDutyHdr" style="padding:8px 12px;font-size:12.5px;display:none;">Go off duty</button>
   </header>
@@ -253,9 +253,9 @@
 
   <!-- not allowed -->
   <div id="v-denied" class="card hidden" style="max-width:420px;margin:30px auto;text-align:center;">
-    <h2 style="font-family:Outfit,sans-serif;margin:0 0 6px;">You're all set</h2>
+    <h2 style="font-family:Outfit,sans-serif;margin:0 0 6px;" id="denied-title">You're all set</h2>
     <p class="muted" id="denied-email"></p>
-    <p class="muted">Your manager just needs to approve you. This page opens by itself once they do.</p>
+    <p class="muted" id="denied-msg"></p>
     <button class="btn" onclick="signOut()">Sign out</button>
   </div>
 
@@ -375,7 +375,7 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money = n => '$' + Number(n || 0).toFixed(2);
   const TAX = RESTAURANT.taxRate;
-  $('logo').src = RESTAURANT.logo;
+  $('logo').src = 'icons/logo-transparent.png';
 
   let me = null, onDuty = false, opsChan = null, dbChan = null, active = null, callChan = null, lines = [], sentOrder = null, holding = false, cat = 'all';
   const queue = new Map();
@@ -454,7 +454,14 @@
     me = session.user;
     let { data: ok } = await sb.rpc('is_operator');
     if(!ok){ const { data: owner } = await sb.rpc('claim_owner'); ok = !!owner; }
-    if(!ok){ $('denied-email').textContent = 'Signed in as ' + me.email + '.'; show('v-denied'); setTimeout(boot, 15000); return; }
+    if(!ok){
+      // staff sign-ups wait for the owner; any other account (e.g. a customer) is simply not staff
+      const isStaffSignup = !!(me.user_metadata && me.user_metadata.staff);
+      $('denied-title').textContent = isStaffSignup ? 'You\'re all set' : 'Not a staff account';
+      $('denied-email').textContent = 'Signed in as ' + me.email + '.';
+      $('denied-msg').textContent = isStaffSignup ? 'The owner just needs to approve you. This page opens by itself once they do.' : 'This account doesn\'t have staff access. If you work at La Cabaña, ask the owner for an invite link.';
+      show('v-denied'); if(isStaffSignup) setTimeout(boot, 15000); return;
+    }
     if(!/[?&]voice=1/.test(location.search) && !/reset|recovery/.test(location.hash + location.search)){ location.replace('admin.html'); return; }
     show('v-app');
     loadOrders(); loadQueue(); loadPaid(); loadStaff();
