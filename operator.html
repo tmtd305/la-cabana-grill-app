@@ -75,16 +75,44 @@
   .po{padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
   .po b{font-size:14.5px}
   .hidden{display:none!important}
-  .oc{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:10px;background:var(--card2)}
-  .oc.new{border-color:var(--or);box-shadow:0 0 0 1px var(--or) inset}
-  .oc.done{opacity:.5}
-  .oc .top{display:flex;align-items:baseline;gap:8px}
-  .oc .nm{font-weight:800;font-size:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .oc .tt{font-weight:800;color:var(--gr);font-size:16px}
-  .oc .ct{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
-  .oc .ct a{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:100px;background:#141414;border:1px solid #2e2e2e;color:#fff;text-decoration:none;font-size:13.5px;font-weight:700}
-  .oc .it{font-size:14px;line-height:1.5}
-  .oc .tag{font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:100px;background:rgba(243,99,16,.15);color:var(--or2)}
+  .tabs{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:14px}
+  .tabs button{all:unset;cursor:pointer;flex:1;text-align:center;padding:10px 0;border-radius:10px;font-weight:800;font-size:14.5px;color:var(--fg2);display:flex;align-items:center;justify-content:center;gap:6px}
+  .tabs button.on{background:#fff;color:#111}
+  .cnt{min-width:20px;height:20px;padding:0 6px;border-radius:100px;background:var(--or);color:#fff;font-size:12px;display:inline-flex;align-items:center;justify-content:center}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  .stat small{display:block;color:var(--fg2);font-size:12.5px;font-weight:700}
+  .stat b{display:block;font-family:Outfit,sans-serif;font-size:26px;margin-top:2px}
+  .seg{display:flex;gap:8px;margin-bottom:12px}
+  .seg button{all:unset;cursor:pointer;padding:8px 14px;border-radius:100px;border:1px solid #333;font-size:13.5px;font-weight:700;color:var(--fg2)}
+  .seg button.on{border-color:#fff;color:#fff}
+  .empty{text-align:center;color:var(--fg2);padding:40px 10px;font-size:14px}
+  .ordlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+  .oc{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
+  .oc.new{border-color:var(--or);box-shadow:0 0 0 1px var(--or) inset,0 0 24px rgba(243,99,16,.18)}
+  .oc.ready{border-color:rgba(34,197,94,.6)}
+  .oc.done{opacity:.55}
+  .oc-h{display:flex;align-items:flex-start;gap:10px}
+  .oc-h .nm{font-family:Outfit,sans-serif;font-weight:700;font-size:19px;line-height:1.2}
+  .oc-h .meta{color:var(--fg2);font-size:12.5px;margin-top:3px}
+  .oc-h .tt{margin-left:auto;text-align:right;font-family:Outfit,sans-serif;font-weight:700;font-size:19px;white-space:nowrap}
+  .oc-h .tt small{display:block;font-family:Manrope,sans-serif;font-size:11.5px;font-weight:700;color:var(--fg2)}
+  .badge{display:inline-flex;align-items:center;font-size:11px;font-weight:800;letter-spacing:.02em;padding:3px 8px;border-radius:100px;border:1px solid #3a3a3a;color:#ddd;margin-right:4px}
+  .badge.o{border-color:var(--or);color:var(--or2)}
+  .badge.g{border-color:rgba(34,197,94,.6);color:var(--gr)}
+  .badge.r{border-color:rgba(248,113,113,.6);color:var(--rd)}
+  .items{background:#141414;border-radius:12px;padding:10px 12px}
+  .items .ln{display:flex;gap:10px;padding:5px 0;font-size:14.5px;line-height:1.35}
+  .items .ln+.ln{border-top:1px solid rgba(255,255,255,.06)}
+  .items .q{font-weight:800;min-width:26px;color:var(--or2)}
+  .items .nt{display:block;color:var(--fg2);font-size:12.5px}
+  .ocw{font-size:13px;color:var(--fg2);line-height:1.6}
+  .ocw b{color:#fff;font-weight:700}
+  .acts{display:flex;gap:8px;flex-wrap:wrap}
+  .pillb{all:unset;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;padding:0 16px;border-radius:100px;font-size:13.5px;font-weight:800;border:1px solid #3a3a3a;color:#fff;text-decoration:none}
+  .pillb.main{background:#fff;color:#111;border-color:#fff;margin-left:auto}
+  .pillb.plain{border-color:transparent;color:var(--fg2)}
+  .pillb svg{width:16px;height:16px}
   .pwrap{position:relative}
   .pwrap .field{padding-right:48px}
   .eye{all:unset;cursor:pointer;position:absolute;right:6px;top:50%;transform:translateY(-50%);width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--fg2);border-radius:10px}
@@ -167,8 +195,8 @@
 <div class="wrap">
   <header>
     <img id="logo" alt="">
-    <h1>Voice Orders</h1>
-    <span class="pill" id="duty"><i></i><span>Off duty</span></span>
+    <h1>Orders</h1>
+    <span class="pill" id="duty" style="display:none"><i></i><span>Off duty</span></span>
     <button class="btn" id="bDutyHdr" style="padding:8px 12px;font-size:12.5px;display:none;">Go off duty</button>
   </header>
   <div id="sound-tip" class="hidden" style="background:rgba(251,191,36,.12);color:#FBBF24;border-radius:12px;padding:10px 14px;font-weight:700;font-size:13.5px;margin-bottom:12px;">Tap anywhere to turn on the ringer and sound.</div>
@@ -209,15 +237,24 @@
 
   <!-- console -->
   <div id="v-app" class="hidden">
-    <div class="card" id="ord-card" style="margin-bottom:14px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-        <div class="sec" style="margin:0;flex:1;">Orders</div>
-        <select id="ord-days" class="field" style="width:auto;height:36px;font-size:13.5px;padding:0 10px;"><option value="1">Today</option><option value="2" selected>Last 2 days</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select>
-        <button class="btn" id="ord-refresh" style="padding:8px 12px;font-size:12.5px;">Refresh</button>
-      </div>
-      <div id="ord-sum" class="muted" style="font-size:13px;margin-bottom:8px;"></div>
-      <div id="orders"><div class="muted">Loading orders…</div></div>
+    <div class="tabs" id="tabs"><button class="on" data-tab="orders">Orders <span id="new-count" class="cnt hidden"></span></button><button data-tab="staff">Staff <span id="pend-count" class="cnt hidden"></span></button></div>
+    <div id="tab-orders">
+      <div class="stats"><div class="stat"><small>Orders today</small><b id="st-n">–</b></div><div class="stat"><small>Sales today</small><b id="st-s">–</b></div></div>
+      <div class="seg" id="ord-filter"><button class="on" data-f="open">Open</button><button data-f="done">Completed</button><button data-f="all">All</button></div>
+      <div id="orders"><div class="empty">Loading orders…</div></div>
+      <div style="display:flex;justify-content:center;gap:8px;margin-top:16px;"><select id="ord-days" class="field" style="width:auto;height:38px;font-size:13.5px;padding:0 12px;"><option value="1">Today</option><option value="2" selected>Last 2 days</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select><button class="btn" id="ord-refresh" style="padding:8px 14px;font-size:13px;">Refresh</button></div>
     </div>
+    <div id="tab-staff" class="hidden">
+        <div class="card">
+          <div class="sec">Staff</div>
+          <div id="pend-box" class="hidden"><div class="muted" style="font-weight:800;color:var(--or2);margin-bottom:6px;">Waiting for approval</div><div id="pending"></div></div>
+          <p class="muted" style="margin:6px 0 0;font-size:13px;">New staff open this page and tap “Create an account”. They show up here for you to approve.</p>
+          <div id="st-msg" class="muted" style="margin-top:8px;display:none;"></div>
+          <div id="staff" style="margin-top:6px;"></div>
+        </div>
+        <button class="btn" onclick="signOut()" style="width:100%;margin-top:14px;">Sign out</button>
+    </div>
+    <div id="voice-wrap" style="display:none">
     <div id="start-box" class="card" style="text-align:center;margin-bottom:14px;">
       <div style="font-family:Outfit,sans-serif;font-size:18px;font-weight:700;">Ready to take calls?</div>
       <p class="muted">Going on duty tells customers someone is on the line and turns on your speaker and microphone.</p>
@@ -233,13 +270,6 @@
         <div class="card">
           <div class="sec">Paid voice orders today</div>
           <div id="paid"><div class="muted">Nothing yet today.</div></div>
-        </div>
-        <div class="card" style="margin-top:14px;">
-          <div class="sec">Staff</div>
-          <div id="pend-box" class="hidden"><div class="muted" style="font-weight:800;color:var(--or2);margin-bottom:6px;">Waiting for approval</div><div id="pending"></div></div>
-          <p class="muted" style="margin:6px 0 0;font-size:13px;">New staff open this page and tap “Create an account”. They show up here for you to approve.</p>
-          <div id="st-msg" class="muted" style="margin-top:8px;display:none;"></div>
-          <div id="staff" style="margin-top:6px;"></div>
         </div>
       </div>
 
@@ -303,6 +333,7 @@
           </div>
         </div>
       </div>
+    </div>
     </div>
   </div>
 </div>
@@ -752,6 +783,7 @@
       (r.email === mine ? '' : '<button class="btn" style="padding:6px 12px;font-size:12.5px;" data-rm="' + esc(r.email) + '">Remove</button>') + '</div>').join('');
     const pl = (pend && pend.data) || [];
     $('pend-box').classList.toggle('hidden', !pl.length);
+    $('pend-count').textContent = pl.length; $('pend-count').classList.toggle('hidden', !pl.length);
     $('pending').innerHTML = pl.map(r => '<div class="po" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">' + who(r) + '<button class="btn pri" style="padding:6px 14px;font-size:12.5px;" data-ok="' + esc(r.email) + '">Approve</button></div>').join('');
   }
   $('pending').addEventListener('click', async ev => {
@@ -770,47 +802,68 @@
     if(error){ smsg('Couldn\'t remove: ' + error.message); return; }
     smsg(e + ' removed.', true); loadStaff();
   });
-  // ---------- orders (from Square) ----------
-  const seenKey = 'lc_seen_orders', doneKey = 'lc_done_orders';
+  // ---------- orders (website orders from Square) ----------
+  const seenKey = 'lc_seen_orders';
+  let ordFirst = true, ordList = [], ordStatus = {}, ordFilter = 'open';
   const getSet = k => { try { return new Set(JSON.parse(localStorage.getItem(k) || '[]')); } catch(e){ return new Set(); } };
   const putSet = (k, st) => { try { localStorage.setItem(k, JSON.stringify([...st].slice(-500))); } catch(e){} };
-  let ordFirst = true;
   function ding(){ try { const a = new (window.AudioContext || window.webkitAudioContext)(); [0, .25, .5].forEach(t => { const o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.4, a.currentTime + t); g.gain.exponentialRampToValueAtTime(.01, a.currentTime + t + .22); o.start(a.currentTime + t); o.stop(a.currentTime + t + .22); }); } catch(e){} }
   const fmtPhone = p => { const d = String(p || '').replace(/\D/g, '').replace(/^1(?=\d{10}$)/, ''); return d.length === 10 ? '(' + d.slice(0,3) + ') ' + d.slice(3,6) + '-' + d.slice(6) : p; };
+  const agoT = t => { const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : new Date(t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); };
+  const IC = { call: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>',
+    text: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' };
   async function loadOrders(){
     const { data: { session } } = await sb.auth.getSession(); if(!session) return;
     let j;
     try { const r = await fetch('/api/orders?days=' + $('ord-days').value, { headers: { Authorization: 'Bearer ' + session.access_token } }); j = await r.json(); if(!r.ok) throw new Error(j.error || 'error'); }
-    catch(e){ $('orders').innerHTML = '<div class="muted">Couldn\'t load orders (' + esc(e.message) + '). Tap Refresh.</div>'; return; }
-    const list = j.orders || [], seen = getSet(seenKey), done = getSet(doneKey);
-    const fresh = list.filter(o => !seen.has(o.id));
+    catch(e){ $('orders').innerHTML = '<div class="empty">Couldn\'t load orders. Tap Refresh.</div>'; return; }
+    ordList = j.orders || [];
+    const ids = ordList.map(o => o.id);
+    ordStatus = {};
+    if(ids.length){ const { data: st } = await sb.from('order_status').select('order_id,status').in('order_id', ids); (st || []).forEach(x => ordStatus[x.order_id] = x.status); }
+    const seen = getSet(seenKey), fresh = ordList.filter(o => !seen.has(o.id));
     if(!ordFirst && fresh.length) ding();
-    const today = new Date().toDateString(), todays = list.filter(o => new Date(o.created).toDateString() === today && o.paid);
-    $('ord-sum').textContent = 'Today: ' + todays.length + ' paid order' + (todays.length === 1 ? '' : 's') + ' · ' + money(todays.reduce((a, o) => a + o.total, 0));
-    $('orders').innerHTML = list.length ? list.map(o => {
-      const isNew = !ordFirst && fresh.some(f => f.id === o.id) || (!seen.has(o.id) && !ordFirst);
-      const t = new Date(o.created);
-      const when = (t.toDateString() === today ? '' : t.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ') + t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-      const type = o.type === 'DELIVERY' ? 'Delivery' : o.type === 'PICKUP' ? 'Pickup' : '';
-      return '<div class="oc' + (isNew ? ' new' : '') + (done.has(o.id) ? ' done' : '') + '" data-id="' + esc(o.id) + '">' +
-        '<div class="top"><span class="nm">' + esc(o.name || 'No name') + '</span><span class="tt">' + money(o.total) + '</span></div>' +
-        '<div class="muted" style="font-size:12.5px;margin-top:2px;">' + esc(when) + ' · ' + esc(o.source) + (type ? ' · <span class="tag">' + type + '</span>' : '') + (o.paid ? '' : ' · <span style="color:var(--rd);font-weight:800;">Not paid</span>') + (o.tip ? ' · tip ' + money(o.tip) : '') + '</div>' +
-        '<div class="ct">' + (o.phone ? '<a href="tel:' + esc(o.phone) + '">Call ' + esc(fmtPhone(o.phone)) + '</a><a href="sms:' + esc(o.phone) + '">Text</a>' : '<span class="muted" style="font-size:13px;">No phone on this order</span>') + (o.email ? '<a href="mailto:' + esc(o.email) + '">' + esc(o.email) + '</a>' : '') + '</div>' +
-        (o.card ? '<div class="muted" style="font-size:12.5px;">Card: ' + esc(o.card) + (o.cardName ? ' · ' + esc(o.cardName) : '') + '</div>' : '') +
-        (o.address ? '<div class="muted" style="font-size:12.5px;">Address: ' + esc(o.address) + '</div>' : '') +
-        '<div class="it" style="margin-top:6px;">' + o.items.map(i => '<div><b>' + i.qty + '×</b> ' + esc(i.name) + (i.mods ? ' <span class="muted">(' + esc(i.mods) + ')</span>' : '') + (i.note ? ' <span class="muted">— ' + esc(i.note) + '</span>' : '') + '</div>').join('') + '</div>' +
-        '<div style="display:flex;justify-content:flex-end;margin-top:8px;"><button class="btn" style="padding:6px 14px;font-size:12.5px;" data-done="' + esc(o.id) + '">' + (done.has(o.id) ? 'Undo' : 'Done') + '</button></div></div>';
-    }).join('') : '<div class="muted">No orders in this time.</div>';
-    list.forEach(o => seen.add(o.id)); putSet(seenKey, seen); ordFirst = false;
+    ordList.forEach(o => seen.add(o.id)); putSet(seenKey, seen); ordFirst = false;
+    renderOrders();
   }
-  $('orders').addEventListener('click', ev => {
-    const b = ev.target.closest('[data-done]'); if(!b) return;
-    const id = b.getAttribute('data-done'), done = getSet(doneKey);
-    done.has(id) ? done.delete(id) : done.add(id); putSet(doneKey, done);
-    const c = b.closest('.oc'); c.classList.toggle('done', done.has(id)); c.classList.remove('new'); b.textContent = done.has(id) ? 'Undo' : 'Done';
+  function renderOrders(){
+    const today = new Date().toDateString(), todays = ordList.filter(o => new Date(o.created).toDateString() === today && o.paid);
+    $('st-n').textContent = todays.length; $('st-s').textContent = money(todays.reduce((a, o) => a + o.total, 0));
+    const stOf = o => ordStatus[o.id] || 'new';
+    const open = ordList.filter(o => stOf(o) !== 'done');
+    $('new-count').textContent = open.length; $('new-count').classList.toggle('hidden', !open.length);
+    const list = ordFilter === 'open' ? open : ordFilter === 'done' ? ordList.filter(o => stOf(o) === 'done') : ordList;
+    if(!list.length){ $('orders').innerHTML = '<div class="empty">' + (ordFilter === 'open' ? 'No open orders. New website orders show up here with a sound.' : 'Nothing here yet.') + '</div>'; return; }
+    $('orders').innerHTML = '<div class="ordlist">' + list.map(o => {
+      const st = stOf(o), t = new Date(o.created);
+      const when = t.toDateString() === today ? agoT(t) : t.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ', ' + t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      const num = (o.ref || o.id).replace(/^APP-/, '').slice(-5);
+      const badges = (o.type === 'DELIVERY' ? '<span class="badge o">DELIVERY</span>' : '<span class="badge">PICKUP</span>') +
+        (st === 'ready' ? '<span class="badge g">READY</span>' : st === 'done' ? '<span class="badge">DONE</span>' : '<span class="badge o">NEW</span>') +
+        (o.paid ? '' : '<span class="badge r">NOT PAID</span>');
+      const next = st === 'new' ? ['ready', 'Mark ready'] : st === 'ready' ? ['done', 'Picked up'] : ['new', 'Reopen'];
+      return '<div class="oc ' + st + '">' +
+        '<div class="oc-h"><div style="min-width:0"><div class="nm">' + esc(o.name || 'Guest') + '</div><div class="meta">#' + esc(num) + ' · ' + esc(when) + '</div><div style="margin-top:6px">' + badges + '</div></div>' +
+          '<div class="tt">' + money(o.total) + (o.tip ? '<small>incl. ' + money(o.tip) + ' tip</small>' : '') + '</div></div>' +
+        '<div class="items">' + o.items.map(i => '<div class="ln"><span class="q">' + i.qty + '×</span><span>' + esc(i.name) + ((i.mods || i.note) ? '<span class="nt">' + esc([i.mods, i.note].filter(Boolean).join(' · ')) + '</span>' : '') + '</span></div>').join('') + '</div>' +
+        '<div class="ocw">' + (o.phone ? '<b>' + esc(fmtPhone(o.phone)) + '</b>' : 'No phone') + (o.email ? ' · ' + esc(o.email) : '') +
+          (o.address ? '<br>' + esc(o.address) : '') + (o.card ? '<br>' + esc(o.card) + (o.cardName ? ' · ' + esc(o.cardName) : '') : '') + '</div>' +
+        '<div class="acts">' + (o.phone ? '<a class="pillb" href="tel:' + esc(o.phone) + '">' + IC.call + 'Call</a><a class="pillb" href="sms:' + esc(o.phone) + '">' + IC.text + 'Text</a>' : '') +
+          '<button class="pillb ' + (st === 'done' ? 'plain' : 'main') + '" data-st="' + next[0] + '" data-id="' + esc(o.id) + '">' + next[1] + '</button></div></div>';
+    }).join('') + '</div>';
+  }
+  $('orders').addEventListener('click', async ev => {
+    const b = ev.target.closest('[data-st]'); if(!b) return;
+    const id = b.getAttribute('data-id'), st = b.getAttribute('data-st');
+    b.disabled = true; ordStatus[id] = st; renderOrders();
+    const { error } = await sb.from('order_status').upsert({ order_id: id, status: st, updated_at: new Date().toISOString(), updated_by: me.email });
+    if(error) alert('Couldn\'t save: ' + error.message);
   });
+  $('ord-filter').addEventListener('click', ev => { const b = ev.target.closest('[data-f]'); if(!b) return; ordFilter = b.dataset.f; $('ord-filter').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); renderOrders(); });
+  $('tabs').addEventListener('click', ev => { const b = ev.target.closest('[data-tab]'); if(!b) return; $('tabs').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); $('tab-orders').classList.toggle('hidden', b.dataset.tab !== 'orders'); $('tab-staff').classList.toggle('hidden', b.dataset.tab !== 'staff'); });
   $('ord-refresh').onclick = loadOrders; $('ord-days').onchange = loadOrders;
   setInterval(() => { if(me && !$('v-app').classList.contains('hidden')) loadOrders(); }, 15000);
+  setInterval(() => { if(ordList.length) renderOrders(); }, 60000);
 
   window.answer = answer; window.addLine = addLine; window.signOut = signOut; window.show = show;
   sb.auth.onAuthStateChange((ev) => { if(ev === 'SIGNED_OUT') show('v-login'); });
