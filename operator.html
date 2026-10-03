@@ -403,6 +403,8 @@
     (createMode ? $('nm') : $('em')).focus();
   };
   $('em').style.marginTop = '0';
+  // invite link from the owner opens straight on Create account
+  if(/[?&]invite=1/.test(location.search)) setTimeout(() => { if(!createMode) $('bMode').click(); }, 0);
   $('lform').onsubmit = () => { (createMode ? signup : login)(); return false; };
   async function login(){
     const email = $('em').value.trim(), password = $('pw').value;

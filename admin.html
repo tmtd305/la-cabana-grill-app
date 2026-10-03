@@ -303,6 +303,15 @@
 
     <!-- STAFF -->
     <section data-view="staff" class="hidden">
+      <div class="card" style="margin-bottom:14px">
+        <div class="ch"><h2>Invite staff</h2></div>
+        <p class="muted" style="margin:-4px 0 12px">Send this link. It opens the sign-up screen. When they finish, they show up below for you to approve.</p>
+        <div class="row" style="flex-wrap:wrap">
+          <input class="field" id="inv-link" readonly style="flex:1;min-width:220px;color:var(--or2)">
+          <button class="btn main" id="inv-share"><span class="ms">ios_share</span>Send invite</button>
+          <button class="btn" id="inv-copy"><span class="ms">content_copy</span>Copy</button>
+        </div>
+      </div>
       <div class="grid two">
         <div class="card"><div class="ch"><h2>Waiting for approval</h2></div><div id="pending"><div class="muted">Nobody waiting.</div></div></div>
         <div class="card"><div class="ch"><h2>Staff</h2></div><div id="staff"></div>
@@ -665,6 +674,12 @@
   }
   $('pending').addEventListener('click', async e => { const b = e.target.closest('[data-ok]'); if(!b) return; b.disabled = true; const { error } = await sb.rpc('add_operator', { p_email: b.dataset.ok }); toast(error ? 'Couldn\'t approve' : 'Approved'); loadStaff(); });
   $('staff').addEventListener('click', async e => { const b = e.target.closest('[data-rm]'); if(!b) return; if(!confirm('Remove ' + b.dataset.rm + ' from staff?')) return; const { error } = await sb.rpc('remove_operator', { p_email: b.dataset.rm }); toast(error ? 'Couldn\'t remove' : 'Removed'); loadStaff(); });
+  // invite link
+  const INVITE = location.origin + '/operator.html?invite=1';
+  $('inv-link').value = INVITE;
+  const INVITE_TXT = 'You\'re invited to the La Cabaña Grill staff dashboard. Create your account here, then I\'ll approve you: ' + INVITE;
+  $('inv-copy').onclick = async () => { try { await navigator.clipboard.writeText(INVITE); toast('Invite link copied'); } catch(e){ $('inv-link').select(); document.execCommand('copy'); toast('Invite link copied'); } };
+  $('inv-share').onclick = () => { if(navigator.share) navigator.share({ title: 'La Cabaña staff invite', text: INVITE_TXT, url: INVITE }).catch(() => {}); else location.href = 'sms:?&body=' + encodeURIComponent(INVITE_TXT); };
   $('signout').onclick = $('signout2').onclick = $('signout3').onclick = async () => { await sb.auth.signOut(); location.replace('operator.html'); };
 </script>
 </body></html>
