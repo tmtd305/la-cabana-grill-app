@@ -3,7 +3,13 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-<title>La Cabaña — Voice Orders (Staff)</title>
+<title>La Cabaña Grill — Staff Dashboard</title>
+<meta name="description" content="Staff sign in and sign up for the La Cabaña Grill dashboard.">
+<meta property="og:title" content="La Cabaña Grill — Staff Dashboard">
+<meta property="og:description" content="You're invited. Create your staff account, then the owner approves you.">
+<meta property="og:image" content="https://www.lacabanagrill.net/icons/icon-512.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
 <meta name="theme-color" content="#131313"/>
 <meta name="robots" content="noindex"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -534,7 +540,7 @@
     $('queue').innerHTML = waiting.length ? waiting.map(c => '<div class="q ring"><div class="av" style="width:44px;height:44px;font-size:16px;' + (c.customer_photo && /^data:image\//.test(c.customer_photo) ? 'background-image:url(' + c.customer_photo + ')' : '') + '">' + (c.customer_photo ? '' : esc(String(c.customer_name || '?').slice(0, 1))) + '</div><div class="t"><b>' + esc(c.customer_name) + '</b><span>' + (c.dish_name ? 'About ' + esc(c.dish_name) + ' · ' : '') + (c.customer_phone ? esc(c.customer_phone) + ' · ' : '') + 'waiting ' + ago(c.created_at) + '</span></div>' +
       '<button class="btn gr" onclick="answer(\'' + c.id + '\')"' + (onDuty && !active ? '' : ' disabled') + '>Answer</button></div>').join('') + (!onDuty ? '<div class="muted">Go on duty to answer.</div>' : '')
       : '<div class="muted">No one is waiting.</div>';
-    document.title = (waiting.length ? '(' + waiting.length + ') ' : '') + 'La Cabaña — Voice Orders';
+    document.title = (waiting.length ? '(' + waiting.length + ') ' : '') + 'La Cabaña Grill — Staff Dashboard';
   }
   setInterval(renderQueue, 10000);
 
