@@ -21,13 +21,21 @@
 <input id="d-city" type="text" autocomplete="address-level2" placeholder="City" value="Miami Beach" class="h-12 w-full rounded-xl bg-surface-container-low px-4 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
 <input id="d-zip" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="ZIP" maxlength="5" class="h-12 w-full rounded-xl bg-surface-container-low px-4 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
 </div>
-<div class="grid grid-cols-2 gap-2">
+<div class="grid grid-cols-2 gap-2" style="display:none">
 <input id="d-name" type="text" autocomplete="name" placeholder="Your name" class="h-12 w-full rounded-xl bg-surface-container-low px-4 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
 <input id="d-phone" type="tel" autocomplete="tel" placeholder="Phone" class="h-12 w-full rounded-xl bg-surface-container-low px-4 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
 </div>
 <input id="d-notes" type="text" placeholder="Gate code or note for the driver (optional)" maxlength="200" class="h-12 w-full rounded-xl bg-surface-container-low px-4 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
 <div id="d-quote" class="flex items-center gap-2 px-1 pt-1 font-body-md text-body-md text-text-secondary"><span class="material-symbols-outlined text-[18px]" style="color:#4cc417">two_wheeler</span><span id="d-quote-text">We'll show your delivery fee as soon as we have your address.</span></div>
 </div>
+</section>
+<section class="bg-surface-container rounded-2xl p-4 flex flex-col gap-3" id="infoCard">
+<div class="font-headline-md text-headline-md text-text-primary">Your info</div>
+<div class="font-body-md text-body-md text-text-secondary" style="margin-top:-6px">So we can reach you about your order.</div>
+<input id="c-name" type="text" autocomplete="name" autocapitalize="words" placeholder="Full name" class="h-12 w-full rounded-xl bg-surface-container-low px-4 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
+<input id="c-phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="Phone number" class="h-12 w-full rounded-xl bg-surface-container-low px-4 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
+<input id="c-email" type="email" autocomplete="email" inputmode="email" autocapitalize="none" placeholder="Email" class="h-12 w-full rounded-xl bg-surface-container-low px-4 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
+<label class="flex items-start gap-3 font-body-md text-body-md text-text-secondary" style="cursor:pointer"><input id="c-mkt" type="checkbox" checked style="width:20px;height:20px;margin-top:2px;accent-color:#f36310;flex-shrink:0"/><span>Text and email me deals from La Cabaña Grill. Reply STOP anytime.</span></label>
 </section>
 
 <!-- 2. Your order -->
@@ -175,6 +183,7 @@
   document.getElementById('d-zip').addEventListener('input', e => { if (e.target.value.length === 5) getQuote(); });
   try {   // prefill from the customer's profile
     const acc = typeof getAccount === 'function' ? getAccount() : null;
+    if (acc) { document.getElementById('c-name').value = acc.name || ''; document.getElementById('c-phone').value = acc.phone || ''; document.getElementById('c-email').value = acc.email || ''; }
     if (acc) { document.getElementById('d-name').value = acc.name || ''; document.getElementById('d-phone').value = acc.phone || ''; if (acc.address) document.getElementById('d-street').value = acc.address.split(',')[0]; }
     if (localStorage.getItem('lacabana_mode') === 'delivery') fulfillment = 'delivery';
   } catch (x) {}
@@ -299,8 +308,14 @@
 
   function checkReady() {
     if (cartLines().length === 0) { showToast('Your cart is empty'); return false; }
+    const needInfo = (m) => { showToast(m); document.getElementById('infoCard').scrollIntoView({ behavior: 'smooth', block: 'center' }); return false; };
+    if (!val('c-name')) return needInfo('Add your name');
+    if (val('c-phone').replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '').length !== 10) return needInfo('Add your 10-digit phone number');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val('c-email'))) return needInfo('Add your email');
+    try { const a = (typeof getAccount === 'function' && getAccount()) || {}; a.name = val('c-name'); a.phone = val('c-phone'); a.email = val('c-email'); a.marketing = document.getElementById('c-mkt').checked; saveAccount(a); } catch (e) {}
+    document.getElementById('d-name').value = val('c-name'); document.getElementById('d-phone').value = val('c-phone');
     if (fulfillment === 'delivery') {
-      if (!val('d-name') || !val('d-phone') || !val('d-street') || !val('d-zip')) { showToast('Add your name, phone and address for delivery'); document.getElementById('fulfillCard').scrollIntoView({ behavior: 'smooth' }); return false; }
+      if (!val('d-street') || !val('d-zip')) { showToast('Add your address for delivery'); document.getElementById('fulfillCard').scrollIntoView({ behavior: 'smooth' }); return false; }
       if (!quote) { showToast(quoteError || 'Getting your delivery fee, try again in a second'); getQuote(); return false; }
     }
     return true;
@@ -337,8 +352,7 @@
         body: JSON.stringify({ sourceId: tokenResult.token, amount: total, order: {
           lines: lines.map(l => ({ name: l.item.name, qty: l.qty, price: l.unit, note: optsSummary(l.opts) })),
           discount: totals.discount, tip: currentTip, deliveryFee: deliveryFee(), fulfillment,
-          name: fulfillment === 'delivery' ? val('d-name') : ((typeof getAccount === 'function' && getAccount() || {}).name || ''),
-          phone: fulfillment === 'delivery' ? val('d-phone') : ((typeof getAccount === 'function' && getAccount() || {}).phone || ''),
+          name: val('c-name'), phone: val('c-phone'), email: val('c-email'), marketing: document.getElementById('c-mkt').checked,
           address: fulfillment === 'delivery' ? deliveryAddress() : null, notes: fulfillment === 'delivery' ? val('d-notes') : '' } })
       });
       const data = await res.json();

@@ -75,6 +75,16 @@
   .po{padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px}
   .po b{font-size:14.5px}
   .hidden{display:none!important}
+  .oc{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:10px;background:var(--card2)}
+  .oc.new{border-color:var(--or);box-shadow:0 0 0 1px var(--or) inset}
+  .oc.done{opacity:.5}
+  .oc .top{display:flex;align-items:baseline;gap:8px}
+  .oc .nm{font-weight:800;font-size:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .oc .tt{font-weight:800;color:var(--gr);font-size:16px}
+  .oc .ct{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+  .oc .ct a{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:100px;background:#141414;border:1px solid #2e2e2e;color:#fff;text-decoration:none;font-size:13.5px;font-weight:700}
+  .oc .it{font-size:14px;line-height:1.5}
+  .oc .tag{font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:100px;background:rgba(243,99,16,.15);color:var(--or2)}
   .pwrap{position:relative}
   .pwrap .field{padding-right:48px}
   .eye{all:unset;cursor:pointer;position:absolute;right:6px;top:50%;transform:translateY(-50%);width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--fg2);border-radius:10px}
@@ -199,6 +209,15 @@
 
   <!-- console -->
   <div id="v-app" class="hidden">
+    <div class="card" id="ord-card" style="margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div class="sec" style="margin:0;flex:1;">Orders</div>
+        <select id="ord-days" class="field" style="width:auto;height:36px;font-size:13.5px;padding:0 10px;"><option value="1">Today</option><option value="2" selected>Last 2 days</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select>
+        <button class="btn" id="ord-refresh" style="padding:8px 12px;font-size:12.5px;">Refresh</button>
+      </div>
+      <div id="ord-sum" class="muted" style="font-size:13px;margin-bottom:8px;"></div>
+      <div id="orders"><div class="muted">Loading orders…</div></div>
+    </div>
     <div id="start-box" class="card" style="text-align:center;margin-bottom:14px;">
       <div style="font-family:Outfit,sans-serif;font-size:18px;font-weight:700;">Ready to take calls?</div>
       <p class="muted">Going on duty tells customers someone is on the line and turns on your speaker and microphone.</p>
@@ -374,7 +393,7 @@
     if(!ok){ const { data: owner } = await sb.rpc('claim_owner'); ok = !!owner; }
     if(!ok){ $('denied-email').textContent = 'Signed in as ' + me.email + '.'; show('v-denied'); setTimeout(boot, 15000); return; }
     show('v-app');
-    loadQueue(); loadPaid(); loadStaff();
+    loadOrders(); loadQueue(); loadPaid(); loadStaff();
     listenDb();
     if(localStorage.getItem('lc_duty') !== 'off') startDuty(false);
   }
@@ -751,6 +770,48 @@
     if(error){ smsg('Couldn\'t remove: ' + error.message); return; }
     smsg(e + ' removed.', true); loadStaff();
   });
+  // ---------- orders (from Square) ----------
+  const seenKey = 'lc_seen_orders', doneKey = 'lc_done_orders';
+  const getSet = k => { try { return new Set(JSON.parse(localStorage.getItem(k) || '[]')); } catch(e){ return new Set(); } };
+  const putSet = (k, st) => { try { localStorage.setItem(k, JSON.stringify([...st].slice(-500))); } catch(e){} };
+  let ordFirst = true;
+  function ding(){ try { const a = new (window.AudioContext || window.webkitAudioContext)(); [0, .25, .5].forEach(t => { const o = a.createOscillator(), g = a.createGain(); o.frequency.value = 880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.4, a.currentTime + t); g.gain.exponentialRampToValueAtTime(.01, a.currentTime + t + .22); o.start(a.currentTime + t); o.stop(a.currentTime + t + .22); }); } catch(e){} }
+  const fmtPhone = p => { const d = String(p || '').replace(/\D/g, '').replace(/^1(?=\d{10}$)/, ''); return d.length === 10 ? '(' + d.slice(0,3) + ') ' + d.slice(3,6) + '-' + d.slice(6) : p; };
+  async function loadOrders(){
+    const { data: { session } } = await sb.auth.getSession(); if(!session) return;
+    let j;
+    try { const r = await fetch('/api/orders?days=' + $('ord-days').value, { headers: { Authorization: 'Bearer ' + session.access_token } }); j = await r.json(); if(!r.ok) throw new Error(j.error || 'error'); }
+    catch(e){ $('orders').innerHTML = '<div class="muted">Couldn\'t load orders (' + esc(e.message) + '). Tap Refresh.</div>'; return; }
+    const list = j.orders || [], seen = getSet(seenKey), done = getSet(doneKey);
+    const fresh = list.filter(o => !seen.has(o.id));
+    if(!ordFirst && fresh.length) ding();
+    const today = new Date().toDateString(), todays = list.filter(o => new Date(o.created).toDateString() === today && o.paid);
+    $('ord-sum').textContent = 'Today: ' + todays.length + ' paid order' + (todays.length === 1 ? '' : 's') + ' · ' + money(todays.reduce((a, o) => a + o.total, 0));
+    $('orders').innerHTML = list.length ? list.map(o => {
+      const isNew = !ordFirst && fresh.some(f => f.id === o.id) || (!seen.has(o.id) && !ordFirst);
+      const t = new Date(o.created);
+      const when = (t.toDateString() === today ? '' : t.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ') + t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      const type = o.type === 'DELIVERY' ? 'Delivery' : o.type === 'PICKUP' ? 'Pickup' : '';
+      return '<div class="oc' + (isNew ? ' new' : '') + (done.has(o.id) ? ' done' : '') + '" data-id="' + esc(o.id) + '">' +
+        '<div class="top"><span class="nm">' + esc(o.name || 'No name') + '</span><span class="tt">' + money(o.total) + '</span></div>' +
+        '<div class="muted" style="font-size:12.5px;margin-top:2px;">' + esc(when) + ' · ' + esc(o.source) + (type ? ' · <span class="tag">' + type + '</span>' : '') + (o.paid ? '' : ' · <span style="color:var(--rd);font-weight:800;">Not paid</span>') + (o.tip ? ' · tip ' + money(o.tip) : '') + '</div>' +
+        '<div class="ct">' + (o.phone ? '<a href="tel:' + esc(o.phone) + '">Call ' + esc(fmtPhone(o.phone)) + '</a><a href="sms:' + esc(o.phone) + '">Text</a>' : '<span class="muted" style="font-size:13px;">No phone on this order</span>') + (o.email ? '<a href="mailto:' + esc(o.email) + '">' + esc(o.email) + '</a>' : '') + '</div>' +
+        (o.card ? '<div class="muted" style="font-size:12.5px;">Card: ' + esc(o.card) + (o.cardName ? ' · ' + esc(o.cardName) : '') + '</div>' : '') +
+        (o.address ? '<div class="muted" style="font-size:12.5px;">Address: ' + esc(o.address) + '</div>' : '') +
+        '<div class="it" style="margin-top:6px;">' + o.items.map(i => '<div><b>' + i.qty + '×</b> ' + esc(i.name) + (i.mods ? ' <span class="muted">(' + esc(i.mods) + ')</span>' : '') + (i.note ? ' <span class="muted">— ' + esc(i.note) + '</span>' : '') + '</div>').join('') + '</div>' +
+        '<div style="display:flex;justify-content:flex-end;margin-top:8px;"><button class="btn" style="padding:6px 14px;font-size:12.5px;" data-done="' + esc(o.id) + '">' + (done.has(o.id) ? 'Undo' : 'Done') + '</button></div></div>';
+    }).join('') : '<div class="muted">No orders in this time.</div>';
+    list.forEach(o => seen.add(o.id)); putSet(seenKey, seen); ordFirst = false;
+  }
+  $('orders').addEventListener('click', ev => {
+    const b = ev.target.closest('[data-done]'); if(!b) return;
+    const id = b.getAttribute('data-done'), done = getSet(doneKey);
+    done.has(id) ? done.delete(id) : done.add(id); putSet(doneKey, done);
+    const c = b.closest('.oc'); c.classList.toggle('done', done.has(id)); c.classList.remove('new'); b.textContent = done.has(id) ? 'Undo' : 'Done';
+  });
+  $('ord-refresh').onclick = loadOrders; $('ord-days').onchange = loadOrders;
+  setInterval(() => { if(me && !$('v-app').classList.contains('hidden')) loadOrders(); }, 15000);
+
   window.answer = answer; window.addLine = addLine; window.signOut = signOut; window.show = show;
   sb.auth.onAuthStateChange((ev) => { if(ev === 'SIGNED_OUT') show('v-login'); });
   boot();
