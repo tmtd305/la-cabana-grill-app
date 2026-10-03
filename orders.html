@@ -258,7 +258,21 @@
   }
 
   // live status + ready time the kitchen set on the staff dashboard
-  const lcEta = {}; let lcEtaTimer = null;
+  const lcEta = {}; let lcEtaTimer = null, lcEtaSeen = false;
+  // big banner + vibration the moment the kitchen accepts, adds time or marks the order ready
+  function lcAlert(was, now) {
+    const t = (d) => new Date(d).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    let msg = '';
+    if (now.status === 'ready' && (!was || was.status !== 'ready')) msg = 'Your order is ready for pickup!';
+    else if (now.status === 'preparing' && (!was || was.status === 'new') && now.ready_at) msg = 'The kitchen accepted your order. Ready at ' + t(now.ready_at) + '.';
+    else if (now.ready_at && was && was.ready_at && new Date(now.ready_at) > new Date(was.ready_at)) msg = 'The kitchen needs a few more minutes. New time: ' + t(now.ready_at) + '.';
+    if (!msg) return;
+    try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (e) {}
+    let b = document.getElementById('lc-eta-alert');
+    if (!b) { b = document.createElement('div'); b.id = 'lc-eta-alert'; b.style.cssText = 'position:fixed;left:12px;right:12px;top:calc(env(safe-area-inset-top) + 86px);z-index:70;background:#f36310;color:#fff;border-radius:16px;padding:14px 16px;font:800 15px Manrope,sans-serif;box-shadow:0 12px 30px rgba(0,0,0,.5);text-align:center'; document.body.appendChild(b); b.onclick = () => b.remove(); }
+    b.textContent = msg; clearTimeout(b._t); b._t = setTimeout(() => b.remove(), 12000);
+    if (document.hidden && window.Notification && Notification.permission === 'granted') { try { new Notification('La Cabaña Grill', { body: msg, icon: 'icons/icon-192.png' }); } catch (e) {} }
+  }
   async function pollEta(id) {
     try {
       const r = await fetch('https://qzluvwpjtgeccfojutbt.supabase.co/rest/v1/rpc/order_eta', { method: 'POST', headers: { apikey: 'sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ', 'Content-Type': 'application/json' }, body: JSON.stringify({ p_order_id: id }) });
@@ -266,7 +280,12 @@
       const row = Array.isArray(rows) ? rows[0] : null;
       const prev = JSON.stringify(lcEta[id] || null);
       lcEta[id] = row || null;
-      if (JSON.stringify(lcEta[id]) !== prev) renderActiveOrder();
+      if (JSON.stringify(lcEta[id]) !== prev) {
+        const was = prev === 'null' ? null : JSON.parse(prev);
+        if (lcEtaSeen && row) lcAlert(was, row);
+        renderActiveOrder();
+      }
+      lcEtaSeen = true;
     } catch (e) {}
   }
 

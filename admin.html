@@ -10,6 +10,31 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="data.js"></script>
+<script>
+// Store hours (Miami time). Default = Google/Apple Maps listing; the owner edits them in the dashboard (app_settings key "hours").
+var LC_DEFAULT_HOURS = { cutoff: 15, days: [["09:00", "21:00"], ["09:00", "22:00"], ["09:00", "22:00"], ["09:00", "22:00"], ["09:00", "22:00"], ["09:00", "22:00"], ["09:00", "22:00"]] };
+function lcHoursStatus(h, now) {
+  h = h && h.days ? h : LC_DEFAULT_HOURS;
+  var p = {}; new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(now || new Date()).forEach(function (x) { p[x.type] = x.value; });
+  var wd = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(p.weekday), mins = (+p.hour % 24) * 60 + +p.minute;
+  var toM = function (t) { var a = String(t || "").split(":"); return +a[0] * 60 + +(a[1] || 0); };
+  var fmt = function (t) { var m = toM(t), hh = Math.floor(m / 60) % 24; return ((hh % 12) || 12) + (m % 60 ? ":" + String(m % 60).padStart(2, "0") : "") + (hh < 12 ? " AM" : " PM"); };
+  var d = h.days[wd], cutoff = +h.cutoff || 0;
+  if (d && d[0] && d[1]) {
+    var o = toM(d[0]), c = toM(d[1]); if (c <= o) c += 1440;
+    var m2 = mins < o && c > 1440 && mins + 1440 < c ? mins + 1440 : mins;
+    if (m2 >= o && m2 < c - cutoff) return { open: true, label: "Open until " + fmt(d[1]), closesSoon: c - cutoff - m2 <= 30 };
+  }
+  // when do we open next?
+  for (var i = 0; i < 8; i++) {
+    var k = (wd + i) % 7, dd = h.days[k];
+    if (!dd || !dd[0] || !dd[1]) continue;
+    if (i === 0 && mins >= toM(dd[0])) continue;
+    return { open: false, label: "Closed. Opens " + (i === 0 ? "today" : i === 1 ? "tomorrow" : ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][k]) + " at " + fmt(dd[0]) };
+  }
+  return { open: false, label: "Closed" };
+}
+</script>
 <style>
   :root{--bg:#0c0c0c;--side:#111;--card:#171717;--card2:#1f1f1f;--line:rgba(255,255,255,.07);--fg:#f5f5f5;--fg2:#9a9a9a;--or:#f36310;--or2:#ffb596;--gr:#22c55e;--rd:#f87171;--yl:#fbbf24}
   *{box-sizing:border-box}
@@ -241,6 +266,25 @@
     .sw{width:52px;height:30px} .sw span::after{width:24px;height:24px} .sw input:checked+span::after{left:25px}
     .nav,.bnav button,.seg button,.chips button{-webkit-tap-highlight-color:transparent}
   }
+
+  /* green car: request an Uber driver from anywhere */
+  .fab-car{all:unset;cursor:pointer;position:fixed;right:20px;bottom:calc(env(safe-area-inset-bottom) + 22px);z-index:45;display:flex;align-items:center;gap:10px;height:62px;padding:0 22px 0 16px;border-radius:100px;background:linear-gradient(135deg,#19d06f,#06a352);color:#fff;font-weight:800;font-size:15px;box-shadow:0 10px 30px rgba(6,193,103,.45),0 0 0 1px rgba(255,255,255,.18) inset;-webkit-tap-highlight-color:transparent;transition:transform .15s}
+  .fab-car:active{transform:scale(.96)}
+  .fab-car .car{display:flex;animation:carIdle 2.4s ease-in-out infinite}
+  @keyframes carIdle{0%,100%{transform:translateX(0)}50%{transform:translateX(3px)}}
+  .fab-car::after{content:"";position:absolute;inset:-6px;border-radius:100px;border:2px solid rgba(25,208,111,.55);animation:carPing 2.4s ease-out infinite;pointer-events:none}
+  @keyframes carPing{0%{opacity:.9;transform:scale(.96)}80%,100%{opacity:0;transform:scale(1.12)}}
+  .btn.green{background:linear-gradient(135deg,#19d06f,#06a352);border-color:transparent;color:#fff}
+  .btn.green svg{width:26px;height:17px}
+  @media (max-width:700px){.fab-car{right:14px;bottom:calc(env(safe-area-inset-bottom) + 84px);height:56px;padding:0 18px 0 14px;font-size:14px}}
+
+  .hr-d{width:100px;font-size:14px;flex-shrink:0} .hr-d .ds{display:none}
+  .main{padding-bottom:110px}
+  @media (max-width:700px){
+    .main{padding-bottom:170px}
+    .hr-d{width:40px} .hr-d .dl{display:none} .hr-d .ds{display:inline}
+    .hr-row .field{padding:0 8px;font-size:15px}
+  }
 </style>
 </head>
 <body>
@@ -251,6 +295,7 @@
     <div class="brand"><img src="icons/logo-transparent.png" alt="La Cabaña Grill"><small>MIAMI BEACH</small></div>
     <button class="nav on" data-v="dash"><span class="ms">home</span>Dashboard</button>
     <button class="nav" data-v="orders"><span class="ms">receipt_long</span>Orders<span class="cnt hidden" data-cnt="orders"></span></button>
+    <button class="nav" data-v="drivers"><span class="ms">delivery_dining</span>Drivers</button>
     <button class="nav" data-v="menu"><span class="ms">restaurant_menu</span>Menu &amp; Sold out</button>
     <button class="nav" data-v="customers"><span class="ms">group</span>Customers</button>
     <button class="nav" data-v="loyalty"><span class="ms">redeem</span>Marketing &amp; Loyalty</button>
@@ -267,6 +312,7 @@
     <div class="top">
       <h1 id="title">Dashboard</h1>
       <div class="search"><span class="ms">search</span><input id="q" placeholder="Search customers, phone, items…" autocomplete="off"></div>
+      <button class="btn green" data-driver><svg viewBox="0 0 64 40" width="26" height="17" aria-hidden="true"><defs><linearGradient id="cg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9ffd8"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs><path d="M6 27c0-3 1.6-5.2 4.4-6l7.3-2.1 6.9-7.4C26.4 9.6 28.8 8.6 31.3 8.6h9.4c2.6 0 5 1.1 6.6 3.1l5.3 6.6 4.2 1.1c2.6.7 4.2 3 4.2 5.6V29c0 1.4-1.1 2.5-2.5 2.5H8.5C7.1 31.5 6 30.4 6 29z" fill="url(#cg2)"/><path d="M22.5 18.6l5.4-5.6c.9-.9 2.1-1.4 3.4-1.4h3.9v7z" fill="#0a7a3f"/><path d="M38.2 11.6h2.5c1.6 0 3 .7 4 1.9l4.1 5.1H38.2z" fill="#0a7a3f"/><circle cx="18" cy="31" r="6.2" fill="#063" stroke="#fff" stroke-width="2.6"/><circle cx="48" cy="31" r="6.2" fill="#063" stroke="#fff" stroke-width="2.6"/><path d="M1 22h8M0 26.5h6" stroke="#b9ffd8" stroke-width="2.4" stroke-linecap="round"/></svg>Driver</button>
       <button class="status" id="status"><i></i><span>Online</span></button>
       <span class="clock" id="clock"></span>
       <div class="me" id="me"></div>
@@ -293,18 +339,32 @@
         <div class="seg" id="ord-filter"><button class="on" data-f="open">Open</button><button data-f="done">Completed</button><button data-f="all">All</button></div>
         <span class="muted" style="flex:1">Website orders. New ones ding and glow orange.</span>
         <button class="btn sm" id="ord-refresh"><span class="ms">refresh</span>Refresh</button>
+        <button class="btn sm main" data-driver><span class="ms">delivery_dining</span>Request driver</button>
       </div>
       <div id="orders"><div class="empty">Loading…</div></div>
+    </section>
+
+    <!-- DRIVERS -->
+    <section data-view="drivers" class="hidden">
+      <div class="banner"><h3>Uber driver</h3><p>Phone order? Send it with an Uber driver in a few taps.</p><button class="btn green" data-driver><svg viewBox="0 0 64 40" width="26" height="17" aria-hidden="true"><defs><linearGradient id="cg3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9ffd8"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs><path d="M6 27c0-3 1.6-5.2 4.4-6l7.3-2.1 6.9-7.4C26.4 9.6 28.8 8.6 31.3 8.6h9.4c2.6 0 5 1.1 6.6 3.1l5.3 6.6 4.2 1.1c2.6.7 4.2 3 4.2 5.6V29c0 1.4-1.1 2.5-2.5 2.5H8.5C7.1 31.5 6 30.4 6 29z" fill="url(#cg3)"/><path d="M22.5 18.6l5.4-5.6c.9-.9 2.1-1.4 3.4-1.4h3.9v7z" fill="#0a7a3f"/><path d="M38.2 11.6h2.5c1.6 0 3 .7 4 1.9l4.1 5.1H38.2z" fill="#0a7a3f"/><circle cx="18" cy="31" r="6.2" fill="#063" stroke="#fff" stroke-width="2.6"/><circle cx="48" cy="31" r="6.2" fill="#063" stroke="#fff" stroke-width="2.6"/><path d="M1 22h8M0 26.5h6" stroke="#b9ffd8" stroke-width="2.4" stroke-linecap="round"/></svg>Request driver</button></div>
+      <div class="card"><div class="ch"><h2>Today's drivers</h2><button class="btn sm" id="drv-refresh"><span class="ms">refresh</span>Refresh</button></div><div id="drv-list"><div class="empty">Loading…</div></div></div>
     </section>
 
     <!-- MENU -->
     <section data-view="menu" class="hidden">
       <div class="card" style="margin-bottom:14px">
+        <div class="ch"><h2>Store hours</h2><span class="muted" id="hrs-now"></span></div>
+        <p class="muted" style="margin:-4px 0 10px">Online ordering opens and closes by itself on these hours (Miami time). Leave a day blank if you're closed.</p>
+        <div id="hrs-days"></div>
+        <div class="row" style="margin-top:10px;flex-wrap:wrap"><span class="muted" style="flex:1;min-width:180px">Stop taking online orders before closing</span><select class="field" id="hrs-cut" style="width:auto"><option value="0">At closing</option><option value="15">15 min before</option><option value="30">30 min before</option><option value="45">45 min before</option><option value="60">1 hour before</option></select></div>
+        <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn main" id="hrs-save">Save hours</button></div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
         <div class="row" style="flex-wrap:wrap">
-          <div style="flex:1;min-width:200px"><b style="font-size:16px">Online ordering</b><div class="muted" id="pause-sub">Customers can order on the website right now.</div></div>
+          <div style="flex:1;min-width:200px"><b style="font-size:16px">Pause online ordering</b><div class="muted" id="pause-sub">Only for emergencies, like too busy or out of food. Hours handle open and close by themselves.</div></div>
           <label class="sw"><input type="checkbox" id="pause-sw" checked><span></span></label>
         </div>
-        <input class="field" id="pause-msg" placeholder="Message when paused (optional), e.g. Back at 5 PM" style="margin-top:12px" maxlength="120">
+        <input class="field" id="pause-msg" placeholder="Message when paused (optional), e.g. Back in 30 minutes" style="margin-top:12px" maxlength="120">
       </div>
       <div class="card">
         <div class="ch"><h2>Menu items</h2><span class="muted" id="so-count"></span></div>
@@ -390,9 +450,12 @@
   </main>
 </div>
 
+<button class="fab-car hidden" id="fab-car" data-driver aria-label="Request Uber driver"><span class="car"><svg viewBox="0 0 64 40" width="34" height="22" aria-hidden="true"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9ffd8"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs><path d="M6 27c0-3 1.6-5.2 4.4-6l7.3-2.1 6.9-7.4C26.4 9.6 28.8 8.6 31.3 8.6h9.4c2.6 0 5 1.1 6.6 3.1l5.3 6.6 4.2 1.1c2.6.7 4.2 3 4.2 5.6V29c0 1.4-1.1 2.5-2.5 2.5H8.5C7.1 31.5 6 30.4 6 29z" fill="url(#cg)"/><path d="M22.5 18.6l5.4-5.6c.9-.9 2.1-1.4 3.4-1.4h3.9v7z" fill="#0a7a3f"/><path d="M38.2 11.6h2.5c1.6 0 3 .7 4 1.9l4.1 5.1H38.2z" fill="#0a7a3f"/><circle cx="18" cy="31" r="6.2" fill="#063" stroke="#fff" stroke-width="2.6"/><circle cx="48" cy="31" r="6.2" fill="#063" stroke="#fff" stroke-width="2.6"/><path d="M1 22h8M0 26.5h6" stroke="#b9ffd8" stroke-width="2.4" stroke-linecap="round"/></svg></span>Request driver</button>
+
 <nav class="bnav hidden" id="bnav">
   <button class="on" data-v="dash"><span class="ms">home</span>Home</button>
   <button data-v="orders"><span class="ms">receipt_long</span>Orders<span class="cnt hidden" data-cnt="orders"></span></button>
+  <button data-v="drivers"><span class="ms">delivery_dining</span>Drivers</button>
   <button data-v="menu"><span class="ms">restaurant_menu</span>Menu</button>
   <button data-v="customers"><span class="ms">group</span>Customers</button>
   <button data-v="loyalty"><span class="ms">redeem</span>Loyalty</button>
@@ -427,7 +490,7 @@
     me = session.user;
     const { data: ok } = await sb.rpc('is_operator');
     if(!ok){ location.replace('operator.html'); return; }
-    $('gate').classList.add('hidden'); $('app').classList.remove('hidden'); $('bnav').classList.remove('hidden');
+    $('gate').classList.add('hidden'); $('app').classList.remove('hidden'); $('bnav').classList.remove('hidden'); $('fab-car').classList.remove('hidden');
     $('me').textContent = initials((me.user_metadata && me.user_metadata.name) || me.email);
     tick(); setInterval(tick, 15000);
     const v = (location.hash || '').slice(1); if(v && document.querySelector('[data-view="' + v + '"]')) go(v);
@@ -443,12 +506,12 @@
   function tick(){ const d = new Date(); $('clock').textContent = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }) + '  ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
 
   // ---------- navigation ----------
-  const TITLES = { dash: 'Dashboard', orders: 'Orders', menu: 'Menu & Sold out', customers: 'Customers', loyalty: 'Marketing & Loyalty', analytics: 'Analytics', channels: 'Channels', staff: 'Staff' };
+  const TITLES = { dash: 'Dashboard', orders: 'Orders', drivers: 'Uber drivers', menu: 'Hours, Menu & Sold out', customers: 'Customers', loyalty: 'Marketing & Loyalty', analytics: 'Analytics', channels: 'Channels', staff: 'Staff' };
   function go(v){
     document.querySelectorAll('[data-view]').forEach(s => s.classList.toggle('hidden', s.dataset.view !== v));
     document.querySelectorAll('.nav[data-v],.bnav [data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
     $('title').textContent = TITLES[v]; history.replaceState(null, '', '#' + v); window.scrollTo(0, 0);
-    if(v === 'analytics') renderAnalytics(); if(v === 'channels') renderChannels(); if(v === 'loyalty') loadMembers(); if(v === 'customers') loadCustomers();
+    if(v === 'drivers') loadDeliveries(); if(v === 'analytics') renderAnalytics(); if(v === 'channels') renderChannels(); if(v === 'loyalty') loadMembers(); if(v === 'customers') loadCustomers();
   }
   document.addEventListener('click', e => { const b = e.target.closest('[data-v]'); if(b && (b.classList.contains('nav') || b.closest('.bnav'))) go(b.dataset.v); const g = e.target.closest('[data-go]'); if(g) go(g.dataset.go); });
 
@@ -559,39 +622,148 @@
         '<div class="items">' + o.items.map(i => '<div class="ln"><span class="q">' + i.qty + '×</span><span>' + esc(i.name) + ((i.mods || i.note) ? '<span class="nt">' + esc([i.mods, i.note].filter(Boolean).join(' · ')) + '</span>' : '') + '</span></div>').join('') + '</div>' +
         '<div class="muted" style="line-height:1.6">' + (o.phone ? '<b style="color:#fff">' + esc(fmtPhone(o.phone)) + '</b>' : 'No phone') + (o.email ? ' · ' + esc(o.email) : '') + (o.address ? '<br>' + esc(o.address) : '') + (o.card ? '<br>' + esc(o.card) + (o.cardName ? ' · ' + esc(o.cardName) : '') : '') + '</div>' +
         '<div class="acts">' + (o.phone ? '<a class="btn" href="tel:' + esc(o.phone) + '"><span class="ms">call</span>Call</a><a class="btn" href="sms:' + esc(o.phone) + '"><span class="ms">sms</span>Text</a>' : '') +
+        '<button class="btn" data-uber="' + esc(o.id) + '" title="Send with an Uber driver"><span class="ms">delivery_dining</span>Uber</button>' +
         (st === 'new' ? '' : '<button class="btn ' + (st === 'done' ? 'plain' : 'main') + '" data-st="' + next[0] + '" data-id="' + esc(o.id) + '">' + next[1] + '</button>') + '</div></div>';
     }).join('') + '</div>';
   }
   async function saveStatus(id, st, ra){ const row = { order_id: id, status: st, updated_at: new Date().toISOString(), updated_by: me.email }; if(ra !== undefined) row.ready_at = ra; const { error } = await sb.from('order_status').upsert(row); if(error) toast('Couldn\'t save'); }
   $('orders').addEventListener('click', async e => {
+    const ub = e.target.closest('[data-uber]'); if(ub){ const o = all30.find(x => x.id === ub.dataset.uber); driverForm({ name: o.name, phone: (o.phone || '').replace(/^\+1/, ''), items: o.items.map(i => i.qty + ' ' + i.name).join(', ') }); return; }
     const acc = e.target.closest('[data-acc]'), add = e.target.closest('[data-add]');
     if(acc || add){ const id = (acc || add).dataset.id; const base = add && ordReady[id] ? Math.max(Date.now(), new Date(ordReady[id]).getTime()) : Date.now();
-      const ra = new Date(base + (+(acc ? acc.dataset.acc : add.dataset.add)) * 60000).toISOString(); ordStatus[id] = 'preparing'; ordReady[id] = ra; renderOrders(); renderDash(); await saveStatus(id, 'preparing', ra); return; }
+      const ra = new Date(base + (+(acc ? acc.dataset.acc : add.dataset.add)) * 60000).toISOString(); ordStatus[id] = 'preparing'; ordReady[id] = ra; renderOrders(); renderDash(); await saveStatus(id, 'preparing', ra);
+      const o = all30.find(x => x.id === id), at = new Date(ra).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }), first = (o && o.name || '').split(' ')[0];
+      if(o && o.phone) notifyText(o.phone, add ? 'La Cabaña Grill: hi ' + first + ', we need a few more minutes on your order. New pickup time: ' + at + '. Thank you for waiting!' : 'La Cabaña Grill: hi ' + first + ', we got your order! It will be ready at ' + at + '.', add ? 'Tell them about the new time' : 'Confirm the order');
+      return; }
     const b = e.target.closest('[data-st]'); if(!b) return; const id = b.dataset.id, st = b.dataset.st;
     ordStatus[id] = st; if(st === 'new') delete ordReady[id]; renderOrders(); renderDash(); await saveStatus(id, st, st === 'new' ? null : undefined);
+    if(st === 'ready'){ const o = all30.find(x => x.id === id); if(o && o.phone) notifyText(o.phone, 'La Cabaña Grill: ' + ((o.name || '').split(' ')[0] || 'hi') + ', your order is ready for pickup! 6780 Collins Ave.', 'Tell them it\'s ready'); }
   });
   $('ord-filter').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if(!b) return; ordFilter = b.dataset.f; $('ord-filter').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); renderOrders(); });
   $('ord-refresh').onclick = loadAll;
   setInterval(() => { if(!$('app').classList.contains('hidden')) renderOrders(); }, 30000);
 
+
+  // ---------- Uber drivers for phone orders ----------
+  async function uber(body){
+    const { data } = await sb.auth.getSession(); session = data.session;
+    const r = await fetch('/api/uber-direct', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + session.access_token }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({})); if(!r.ok) throw new Error(j.error || 'Uber error'); return j;
+  }
+  const DSTAT = { pending: ['Finding driver', 'o'], pickup: ['Driver on the way', 'o'], pickup_complete: ['Picked up', 'g'], dropoff: ['Out for delivery', 'g'], delivered: ['Delivered', 'g'], canceled: ['Canceled', 'r'], returned: ['Returned', 'r'] };
+  document.addEventListener('click', e => { if(e.target.closest('[data-driver]')) driverForm(); });
+  function driverForm(pre){
+    pre = pre || {};
+    const m = modal('<h3>Request Uber driver</h3><p class="muted" style="margin:0 0 14px">For phone orders. Uber picks up at La Cabaña and drops off here.</p>' +
+      '<div class="stack"><input class="field" id="dv-name" placeholder="Customer name" autocapitalize="words" value="' + esc(pre.name || '') + '"><input class="field" id="dv-phone" type="tel" inputmode="tel" placeholder="Customer phone" value="' + esc(pre.phone || '') + '">' +
+      '<input class="field" id="dv-street" placeholder="Street address" autocomplete="off"><div class="row"><input class="field" id="dv-apt" placeholder="Apt / unit" style="flex:1"><input class="field" id="dv-zip" placeholder="ZIP" inputmode="numeric" maxlength="5" style="width:110px"></div>' +
+      '<input class="field" id="dv-city" placeholder="City" value="Miami Beach"><input class="field" id="dv-notes" placeholder="Note for the driver (gate code, hotel room…)" maxlength="200">' +
+      '<textarea class="field" id="dv-items" placeholder="What\'s in the bag (optional), e.g. 2 Bandeja Paisa, 1 juice" style="height:70px;padding:10px 12px;resize:none">' + esc(pre.items || '') + '</textarea></div>' +
+      '<div id="dv-quote" class="muted" style="margin-top:12px"></div>' +
+      '<div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn plain" data-close>Cancel</button><button class="btn" id="dv-price">Get price</button><button class="btn main" id="dv-go" disabled>Request driver</button></div>');
+    let quote = null;
+    const v = id => m.querySelector('#' + id).value.trim();
+    const addr = () => ({ street: v('dv-street'), apt: v('dv-apt'), city: v('dv-city') || 'Miami Beach', state: 'FL', zip: v('dv-zip') });
+    ['dv-street', 'dv-apt', 'dv-zip', 'dv-city'].forEach(id => m.querySelector('#' + id).oninput = () => { quote = null; m.querySelector('#dv-go').disabled = true; m.querySelector('#dv-quote').textContent = ''; });
+    m.querySelector('#dv-price').onclick = async () => {
+      if(!v('dv-street') || !/^\d{5}$/.test(v('dv-zip'))){ toast('Add the street and 5-digit ZIP'); return; }
+      const b = m.querySelector('#dv-price'); b.disabled = true; b.textContent = 'Checking…';
+      try { quote = await uber({ action: 'quote', address: addr() });
+        m.querySelector('#dv-quote').innerHTML = '<div class="card" style="padding:12px;background:#111"><b style="font-family:Outfit;font-size:22px;color:#fff">' + money(quote.fee) + '</b> <span class="muted">Uber fee</span>' + (quote.etaMinutes ? '<div class="muted">Arrives in about <b style="color:#fff">' + quote.etaMinutes + ' min</b></div>' : '') + '</div>';
+        m.querySelector('#dv-go').disabled = false;
+      } catch(e){ m.querySelector('#dv-quote').innerHTML = '<span style="color:var(--rd)">' + esc(e.message) + '</span>'; }
+      b.disabled = false; b.textContent = 'Get price';
+    };
+    m.querySelector('#dv-go').onclick = async () => {
+      if(!v('dv-name')){ toast('Add the customer name'); return; }
+      if(v('dv-phone').replace(/\D/g, '').length < 10){ toast('Add the customer phone'); return; }
+      const b = m.querySelector('#dv-go'); b.disabled = true; b.textContent = 'Booking…';
+      try {
+        const d = await uber({ action: 'staff_create', quote, address: addr(), name: v('dv-name'), phone: v('dv-phone'), notes: v('dv-notes'), items: v('dv-items') });
+        const a = addr();
+        await sb.from('deliveries').insert({ uber_id: d.deliveryId, tracking_url: d.trackingUrl, status: d.status || 'pending', name: v('dv-name'), phone: v('dv-phone'), address: [a.street, a.apt, a.city, a.zip].filter(Boolean).join(', '), notes: v('dv-notes'), items: v('dv-items'), fee: quote.fee, eta_minutes: quote.etaMinutes || null, created_by: me.email });
+        m.remove(); toast('Driver requested');
+        notifyText(v('dv-phone'), 'La Cabaña Grill: your order is on the way with Uber. Track your driver here: ' + d.trackingUrl, 'Send the tracking link');
+        loadDeliveries();
+      } catch(e){ toast(e.message); b.disabled = false; b.textContent = 'Request driver'; }
+    };
+  }
+  let deliveries = [];
+  async function loadDeliveries(){
+    const since = startOf(1).toISOString();
+    const { data } = await sb.from('deliveries').select('*').gte('created_at', since).order('created_at', { ascending: false });
+    deliveries = data || []; renderDeliveries();
+    // refresh live status of active trips
+    deliveries.filter(d => d.uber_id && !['delivered', 'canceled', 'returned'].includes(d.status)).slice(0, 8).forEach(async d => {
+      try { const st = await uber({ action: 'staff_status', deliveryId: d.uber_id }); d.live = st;
+        if(st.status && st.status !== d.status){ d.status = st.status; sb.from('deliveries').update({ status: st.status, updated_at: new Date().toISOString() }).eq('id', d.id); }
+        renderDeliveries(); } catch(e){}
+    });
+  }
+  function renderDeliveries(){
+    $('drv-list').innerHTML = deliveries.length ? deliveries.map(d => { const st = DSTAT[d.status] || [d.status || 'Requested', 'o'], c = d.live && d.live.courier;
+      return '<div class="oc" style="margin-bottom:10px"><div class="oc-h"><div style="min-width:0"><div class="nm">' + esc(d.name) + '</div><div class="muted">' + esc(d.address) + '</div><div style="margin-top:6px"><span class="badge ' + st[1] + '">' + esc(st[0]).toUpperCase() + '</span></div></div><div class="tt">' + money(d.fee) + '<small>' + new Date(d.created_at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '</small></div></div>' +
+        (c ? '<div class="muted">Driver: <b style="color:#fff">' + esc(c.name) + '</b>' + (c.vehicle ? ' · ' + esc(c.vehicle) : '') + (c.phone ? ' · <a class="lnk" href="tel:' + esc(c.phone) + '">call driver</a>' : '') + '</div>' : '') +
+        (d.items ? '<div class="muted">' + esc(d.items) + '</div>' : '') +
+        '<div class="acts">' + (d.tracking_url ? '<a class="btn" href="' + esc(d.tracking_url) + '" target="_blank" rel="noopener"><span class="ms">map</span>Track</a>' : '') + '<button class="btn" data-dtext="' + esc(d.id) + '"><span class="ms">sms</span>Text customer</button>' +
+        (['pending', 'pickup'].includes(d.status) ? '<button class="btn plain" data-dcancel="' + esc(d.id) + '">Cancel driver</button>' : '') + '</div></div>'; }).join('') : '<div class="empty">No drivers today. Tap "Request driver" for a phone order.</div>';
+  }
+  $('drv-list').addEventListener('click', async e => {
+    const t = e.target.closest('[data-dtext]'), c = e.target.closest('[data-dcancel]');
+    if(t){ const d = deliveries.find(x => x.id === t.dataset.dtext); notifyText(d.phone, 'La Cabaña Grill: your order is on the way with Uber. Track it here: ' + d.tracking_url, 'Text the tracking link'); }
+    if(c){ const d = deliveries.find(x => x.id === c.dataset.dcancel); if(!confirm('Cancel the Uber driver for ' + d.name + '?')) return;
+      try { await uber({ action: 'staff_cancel', deliveryId: d.uber_id }); await sb.from('deliveries').update({ status: 'canceled' }).eq('id', d.id); toast('Driver canceled'); loadDeliveries(); } catch(err){ toast(err.message); } }
+  });
+  $('drv-refresh').onclick = loadDeliveries;
+  setInterval(() => { if(!document.querySelector('[data-view="drivers"]').classList.contains('hidden')) loadDeliveries(); }, 30000);
+
+  // ---------- tell the customer right away (text from this phone / iPad) ----------
+  function notifyText(phone, text, title){
+    if(!phone) return;
+    const m = modal('<h3>' + esc(title || 'Let the customer know') + '</h3><p class="muted" style="margin:0 0 10px">Sends from this phone or iPad\'s Messages app.</p><textarea class="field" id="nt-msg" style="height:110px;padding:10px 12px;resize:none">' + esc(text) + '</textarea>' +
+      '<div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn plain" data-close>Skip</button><a class="btn main" id="nt-go"><span class="ms">sms</span>Text ' + esc(fmtPhone(phone)) + '</a></div>');
+    const go = m.querySelector('#nt-go');
+    const upd = () => { go.href = 'sms:' + String(phone).replace(/[^\d+]/g, '') + (/iPhone|iPad|Mac/.test(navigator.userAgent) ? '&' : '?') + 'body=' + encodeURIComponent(m.querySelector('#nt-msg').value); };
+    upd(); m.querySelector('#nt-msg').oninput = upd; go.onclick = () => setTimeout(() => m.remove(), 300);
+  }
+
   // ---------- settings: pause online ordering ----------
   let paused = false;
+  let hours = null;
+  const DAYN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   async function loadSettings(){
-    const { data } = await sb.from('app_settings').select('value').eq('key', 'ordering').maybeSingle();
-    const v = (data && data.value) || {}; paused = !!v.paused; $('pause-msg').value = v.message || ''; showPause();
+    const { data } = await sb.from('app_settings').select('key,value').in('key', ['ordering', 'hours']);
+    const get = k => ((data || []).find(x => x.key === k) || {}).value;
+    const v = get('ordering') || {}; paused = !!v.paused; $('pause-msg').value = v.message || '';
+    hours = get('hours') || JSON.parse(JSON.stringify(LC_DEFAULT_HOURS));
+    renderHours(); showPause();
   }
+  function renderHours(){
+    $('hrs-days').innerHTML = hours.days.map((d, i) => '<div class="row hr-row" style="padding:6px 0;border-bottom:1px solid var(--line)"><b class="hr-d"><span class="dl">' + DAYN[i] + '</span><span class="ds">' + DAYN[i].slice(0, 3) + '</span></b><input class="field" type="time" data-h="' + i + '" data-k="0" value="' + esc(d && d[0] || '') + '" style="flex:1;min-width:0"><span class="muted">to</span><input class="field" type="time" data-h="' + i + '" data-k="1" value="' + esc(d && d[1] || '') + '" style="flex:1;min-width:0"></div>').join('');
+    $('hrs-cut').value = String(hours.cutoff || 0);
+  }
+  $('hrs-save').onclick = async () => {
+    const days = [0, 1, 2, 3, 4, 5, 6].map(i => { const a = document.querySelector('[data-h="' + i + '"][data-k="0"]').value, b = document.querySelector('[data-h="' + i + '"][data-k="1"]').value; return a && b ? [a, b] : null; });
+    hours = { days, cutoff: +$('hrs-cut').value };
+    const { error } = await sb.from('app_settings').upsert({ key: 'hours', value: hours, updated_at: new Date().toISOString() });
+    toast(error ? 'Couldn\'t save' : 'Hours saved'); showPause();
+  };
   function showPause(){
-    ['status', 'status-m'].forEach(id => { const b = $(id); b.classList.toggle('off', paused); b.querySelector('span').textContent = paused ? 'Paused' : 'Online'; });
+    const hs = lcHoursStatus(hours);
+    const label = paused ? 'Paused' : hs.open ? 'Open' : 'Closed';
+    ['status', 'status-m'].forEach(id => { const b = $(id); b.classList.toggle('off', paused || !hs.open); b.querySelector('span').textContent = label; b.title = paused ? 'Online ordering paused' : hs.label; });
     $('pause-sw').checked = !paused;
-    $('pause-sub').textContent = paused ? 'Paused. Customers can\'t place orders on the website.' : 'Customers can order on the website right now.';
+    $('hrs-now').textContent = paused ? 'Paused by staff' : hs.label;
+    $('pause-sub').textContent = paused ? 'Paused. Customers can\'t order on the website until you switch this back on.' : 'Only for emergencies, like too busy or out of food. Hours handle open and close by themselves.';
   }
+  setInterval(() => { if(hours) showPause(); }, 60000);
   async function setPaused(p){
     paused = p; showPause();
     const { error } = await sb.from('app_settings').upsert({ key: 'ordering', value: { paused: p, message: $('pause-msg').value.trim() }, updated_at: new Date().toISOString() });
     toast(error ? 'Couldn\'t save' : p ? 'Online ordering paused' : 'Online ordering is on');
   }
   $('pause-sw').onchange = () => setPaused(!$('pause-sw').checked);
-  ['status', 'status-m'].forEach(id => $(id).onclick = () => { if(confirm(paused ? 'Turn online ordering back on?' : 'Pause online ordering? Customers won\'t be able to order on the website.')) setPaused(!paused); });
+  ['status', 'status-m'].forEach(id => $(id).onclick = () => go('menu'));
   $('pause-msg').onchange = () => setPaused(paused);
 
   // ---------- menu / sold out ----------

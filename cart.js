@@ -183,6 +183,31 @@ function toggleFav(id) {
   return i < 0;
 }
 
+
+// Store hours (Miami time). Default = Google/Apple Maps listing; the owner edits them in the dashboard (app_settings key "hours").
+var LC_DEFAULT_HOURS = { cutoff: 15, days: [["09:00", "21:00"], ["09:00", "22:00"], ["09:00", "22:00"], ["09:00", "22:00"], ["09:00", "22:00"], ["09:00", "22:00"], ["09:00", "22:00"]] };
+function lcHoursStatus(h, now) {
+  h = h && h.days ? h : LC_DEFAULT_HOURS;
+  var p = {}; new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(now || new Date()).forEach(function (x) { p[x.type] = x.value; });
+  var wd = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(p.weekday), mins = (+p.hour % 24) * 60 + +p.minute;
+  var toM = function (t) { var a = String(t || "").split(":"); return +a[0] * 60 + +(a[1] || 0); };
+  var fmt = function (t) { var m = toM(t), hh = Math.floor(m / 60) % 24; return ((hh % 12) || 12) + (m % 60 ? ":" + String(m % 60).padStart(2, "0") : "") + (hh < 12 ? " AM" : " PM"); };
+  var d = h.days[wd], cutoff = +h.cutoff || 0;
+  if (d && d[0] && d[1]) {
+    var o = toM(d[0]), c = toM(d[1]); if (c <= o) c += 1440;
+    var m2 = mins < o && c > 1440 && mins + 1440 < c ? mins + 1440 : mins;
+    if (m2 >= o && m2 < c - cutoff) return { open: true, label: "Open until " + fmt(d[1]), closesSoon: c - cutoff - m2 <= 30 };
+  }
+  // when do we open next?
+  for (var i = 0; i < 8; i++) {
+    var k = (wd + i) % 7, dd = h.days[k];
+    if (!dd || !dd[0] || !dd[1]) continue;
+    if (i === 0 && mins >= toM(dd[0])) continue;
+    return { open: false, label: "Closed. Opens " + (i === 0 ? "today" : i === 1 ? "tomorrow" : ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][k]) + " at " + fmt(dd[0]) };
+  }
+  return { open: false, label: "Closed" };
+}
+
 // ---------- live store data from the staff dashboard ----------
 // Sold-out items, "ordering paused", ambassador links (?ref=CODE) and a daily visitor count.
 (function () {
@@ -222,12 +247,16 @@ function toggleFav(id) {
   };
   Promise.all([
     fetch(SB + "/rest/v1/menu_status?sold_out=eq.true&select=item_id", { headers: H }).then(function (r) { return r.ok ? r.json() : []; }),
-    fetch(SB + "/rest/v1/app_settings?key=eq.ordering&select=value", { headers: H }).then(function (r) { return r.ok ? r.json() : []; })
+    fetch(SB + "/rest/v1/app_settings?key=in.(ordering,hours)&select=key,value", { headers: H }).then(function (r) { return r.ok ? r.json() : []; })
   ]).then(function (res) {
     LC_SOLD_OUT = new Set((res[0] || []).map(function (x) { return x.item_id; }));
     try { localStorage.setItem("lc_soldout", JSON.stringify(Array.from(LC_SOLD_OUT))); } catch (e) {}
-    var v = res[1] && res[1][0] && res[1][0].value || {};
-    LC_PAUSED = !!v.paused; window.LC_PAUSED_MSG = v.message || "";
+    var rows = res[1] || [], get = function (k) { var r = rows.filter(function (x) { return x.key === k; })[0]; return r ? r.value : null; };
+    var v = get("ordering") || {}; window.LC_HOURS = get("hours");
+    var hs = lcHoursStatus(window.LC_HOURS);
+    // manual pause from the dashboard wins; otherwise we're open/closed by the store hours
+    LC_PAUSED = !!v.paused || !hs.open;
+    window.LC_PAUSED_MSG = v.paused ? (v.message || "Online ordering is paused right now. Call us to order.") : (hs.open ? "" : "We're closed right now. " + hs.label.replace(/^Closed\. /, "") + ". You can browse the menu.");
     mark();
   }).catch(function () {});
   document.addEventListener("DOMContentLoaded", mark);
