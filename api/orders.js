@@ -23,22 +23,40 @@ export default async function handler(req, res) {
   const days = Math.max(1, Math.min(30, parseInt(req.query.days, 10) || 2));
   const since = new Date(Date.now() - days * 864e5).toISOString();
   try {
-    const [or, pr] = await Promise.all([
-      fetch(apiHost + "/v2/orders/search", { method: "POST", headers: H, body: JSON.stringify({
-        location_ids: [locationId], limit: 100,
-        query: { filter: { date_time_filter: { created_at: { start_at: since } } }, sort: { sort_field: "CREATED_AT", sort_order: "DESC" } } }) }).then((r) => r.json()),
-      fetch(apiHost + "/v2/payments?location_id=" + encodeURIComponent(locationId) + "&begin_time=" + encodeURIComponent(since) + "&sort_order=DESC&limit=100", { headers: H }).then((r) => r.json())
-    ]);
+    // page through Square (up to 1,000 orders / payments for the period)
+    const allOrders = [], allPays = [];
+    const pageOrders = async () => { let cursor; for (let i = 0; i < 10; i++) {
+      const r = await fetch(apiHost + "/v2/orders/search", { method: "POST", headers: H, body: JSON.stringify({ location_ids: [locationId], limit: 100, cursor,
+        query: { filter: { date_time_filter: { created_at: { start_at: since } } }, sort: { sort_field: "CREATED_AT", sort_order: "DESC" } } }) }).then((r) => r.json());
+      allOrders.push(...(r.orders || [])); cursor = r.cursor; if (!cursor) break; } };
+    const pagePays = async () => { let cursor; for (let i = 0; i < 10; i++) {
+      const r = await fetch(apiHost + "/v2/payments?location_id=" + encodeURIComponent(locationId) + "&begin_time=" + encodeURIComponent(since) + "&sort_order=DESC&limit=100" + (cursor ? "&cursor=" + encodeURIComponent(cursor) : ""), { headers: H }).then((r) => r.json());
+      allPays.push(...(r.payments || [])); cursor = r.cursor; if (!cursor) break; } };
+    await Promise.all([pageOrders(), pagePays()]);
+    const or = { orders: allOrders }, pr = { payments: allPays };
     const pays = {};
     (pr.payments || []).forEach((p) => { pays[p.id] = p; if (p.order_id) pays["o:" + p.order_id] = p; });
     const cust = {};
-    const ids = [...new Set((pr.payments || []).map((p) => p.customer_id).filter(Boolean))].slice(0, 100);
+    const ids = [...new Set((pr.payments || []).map((p) => p.customer_id).filter(Boolean))].slice(0, 100);  // Square limit per call
     if (ids.length) {
       const cr = await fetch(apiHost + "/v2/customers/bulk-retrieve", { method: "POST", headers: H, body: JSON.stringify({ customer_ids: ids }) }).then((r) => r.json()).catch(() => ({}));
       Object.values(cr.responses || {}).forEach((x) => { if (x.customer) cust[x.customer.id] = x.customer; });
     }
     const web = (o) => (o.source && o.source.name === "La Cabana App") || /^APP-/.test(o.reference_id || "");
-    const out = (or.orders || []).filter((o) => o.state !== "DRAFT" && web(o)).map((o) => {
+    // which channel the money came from
+    const channel = (o) => {
+      if (web(o)) return "Website";
+      const n = ((o.source && o.source.name) || "").toLowerCase();
+      if (/uber/.test(n)) return "Uber Eats";
+      if (/door ?dash/.test(n)) return "DoorDash";
+      if (/grub ?hub/.test(n)) return "Grubhub";
+      if (/postmates/.test(n)) return "Postmates";
+      if (/square online|online/.test(n)) return "Square Online";
+      if (!n || /point of sale|square|register|terminal|virtual/.test(n)) return "In store (Square)";
+      return o.source.name;
+    };
+    const scopeAll = req.query.scope === "all";
+    const out = (or.orders || []).filter((o) => o.state !== "DRAFT" && (scopeAll || web(o)) && (!scopeAll || o.state !== "CANCELED")).map((o) => {
       const p = pays["o:" + o.id] || {};
       const f = (o.fulfillments || [])[0] || {};
       const rec = (f.pickup_details && f.pickup_details.recipient) || (f.delivery_details && f.delivery_details.recipient) || {};
@@ -47,7 +65,7 @@ export default async function handler(req, res) {
       const addr = rec.address ? [rec.address.address_line_1, rec.address.address_line_2, rec.address.postal_code].filter(Boolean).join(", ") : "";
       return {
         id: o.id, ref: o.reference_id || "", created: o.created_at, state: o.state,
-        source: (o.source && o.source.name) || "Square",
+        source: (o.source && o.source.name) || "Square", channel: channel(o),
         type: f.type || "", fstate: f.state || "", address: addr,
         note: (f.pickup_details && f.pickup_details.note) || (f.delivery_details && f.delivery_details.note) || "",
         name: rec.display_name && rec.display_name !== "App customer" ? rec.display_name : ([c.given_name, c.family_name].filter(Boolean).join(" ") || card.cardholder_name || ""),
