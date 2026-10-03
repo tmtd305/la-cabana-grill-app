@@ -476,7 +476,7 @@ function lcHoursStatus(h, now) {
   const dayKey = d => { const x = new Date(d); return x.getFullYear() + '-' + (x.getMonth() + 1) + '-' + x.getDate(); };
   const startOf = (daysAgo) => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - daysAgo); return d; };
   function toast(m){ const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2400); }
-  const CH_COLOR = { 'Website': '#f36310', 'In store (Square)': '#e5e7eb', 'Uber Eats': '#06C167', 'DoorDash': '#FF3008', 'Grubhub': '#F63440', 'Postmates': '#a3a3a3', 'Square Online': '#60a5fa' };
+  const CH_COLOR = { 'Website': '#f36310', 'Phone (Uber delivery)': '#19d06f', 'In store (Square)': '#e5e7eb', 'Uber Eats': '#06C167', 'DoorDash': '#FF3008', 'Grubhub': '#F63440', 'Postmates': '#a3a3a3', 'Square Online': '#60a5fa' };
 
   let me = null, session = null, isOwner = false;
   let all30 = [], loaded30 = false;          // every paid Square order, last 30 days
@@ -654,23 +654,51 @@ function lcHoursStatus(h, now) {
   document.addEventListener('click', e => { if(e.target.closest('[data-driver]')) driverForm(); });
   function driverForm(pre){
     pre = pre || {};
-    const m = modal('<h3>Request Uber driver</h3><p class="muted" style="margin:0 0 14px">For phone orders. Uber picks up at La Cabaña and drops off here.</p>' +
+    const m = modal('<h3>Request Uber driver</h3><p class="muted" style="margin:0 0 14px">For phone orders. The customer pays first by text link, then Uber picks up here and drops off.</p>' +
       '<div class="stack"><input class="field" id="dv-name" placeholder="Customer name" autocapitalize="words" value="' + esc(pre.name || '') + '"><input class="field" id="dv-phone" type="tel" inputmode="tel" placeholder="Customer phone" value="' + esc(pre.phone || '') + '">' +
       '<input class="field" id="dv-street" placeholder="Street address" autocomplete="off"><div class="row"><input class="field" id="dv-apt" placeholder="Apt / unit" style="flex:1"><input class="field" id="dv-zip" placeholder="ZIP" inputmode="numeric" maxlength="5" style="width:110px"></div>' +
       '<input class="field" id="dv-city" placeholder="City" value="Miami Beach"><input class="field" id="dv-notes" placeholder="Note for the driver (gate code, hotel room…)" maxlength="200">' +
       '<textarea class="field" id="dv-items" placeholder="What\'s in the bag (optional), e.g. 2 Bandeja Paisa, 1 juice" style="height:70px;padding:10px 12px;resize:none">' + esc(pre.items || '') + '</textarea></div>' +
       '<div id="dv-quote" class="muted" style="margin-top:12px"></div>' +
-      '<div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn plain" data-close>Cancel</button><button class="btn" id="dv-price">Get price</button><button class="btn main" id="dv-go" disabled>Request driver</button></div>');
-    let quote = null;
+      '<div id="dv-pay" class="hidden" style="margin-top:12px"><div class="ch" style="margin:0 0 8px"><h2 style="font-size:14px">1. Customer pays first</h2></div>' +
+        '<div class="row"><span class="muted" style="white-space:nowrap">Food total $</span><input class="field" id="dv-food" inputmode="decimal" placeholder="0.00" style="flex:1"></div>' +
+        '<div class="muted" id="dv-total" style="margin-top:6px"></div>' +
+        '<div class="row" style="margin-top:10px;flex-wrap:wrap"><button class="btn main" id="dv-link"><span class="ms">sms</span>Text payment link</button><span id="dv-paid" class="muted"></span></div>' +
+        '<label class="row muted" style="margin-top:10px;font-size:13px;cursor:pointer"><input type="checkbox" id="dv-offline" style="width:18px;height:18px;accent-color:#f36310"> Already paid at the register (card or cash)</label>' +
+        '<div class="ch" style="margin:14px 0 0"><h2 style="font-size:14px">2. Then request the driver</h2></div></div>' +
+      '<div class="row" style="margin-top:14px;justify-content:flex-end"><button class="btn plain" data-close>Cancel</button><button class="btn" id="dv-price">Get price</button><button class="btn green" id="dv-go" disabled>Request driver</button></div>');
+    let quote = null, payOrder = null, paid = false, poll = null;
     const v = id => m.querySelector('#' + id).value.trim();
+    const canGo = () => { m.querySelector('#dv-go').disabled = !(quote && (paid || m.querySelector('#dv-offline').checked)); };
+    const total = () => +((parseFloat(v('dv-food')) || 0) + (quote ? quote.fee : 0)).toFixed(2);
+    m.querySelector('#dv-food').oninput = () => { m.querySelector('#dv-total').innerHTML = 'Charge <b style="color:#fff">' + money(total()) + '</b> (food + ' + money(quote ? quote.fee : 0) + ' delivery)'; };
+    m.querySelector('#dv-offline').onchange = canGo;
+    m.querySelector('#dv-link').onclick = async () => {
+      if(!v('dv-name') || v('dv-phone').replace(/\D/g, '').length < 10){ toast('Add the customer name and phone first'); return; }
+      if(!(parseFloat(v('dv-food')) > 0)){ toast('Enter the food total'); return; }
+      const b = m.querySelector('#dv-link'); b.disabled = true;
+      try {
+        const pl = await uber({ action: 'staff_paylink', amount: total(), name: v('dv-name'), phone: v('dv-phone') });
+        payOrder = pl.orderId;
+        m.querySelector('#dv-paid').innerHTML = '<span class="badge y">WAITING FOR PAYMENT</span>';
+        const sms = 'La Cabaña Grill: hi ' + v('dv-name').split(' ')[0] + ', here is your secure payment link for ' + money(total()) + ' (food + delivery): ' + pl.url + ' . We send your order with an Uber driver as soon as it\'s paid.';
+        location.href = 'sms:' + v('dv-phone').replace(/[^\d+]/g, '') + (/iPhone|iPad|Mac/.test(navigator.userAgent) ? '&' : '?') + 'body=' + encodeURIComponent(sms);
+        clearInterval(poll);
+        poll = setInterval(async () => {
+          if(!document.body.contains(m)){ clearInterval(poll); return; }
+          try { const st = await uber({ action: 'staff_paycheck', orderId: payOrder }); if(st.paid){ paid = true; clearInterval(poll); m.querySelector('#dv-paid').innerHTML = '<span class="badge g">PAID ' + money(st.cents / 100) + '</span>'; ding(); canGo(); } } catch(e){}
+        }, 5000);
+      } catch(e){ toast(e.message); }
+      b.disabled = false; b.textContent = 'Resend payment link';
+    };
     const addr = () => ({ street: v('dv-street'), apt: v('dv-apt'), city: v('dv-city') || 'Miami Beach', state: 'FL', zip: v('dv-zip') });
-    ['dv-street', 'dv-apt', 'dv-zip', 'dv-city'].forEach(id => m.querySelector('#' + id).oninput = () => { quote = null; m.querySelector('#dv-go').disabled = true; m.querySelector('#dv-quote').textContent = ''; });
+    ['dv-street', 'dv-apt', 'dv-zip', 'dv-city'].forEach(id => m.querySelector('#' + id).oninput = () => { quote = null; canGo(); m.querySelector('#dv-quote').textContent = ''; });
     m.querySelector('#dv-price').onclick = async () => {
       if(!v('dv-street') || !/^\d{5}$/.test(v('dv-zip'))){ toast('Add the street and 5-digit ZIP'); return; }
       const b = m.querySelector('#dv-price'); b.disabled = true; b.textContent = 'Checking…';
       try { quote = await uber({ action: 'quote', address: addr() });
         m.querySelector('#dv-quote').innerHTML = '<div class="card" style="padding:12px;background:#111"><b style="font-family:Outfit;font-size:22px;color:#fff">' + money(quote.fee) + '</b> <span class="muted">Uber fee</span>' + (quote.etaMinutes ? '<div class="muted">Arrives in about <b style="color:#fff">' + quote.etaMinutes + ' min</b></div>' : '') + '</div>';
-        m.querySelector('#dv-go').disabled = false;
+        m.querySelector('#dv-pay').classList.remove('hidden'); m.querySelector('#dv-food').oninput(); canGo();
       } catch(e){ m.querySelector('#dv-quote').innerHTML = '<span style="color:var(--rd)">' + esc(e.message) + '</span>'; }
       b.disabled = false; b.textContent = 'Get price';
     };
@@ -679,7 +707,7 @@ function lcHoursStatus(h, now) {
       if(v('dv-phone').replace(/\D/g, '').length < 10){ toast('Add the customer phone'); return; }
       const b = m.querySelector('#dv-go'); b.disabled = true; b.textContent = 'Booking…';
       try {
-        const d = await uber({ action: 'staff_create', quote, address: addr(), name: v('dv-name'), phone: v('dv-phone'), notes: v('dv-notes'), items: v('dv-items') });
+        const d = await uber({ action: 'staff_create', quote, address: addr(), name: v('dv-name'), phone: v('dv-phone'), notes: v('dv-notes'), items: v('dv-items'), paidOrderId: payOrder, paidOffline: !paid && m.querySelector('#dv-offline').checked });
         const a = addr();
         await sb.from('deliveries').insert({ uber_id: d.deliveryId, tracking_url: d.trackingUrl, status: d.status || 'pending', name: v('dv-name'), phone: v('dv-phone'), address: [a.street, a.apt, a.city, a.zip].filter(Boolean).join(', '), notes: v('dv-notes'), items: v('dv-items'), fee: quote.fee, eta_minutes: quote.etaMinutes || null, created_by: me.email });
         m.remove(); toast('Driver requested');
