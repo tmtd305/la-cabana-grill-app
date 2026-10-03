@@ -1,4 +1,4 @@
-// Staff dashboard feed: recent orders straight from Square (app orders, POS sales, voice orders),
+// Staff dashboard feed: recent WEBSITE orders from Square (made by the app checkout, source "La Cabana App"),
 // with the customer's name, phone and email from the order and the card payment.
 // Only signed-in staff (is_operator) can read it.
 const LC_SUPABASE_URL = process.env.LC_SUPABASE_URL || "https://qzluvwpjtgeccfojutbt.supabase.co";
@@ -37,7 +37,8 @@ export default async function handler(req, res) {
       const cr = await fetch(apiHost + "/v2/customers/bulk-retrieve", { method: "POST", headers: H, body: JSON.stringify({ customer_ids: ids }) }).then((r) => r.json()).catch(() => ({}));
       Object.values(cr.responses || {}).forEach((x) => { if (x.customer) cust[x.customer.id] = x.customer; });
     }
-    const out = (or.orders || []).filter((o) => o.state !== "DRAFT").map((o) => {
+    const web = (o) => (o.source && o.source.name === "La Cabana App") || /^APP-/.test(o.reference_id || "");
+    const out = (or.orders || []).filter((o) => o.state !== "DRAFT" && web(o)).map((o) => {
       const p = pays["o:" + o.id] || {};
       const f = (o.fulfillments || [])[0] || {};
       const rec = (f.pickup_details && f.pickup_details.recipient) || (f.delivery_details && f.delivery_details.recipient) || {};
