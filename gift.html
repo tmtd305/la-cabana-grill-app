@@ -2,8 +2,8 @@
 <html lang="en"><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="robots" content="noindex"/>
-<title>Free drink at La Cabaña Grill</title>
-<meta property="og:title" content="A free drink at La Cabaña Grill"/><meta property="og:description" content="With your meal. Colombian grill in Miami Beach."/>
+<title>Free drinks at La Cabaña Grill</title>
+<meta property="og:title" content="2 free drinks at La Cabaña Grill"/><meta property="og:description" content="With your meal. Colombian grill in Miami Beach."/>
 <meta name="theme-color" content="#0c0c0c"/>
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2"/><link rel="icon" type="image/png" href="icons/favicon-64.png?v=2"/>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet"/>
@@ -35,7 +35,7 @@
   .fine{color:#7a7a7a;font-size:12.5px;line-height:1.5;margin:14px 2px 0;text-align:center}
 </style>
 </head><body>
-<div class="wrap" id="w"><p class="fine" style="padding-top:80px">Getting your free drink…</p></div>
+<div class="wrap" id="w"><p class="fine" style="padding-top:80px">Getting your free drinks…</p></div>
 <script>
 (async function () {
   const SB = 'https://qzluvwpjtgeccfojutbt.supabase.co', H = { apikey: 'sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ', 'Content-Type': 'application/json' };
@@ -56,13 +56,13 @@
 
   function show(g) {
     w.innerHTML = '<img class="logo" src="icons/logo-transparent.png" alt="La Cabaña Grill">' +
-      (g.used ? '<h1>Enjoy your drink</h1>' : '<div class="from">From ' + esc(first(g.member)) + '</div><h1>Your free drink<br>is ready</h1>') +
+      (g.used ? '<h1>Enjoy your drinks</h1>' : '<div class="from">From ' + esc(first(g.member)) + '</div><h1>2 free drinks<br>for your table</h1>') +
       '<div class="ticket' + (g.used ? ' used' : '') + '"><small>' + (g.used ? 'USED' : 'YOUR PIN') + '</small><div class="pin">' + esc(g.code) + '</div><div class="once">' + (g.used ? 'This PIN was already used' : 'Works one time') + '</div>' +
-      '<div class="cut"></div><div class="what">Free drink with your meal.<br>Show this PIN to your waiter.</div></div>' +
+      '<div class="cut"></div><div class="what">Up to 2 free drinks for your party, with your meal.<br>Show this PIN to your waiter.</div></div>' +
       (g.used ? '' : '<div class="shot">Take a screenshot</div>' +
         '<div class="box"><b>Tell ' + esc(first(g.member)) + ' it was you</b><span>Optional. So they see you came.</span><div class="row"><input id="nm" placeholder="Your first name" autocapitalize="words" value="' + esc(g.name || '') + '"><button class="btn main" id="nm-go">' + (g.name ? 'Saved' : 'Save') + '</button></div></div>') +
       '<div class="box"><b>La Cabaña Grill</b><span>6780 Collins Ave, Miami Beach</span><a class="btn ghost" href="' + MAP + '" target="_blank" rel="noopener">Directions</a><a class="btn ghost" href="menu.html">See the menu</a></div>' +
-      '<p class="fine">One free drink per PIN, with the purchase of a meal.</p>';
+      '<p class="fine">Up to 2 free drinks per party, with the purchase of a meal. Each PIN works one time.</p>';
     const go = document.getElementById('nm-go');
     if (go) go.onclick = async () => {
       const v = document.getElementById('nm').value.trim(); if (!v) return;

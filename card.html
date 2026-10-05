@@ -64,17 +64,17 @@
   const acts = (m.activity || []);
   w.innerHTML = '<div class="card" id="card"><div class="top"><img src="icons/logo-transparent.png" alt="La Cabaña Grill"><div class="tag">MEMBER</div></div>' +
     '<div class="nm">' + esc(m.name) + '</div><div class="code">' + esc(code) + '</div>' +
-    '<div class="qrw"><div class="qr" id="qr"></div><div class="offer"><b>Scan for a free drink</b><span>With your meal at La Cabaña Grill, Miami Beach.</span></div></div>' +
+    '<div class="qrw"><div class="qr" id="qr"></div><div class="offer"><b>Scan for 2 free drinks</b><span>For your party, with your meal at La Cabaña Grill, Miami Beach.</span></div></div>' +
     '<div class="stats"><div class="stat"><small>PINs given</small><b>' + (m.claimed || 0) + '</b></div><div class="stat"><small>Came in</small><b>' + (m.referred || 0) + '</b></div><div class="stat"><small>You earned</small><b>$' + m.points + '</b></div></div></div>' +
     '<button class="btn main" id="b-share">Send to a friend</button><button class="btn ghost" id="b-save">Save card to Photos</button>' +
-    '<div class="box"><h3>Your people</h3>' + (acts.length ? acts.map(a => '<div class="act"><div class="dot ' + (a.came ? 'came' : 'got') + '">' + esc((a.n || '#')[0].toUpperCase()) + '</div><div>' + (a.n ? '<b>' + esc(a.n) + '</b>' : 'PIN <b>' + esc(a.c) + '</b>') + ' ' + (a.came ? 'came in · <b style="color:#4ade80">+$1</b>' : 'got a free drink PIN') + '</div><span>' + ago(a.t) + '</span></div>').join('') : '<p class="m" style="margin:4px 0;text-align:left">No one yet. Send your card to a friend.</p>') + '</div>' +
-    '<div class="box"><h3>How it works</h3><ul class="steps"><li>A friend scans your QR. They get a free drink PIN.</li><li>They show the PIN at La Cabaña with their meal. It works one time.</li><li>You get <b style="color:#fff">$1</b> to spend here, and see who came in above.</li></ul></div>' +
+    '<div class="box"><h3>Your people</h3>' + (acts.length ? acts.map(a => '<div class="act"><div class="dot ' + (a.came ? 'came' : 'got') + '">' + esc((a.n || '#')[0].toUpperCase()) + '</div><div>' + (a.n ? '<b>' + esc(a.n) + '</b>' : 'PIN <b>' + esc(a.c) + '</b>') + ' ' + (a.came ? 'came in · <b style="color:#4ade80">+$1</b>' : 'got a free drinks PIN') + '</div><span>' + ago(a.t) + '</span></div>').join('') : '<p class="m" style="margin:4px 0;text-align:left">No one yet. Send your card to a friend.</p>') + '</div>' +
+    '<div class="box"><h3>How it works</h3><ul class="steps"><li>A friend scans your QR. They get a PIN for up to 2 free drinks.</li><li>They show the PIN at La Cabaña with their meal. It works one time.</li><li>You get <b style="color:#fff">$1</b> to spend here, and see who came in above.</li></ul></div>' +
     '<p class="m">Keep this card: tap <b style="color:#fff">Share</b> then <b style="color:#fff">Add to Home Screen</b>.</p>';
   new QRCode(document.getElementById('qr'), { text: share, width: 264, height: 264, correctLevel: QRCode.CorrectLevel.M });
 
-  const txt = 'Free drink at La Cabaña Grill on me. Scan or open this for your PIN: ' + share;
+  const txt = '2 free drinks at La Cabaña Grill on me. Open this for your PIN: ' + share;
   document.getElementById('b-share').onclick = () => {
-    if (navigator.share) navigator.share({ title: 'Free drink at La Cabaña Grill', text: txt, url: share }).catch(() => {});
+    if (navigator.share) navigator.share({ title: 'Free drinks at La Cabaña Grill', text: txt, url: share }).catch(() => {});
     else location.href = 'sms:?&body=' + encodeURIComponent(txt);
   };
 
@@ -94,7 +94,7 @@
     x.fillStyle = '#ffb27a'; x.font = '800 36px Manrope'; x.fillText(code.split('').join(' '), 120, 460);
     R(120, 540, 480, 480, 36); x.fillStyle = '#fff'; x.fill();
     const q = document.querySelector('#qr canvas'); if (q) x.drawImage(q, 150, 570, 420, 420);
-    x.fillStyle = '#fff'; x.font = '800 54px Outfit'; x.fillText('Scan for a', 640, 700); x.fillText('free drink', 640, 764);
+    x.fillStyle = '#fff'; x.font = '800 54px Outfit'; x.fillText('Scan for 2', 640, 700); x.fillText('free drinks', 640, 764);
     x.fillStyle = '#d9c3b4'; x.font = '600 32px Manrope'; x.fillText('With your meal at', 640, 830); x.fillText('La Cabaña Grill', 640, 872);
     x.fillStyle = '#ff8a3d'; x.font = '800 34px Manrope'; x.fillText('6780 Collins Ave · Miami Beach', 120, 1130);
     const blob = await new Promise(r => c.toBlob(r, 'image/png'));

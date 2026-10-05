@@ -510,7 +510,7 @@ function lcHoursStatus(h, now) {
           <div class="stack muted" style="font-size:14px;line-height:1.5">
             <div><b style="color:#fff">1.</b> Tap <b style="color:#fff">New member card</b> and type their name and phone.</div>
             <div><b style="color:#fff">2.</b> They scan the QR that pops up. That opens their member card.</div>
-            <div><b style="color:#fff">3.</b> A friend scans the member's card and gets a <b style="color:#fff">4-digit free drink PIN</b> right away.</div>
+            <div><b style="color:#fff">3.</b> A friend scans the member's card and gets a <b style="color:#fff">4-digit PIN for up to 2 free drinks</b> right away.</div>
             <div><b style="color:#fff">4.</b> They show the PIN with their meal. Type it in <b style="color:#fff">Free drink PIN</b> above. It works one time. The member gets <b style="color:#fff">1 point ($1)</b> and sees who came in. A first online order counts too.</div>
             <div><b style="color:#fff">5.</b> Paying a member out? Tap <b style="color:#fff">Redeem</b>.</div>
           </div>
@@ -1167,7 +1167,7 @@ function lcHoursStatus(h, now) {
     const r = data && data[0];
     if(error || !r){ out.style.color = 'var(--rd)'; out.textContent = /not_found/.test(error && error.message) ? 'That PIN doesn\'t exist.' : 'Couldn\'t check it: ' + (error ? error.message : ''); return; }
     if(r.already){ out.style.color = 'var(--rd)'; out.textContent = 'Already used ' + new Date(r.redeemed_at).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) + '. No free drink.'; return; }
-    out.style.color = 'var(--gr)'; out.textContent = 'Good. Give a free drink' + (r.name ? ' to ' + r.name : '') + '. From ' + r.member_name + ' (+$1 to them).'; $('pin-in').value = ''; loadMembers();
+    out.style.color = 'var(--gr)'; out.textContent = 'Good. Up to 2 free drinks' + (r.name ? ' for ' + r.name + "'s party" : ' for this party') + '. From ' + r.member_name + ' (+$1 to them).'; $('pin-in').value = ''; loadMembers();
   };
   $('pin-in').addEventListener('keydown', e => { if(e.key === 'Enter') $('pin-go').click(); });
   $('mem-tbl').addEventListener('click', async e => {
