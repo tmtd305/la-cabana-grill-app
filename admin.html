@@ -498,6 +498,7 @@ function lcHoursStatus(h, now) {
     <!-- LOYALTY -->
     <section data-view="loyalty" class="hidden">
       <div class="grid kpis" id="loy-kpis"></div>
+      <div class="card" style="margin-bottom:14px"><div class="ch"><h2>Free drink PIN</h2></div><div class="row" style="gap:8px"><input class="field" id="pin-in" inputmode="numeric" maxlength="4" placeholder="4-digit PIN" style="max-width:180px;font-family:Outfit;font-size:22px;letter-spacing:.3em;text-align:center"><button class="btn main" id="pin-go">Use PIN</button></div><div id="pin-out" style="margin-top:10px;font-weight:700"></div></div>
       <div class="banner"><h3>Ambassador cards</h3><p>Give a regular a QR card. Every new customer they bring = 1 point = $1.</p><button class="btn main" id="add-member"><span class="ms">add_card</span>New member card</button></div>
       <div class="grid two">
         <div class="card">
@@ -508,9 +509,10 @@ function lcHoursStatus(h, now) {
           <div class="ch"><h2>How it works</h2></div>
           <div class="stack muted" style="font-size:14px;line-height:1.5">
             <div><b style="color:#fff">1.</b> Tap <b style="color:#fff">New member card</b> and type their name and phone.</div>
-            <div><b style="color:#fff">2.</b> Send them their card link. They save it to their phone's home screen and show the QR.</div>
-            <div><b style="color:#fff">3.</b> People scan the QR, it opens our website, and when they place their <b style="color:#fff">first order</b> the member gets <b style="color:#fff">1 point ($1)</b>. Same person only counts once.</div>
-            <div><b style="color:#fff">4.</b> Walk-in they sent? Tap <b style="color:#fff">+1</b>. Paying them out? Tap <b style="color:#fff">Redeem</b>.</div>
+            <div><b style="color:#fff">2.</b> They scan the QR that pops up. That opens their member card.</div>
+            <div><b style="color:#fff">3.</b> A friend scans the member's card and gets a <b style="color:#fff">4-digit free drink PIN</b> right away.</div>
+            <div><b style="color:#fff">4.</b> They show the PIN with their meal. Type it in <b style="color:#fff">Free drink PIN</b> above. It works one time. The member gets <b style="color:#fff">1 point ($1)</b> and sees who came in. A first online order counts too.</div>
+            <div><b style="color:#fff">5.</b> Paying a member out? Tap <b style="color:#fff">Redeem</b>.</div>
           </div>
           <div class="ch" style="margin-top:18px"><h2>Points from orders</h2></div>
           <div class="muted" style="font-size:14px;line-height:1.5">Every website customer also earns <b style="color:#fff">1 point per $1</b> spent. You can see their points in Customers.</div>
@@ -1151,14 +1153,23 @@ function lcHoursStatus(h, now) {
     };
   };
   function showCard(x){
-    const m = modal('<h3>' + esc(x.name) + '</h3><p class="muted" style="margin:0 0 14px">Member code <b style="color:#fff">' + esc(x.code) + '</b> · ' + x.points + ' points</p><div style="text-align:center"><div class="qrbox" id="qr"></div><p class="muted">People scan this to order. Their first order gives ' + esc(x.name.split(' ')[0]) + ' 1 point ($1).</p></div>' +
+    const m = modal('<h3>' + esc(x.name) + '</h3><p class="muted" style="margin:0 0 14px">Member code <b style="color:#fff">' + esc(x.code) + '</b> · ' + x.points + ' points</p><div style="text-align:center"><div class="qrbox" id="qr"></div><p class="muted">Have ' + esc(x.name.split(' ')[0]) + ' scan this with their phone camera. It opens their member card.</p></div>' +
       '<div class="stack" style="margin-top:12px"><button class="btn main" id="c-share" style="width:100%"><span class="ms">ios_share</span>Send card to ' + esc(x.name.split(' ')[0]) + '</button><button class="btn" id="c-copy" style="width:100%"><span class="ms">link</span>Copy card link</button><button class="btn plain" data-close style="width:100%">Close</button></div>' +
-      '<p class="muted" style="font-size:12px;margin-top:10px">They open the link and tap Share → Add to Home Screen to keep the card on their phone. Apple Wallet cards need an Apple Developer account.</p>');
-    new QRCode(m.querySelector('#qr'), { text: refUrl(x.code), width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M });
+      '<p class="muted" style="font-size:12px;margin-top:10px">On their card they get their own QR for friends (free drink with a meal), a Save to Photos button and a live list of who came in.</p>');
+    new QRCode(m.querySelector('#qr'), { text: cardUrl(x.code), width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M });
     const link = cardUrl(x.code);
     m.querySelector('#c-copy').onclick = async () => { try { await navigator.clipboard.writeText(link); toast('Link copied'); } catch(e){ prompt('Copy this link', link); } };
     m.querySelector('#c-share').onclick = () => { const txt = 'Your La Cabaña Grill member card: ' + link; if(navigator.share) navigator.share({ title: 'La Cabaña member card', text: txt, url: link }).catch(() => {}); else if(x.phone) location.href = 'sms:' + x.phone + '?&body=' + encodeURIComponent(txt); else m.querySelector('#c-copy').click(); };
   }
+  $('pin-go').onclick = async () => {
+    const v = $('pin-in').value.replace(/\D/g, ''), out = $('pin-out'); if(v.length !== 4){ out.style.color = 'var(--rd)'; out.textContent = 'Type the 4 numbers.'; return; }
+    $('pin-go').disabled = true; const { data, error } = await sb.rpc('redeem_gift', { p_code: v }); $('pin-go').disabled = false;
+    const r = data && data[0];
+    if(error || !r){ out.style.color = 'var(--rd)'; out.textContent = /not_found/.test(error && error.message) ? 'That PIN doesn\'t exist.' : 'Couldn\'t check it: ' + (error ? error.message : ''); return; }
+    if(r.already){ out.style.color = 'var(--rd)'; out.textContent = 'Already used ' + new Date(r.redeemed_at).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) + '. No free drink.'; return; }
+    out.style.color = 'var(--gr)'; out.textContent = 'Good. Give a free drink' + (r.name ? ' to ' + r.name : '') + '. From ' + r.member_name + ' (+$1 to them).'; $('pin-in').value = ''; loadMembers();
+  };
+  $('pin-in').addEventListener('keydown', e => { if(e.key === 'Enter') $('pin-go').click(); });
   $('mem-tbl').addEventListener('click', async e => {
     const c = e.target.closest('[data-card]'), p = e.target.closest('[data-pt]'), r = e.target.closest('[data-redeem]');
     if(c){ showCard(members.find(x => x.id === c.dataset.card)); return; }
