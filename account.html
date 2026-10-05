@@ -36,7 +36,7 @@
 </label>
 <p id="s-err" class="hidden font-body-sm text-body-sm" style="color:#f87171;font-weight:700"></p>
 <button type="submit" class="w-full h-14 rounded-full bg-primary-container text-white font-label-lg text-label-lg shadow-[0_8px_24px_rgba(243,99,16,0.35)]">Sign In</button>
-<button type="button" onclick="showMode('create')" class="w-full h-12 rounded-full text-text-primary font-label-lg text-label-lg">New here? <span class="text-primary-container">Join free, get a free drink</span></button>
+<button type="button" onclick="showMode('create')" class="w-full h-12 rounded-full text-text-primary font-label-lg text-label-lg">New here? <span class="text-primary-container">Join La Cabaña Club</span></button>
 </form>
 
 <form id="account-form" class="flex flex-col gap-space-lg">
@@ -45,7 +45,7 @@
 <h1 class="font-headline-lg text-headline-lg text-text-primary">Join La Cabaña Club</h1>
 <p class="font-body-sm text-body-sm text-text-muted mt-1">Your account is your loyalty membership. It's free.</p>
 <div style="display:grid;gap:8px;margin-top:12px">
-<div style="display:flex;gap:10px;align-items:center;font:700 14px Manrope,sans-serif;color:#f5f5f5"><span class="material-symbols-outlined" style="color:#f36310">local_bar</span>1 free drink with your meal, right away</div>
+<div style="display:flex;gap:10px;align-items:center;font:700 14px Manrope,sans-serif;color:#f5f5f5"><span class="material-symbols-outlined" style="color:#f36310">local_bar</span>A free drink when you order a meal</div>
 <div style="display:flex;gap:10px;align-items:center;font:700 14px Manrope,sans-serif;color:#f5f5f5"><span class="material-symbols-outlined" style="color:#f36310">qr_code_2</span>Your own member card on your profile</div>
 <div style="display:flex;gap:10px;align-items:center;font:700 14px Manrope,sans-serif;color:#f5f5f5"><span class="material-symbols-outlined" style="color:#f36310">group_add</span>Friends you bring get free drinks, you get $1 each</div>
 <div style="display:flex;gap:10px;align-items:center;font:700 14px Manrope,sans-serif;color:#f5f5f5"><span class="material-symbols-outlined" style="color:#f36310">bolt</span>Faster checkout and order updates</div>
@@ -77,7 +77,7 @@
 <input id="f-sms" type="checkbox" checked class="accent-primary-container w-5 h-5 mt-0.5 shrink-0"/>
 <span class="font-body-sm text-body-sm text-text-secondary">Yes, text me deals and order updates. Msg &amp; data rates may apply. Reply STOP to opt out anytime.</span>
 </label>
-<button type="submit" class="w-full h-14 rounded-full bg-primary-container text-white font-label-lg text-label-lg shadow-[0_8px_24px_rgba(243,99,16,0.35)]">Join free and get my drink</button>
+<button type="submit" class="w-full h-14 rounded-full bg-primary-container text-white font-label-lg text-label-lg shadow-[0_8px_24px_rgba(243,99,16,0.35)]">Join La Cabaña Club</button>
 </form>
 
 </div></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-8px_24px_rgba(0,0,0,0.55)]" data-active-classes="text-primary-container font-headline-md"><div class="h-16 px-gutter flex items-center justify-around"><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="home" href="home.html"><span class="material-symbols-outlined text-[24px]">local_fire_department</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="menu" href="menu.html"><span class="material-symbols-outlined text-[24px]">restaurant_menu</span><span class="font-label-caps text-label-caps">Menu</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="orders" href="orders.html"><span class="material-symbols-outlined text-[24px]">receipt_long</span><span class="font-label-caps text-label-caps">Orders</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="favorites" href="home.html#favorites"><span class="material-symbols-outlined text-[24px]">favorite</span><span class="font-label-caps text-label-caps">Favorites</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 transition-colors text-primary-container font-headline-md" data-path="account" href="account.html"><span class="material-symbols-outlined text-[24px]">account_circle</span><span class="font-label-caps text-label-caps">Account</span></a></div></nav>
@@ -148,7 +148,7 @@ document.getElementById("signin-form").addEventListener("submit", async function
   try {
     var r = await fetch("https://qzluvwpjtgeccfojutbt.supabase.co/rest/v1/rpc/account_signin", { method: "POST", headers: { apikey: "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ", "Content-Type": "application/json" }, body: JSON.stringify({ p_phone: ph }) });
     var row = (await r.json())[0];
-    if (!row || !row.name) return show("We don't have that number yet. Tap Join free below.");
+    if (!row || !row.name) return show("We don't have that number yet. Tap Join La Cabaña Club below.");
     saveAccount({ name: row.name, phone: ph, email: "", address: "", sms: true, photo: "" });
     showToast("Welcome back, " + row.name.split(" ")[0]);
     document.getElementById("signin-form").classList.add("hidden"); document.getElementById("signin-form").classList.remove("flex");

@@ -413,7 +413,7 @@
     let mem = null; try { mem = JSON.parse(localStorage.getItem('lc_member') || 'null'); } catch (e) {}
     document.getElementById('lc-member').innerHTML = mem && mem.code
       ? '<a class="lc-mb lc-club" href="card.html?c=' + encodeURIComponent(mem.code) + '"><img src="icons/logo-transparent.png" alt="" style="object-fit:contain;background:#1a0c05;padding:6px"/><div class="min-w-0 flex-1"><div class="lc-mb-k">La Cabaña Club</div><h4>Your member card</h4><p>Show it to friends. They get free drinks, you get $1.</p></div><span class="lc-go">Open</span></a>'
-      : '<a class="lc-mb lc-club" href="join.html"><img src="' + esc(j.img || 'images/juice-mango.jpg') + '" alt=""/><div class="min-w-0 flex-1"><div class="lc-mb-k">La Cabaña Club · Free</div><h4>Join and get a free drink</h4><p>With your meal. Plus your own member card.</p></div><span class="lc-go">Join</span></a>';
+      : '<a class="lc-mb lc-club" href="join.html"><img src="' + esc(j.img || 'images/juice-mango.jpg') + '" alt=""/><div class="min-w-0 flex-1"><div class="lc-mb-k">Loyalty program · Free to join</div><h4>Free drink with your meal</h4><p>Join La Cabaña Club. Order a meal, your drink is on us.</p></div><span class="lc-go">Join</span></a>';
   }
   if (false) {
     document.getElementById('lc-member').innerHTML = a
