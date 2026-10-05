@@ -12,6 +12,13 @@ async function isStaff(token) {
   return r.ok && (await r.json()) === true;
 }
 
+async function hasPerm(token, p) {
+  const r = await fetch(LC_SUPABASE_URL + "/rest/v1/rpc/has_perm", {
+    method: "POST", headers: { apikey: SB_PUBLIC_KEY, Authorization: "Bearer " + token, "Content-Type": "application/json" }, body: JSON.stringify({ p })
+  });
+  return r.ok && (await r.json()) === true;
+}
+
 export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   const token = String(req.headers.authorization || "").replace(/^Bearer\s+/i, "");
@@ -20,7 +27,8 @@ export default async function handler(req, res) {
   const apiHost = process.env.SQUARE_ENV === "production" ? "https://connect.squareup.com" : "https://connect.squareupsandbox.com";
   if (!accessToken || !locationId) { res.status(500).json({ error: "Square isn't set up" }); return; }
   const H = { "Square-Version": "2024-01-18", Authorization: "Bearer " + accessToken, "Content-Type": "application/json" };
-  const days = Math.max(1, Math.min(30, parseInt(req.query.days, 10) || 2));
+  let days = Math.max(1, Math.min(30, parseInt(req.query.days, 10) || 2));
+  if (days > 2 && !(await hasPerm(token, "sales"))) days = 2;   // past sales only for managers
   const since = new Date(Date.now() - days * 864e5).toISOString();
   try {
     // page through Square (up to 1,000 orders / payments for the period)
