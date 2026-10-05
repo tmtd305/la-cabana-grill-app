@@ -24,7 +24,22 @@
 <button onclick="signOutAccount()" class="w-full h-12 rounded-full text-error font-label-lg text-label-lg flex items-center justify-center gap-2">Sign Out</button>
 </div>
 
+<form id="signin-form" class="hidden flex-col gap-space-lg">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-text-primary">Sign In</h1>
+<p class="font-body-sm text-body-sm text-text-muted mt-1">Type the phone number you used before.</p>
+</div>
+<label class="flex flex-col gap-1">
+<span class="font-label-md text-label-md text-on-surface-variant">Phone Number</span>
+<input id="s-phone" required type="tel" inputmode="tel" autocomplete="tel" placeholder="(305) 555-0100" class="h-12 rounded-xl bg-surface-container-low px-4 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
+</label>
+<p id="s-err" class="hidden font-body-sm text-body-sm" style="color:#f87171;font-weight:700"></p>
+<button type="submit" class="w-full h-14 rounded-full bg-primary-container text-white font-label-lg text-label-lg shadow-[0_8px_24px_rgba(243,99,16,0.35)]">Sign In</button>
+<button type="button" onclick="showMode('create')" class="w-full h-12 rounded-full text-text-primary font-label-lg text-label-lg">New here? <span class="text-primary-container">Create an account</span></button>
+</form>
+
 <form id="account-form" class="flex flex-col gap-space-lg">
+<button type="button" id="to-signin" onclick="showMode('signin')" class="w-full h-14 rounded-full border border-primary-container text-text-primary font-label-lg text-label-lg flex items-center justify-center gap-2" style="box-shadow:0 0 14px rgba(243,99,16,.25)"><span class="material-symbols-outlined text-[20px] text-primary-container">login</span>Already have an account? Sign in</button>
 <div>
 <h1 class="font-headline-lg text-headline-lg text-text-primary">Create Your Account</h1>
 <p class="font-body-sm text-body-sm text-text-muted mt-1">Save your info for faster checkout and order updates.</p>
@@ -77,6 +92,7 @@ function renderAccount() {
     showMemberCard(account.phone);
   } else {
     formEl.classList.remove("hidden");
+    document.getElementById("to-signin").classList.remove("hidden");
     viewEl.classList.add("hidden");
     viewEl.classList.remove("flex");
   }
@@ -102,6 +118,30 @@ async function showMemberCard(phone) {
   } catch (e) {}
 }
 
+function showMode(mode) {
+  var si = document.getElementById("signin-form"), cr = document.getElementById("account-form");
+  si.classList.toggle("hidden", mode !== "signin"); si.classList.toggle("flex", mode === "signin");
+  cr.classList.toggle("hidden", mode === "signin");
+  if (mode === "signin") document.getElementById("s-phone").focus();
+  window.scrollTo(0, 0);
+}
+document.getElementById("signin-form").addEventListener("submit", async function (e) {
+  e.preventDefault();
+  var ph = document.getElementById("s-phone").value.trim(), err = document.getElementById("s-err");
+  var show = function (t) { err.textContent = t; err.classList.toggle("hidden", !t); };
+  if (ph.replace(/\D/g, "").length < 10) return show("Type your 10-digit phone number.");
+  show("");
+  try {
+    var r = await fetch("https://qzluvwpjtgeccfojutbt.supabase.co/rest/v1/rpc/account_signin", { method: "POST", headers: { apikey: "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ", "Content-Type": "application/json" }, body: JSON.stringify({ p_phone: ph }) });
+    var row = (await r.json())[0];
+    if (!row || !row.name) return show("We don't have that number yet. Tap Create an account.");
+    saveAccount({ name: row.name, phone: ph, email: "", address: "", sms: true, photo: "" });
+    showToast("Welcome back, " + row.name.split(" ")[0]);
+    document.getElementById("signin-form").classList.add("hidden"); document.getElementById("signin-form").classList.remove("flex");
+    renderAccount();
+  } catch (x) { show("Couldn't sign in. Try again."); }
+});
+
 function editAccount() {
   const account = getAccount();
   if (account) {
@@ -116,6 +156,7 @@ function editAccount() {
   document.getElementById("account-view").classList.add("hidden");
   document.getElementById("account-view").classList.remove("flex");
   document.getElementById("account-form").classList.remove("hidden");
+  document.getElementById("to-signin").classList.add("hidden");
 }
 
 var formPhoto = "";
@@ -149,6 +190,7 @@ document.getElementById("account-form").addEventListener("submit", function (e) 
     sms: document.getElementById("f-sms").checked,
     photo: formPhoto
   });
+  try { fetch("https://qzluvwpjtgeccfojutbt.supabase.co/rest/v1/rpc/save_app_account", { method: "POST", headers: { apikey: "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ", "Content-Type": "application/json" }, body: JSON.stringify({ p_phone: document.getElementById("f-phone").value.trim(), p_name: document.getElementById("f-name").value.trim(), p_email: document.getElementById("f-email").value.trim(), p_sms: document.getElementById("f-sms").checked }) }); } catch (x) {}
   var joined = /[?&]join=1/.test(location.search);
   showToast(joined ? "Welcome. Your free juice comes with every meal" : "Account created");
   renderAccount();

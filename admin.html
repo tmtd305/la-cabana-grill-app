@@ -331,6 +331,23 @@ function lcHoursStatus(h, now) {
   .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#06C167;box-shadow:0 0 0 3px rgba(6,193,103,.25);margin-right:6px;animation:liveP 1.4s infinite}
   @keyframes liveP{50%{opacity:.35}}
 
+  /* permissions: hide what this person can't see */
+  body.no-orders [data-perm~="orders"],body.no-drivers [data-perm~="drivers"],body.no-menu [data-perm~="menu"],body.no-members [data-perm~="members"],
+  body.no-sales [data-perm~="sales"],body.no-customers [data-perm~="customers"],body.no-points [data-perm~="points"],body.no-owner [data-perm~="owner"]{display:none!important}
+  .pin-hero{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border-radius:20px;padding:18px 20px;margin-bottom:14px;background:linear-gradient(110deg,#2a1206,#1a0c05);border:1px solid rgba(243,99,16,.55);box-shadow:0 0 0 1px rgba(243,99,16,.12),0 10px 30px rgba(243,99,16,.12)}
+  .pin-hero .ph-ic{width:52px;height:52px;border-radius:16px;background:#f36310;color:#1a0800;display:flex;align-items:center;justify-content:center;flex:none}
+  .pin-hero .ph-ic .ms{font-size:30px}
+  .pin-hero .ph-t{flex:1;min-width:170px}.pin-hero .ph-t b{display:block;font-family:Outfit;font-size:20px}.pin-hero .ph-t small{color:var(--fg2);font-size:13px}
+  .pin-hero .ph-in{display:flex;gap:8px;flex:1;min-width:250px}
+  .pin-hero input{flex:1;min-width:0;height:58px;border-radius:14px;background:#0c0c0c;border:2px solid rgba(243,99,16,.6);color:#fff;font:800 30px Outfit;letter-spacing:.35em;text-align:center;outline:none}
+  .pin-hero input:focus{border-color:#ff8a3d}
+  .pin-hero .btn.main{height:58px;padding:0 22px;font-size:16px}
+  .pin-hero #pin-out{flex-basis:100%;font-weight:800;font-size:15px}
+  .perm-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer}
+  .perm-row input{width:20px;height:20px;accent-color:#f36310}
+  .perm-row b{display:block;font-size:14.5px}.perm-row small{color:var(--fg2);font-size:12.5px}
+  .role-seg{display:flex;gap:6px;margin:4px 0 8px}.role-seg button{all:unset;cursor:pointer;flex:1;text-align:center;padding:10px;border-radius:12px;border:1px solid var(--line);font-weight:800;font-size:14px}
+  .role-seg button.on{border-color:var(--or);color:var(--or2);box-shadow:0 0 12px rgba(243,99,16,.25)}
   /* loyalty: bright gold so it stands out */
   .btn.gold{background:linear-gradient(135deg,#ffd84d,#ffb000);border-color:transparent;color:#1a1200;box-shadow:0 6px 20px rgba(255,190,0,.35)}
   .btn.gold:hover{filter:brightness(1.06)}
@@ -358,22 +375,22 @@ function lcHoursStatus(h, now) {
   @media (min-width:701px) and (max-width:1100px){.nav-gold .star{position:absolute;top:4px;right:10px}}
 </style>
 </head>
-<body>
+<body class="no-sales no-customers no-points no-owner">
 <div class="gate" id="gate"><img src="icons/logo-transparent.png" alt="" style="height:70px"><p class="muted">Loading your dashboard…</p></div>
 
 <div class="app hidden" id="app">
   <aside class="side">
     <div class="brand"><img src="icons/logo-transparent.png" alt="La Cabaña Grill"><small>MIAMI BEACH</small></div>
     <button class="nav on" data-v="dash"><span class="ms">home</span>Dashboard</button>
-    <button class="nav" data-v="orders"><span class="ms">receipt_long</span>Orders<span class="cnt hidden" data-cnt="orders"></span></button>
-    <button class="nav" data-v="neworder"><span class="ms">add_call</span>New phone order</button>
-    <button class="nav" data-v="drivers"><span class="ms">delivery_dining</span>Drivers</button>
-    <button class="nav" data-v="menu"><span class="ms">restaurant_menu</span>Menu &amp; Sold out</button>
-    <button class="nav" data-v="customers"><span class="ms">group</span>Customers</button>
-    <button class="nav nav-gold" data-v="loyalty"><span class="ms">redeem</span>Loyalty &amp; Marketing<span class="star">★</span></button>
-    <button class="nav" data-v="analytics"><span class="ms">bar_chart</span>Analytics</button>
-    <button class="nav" data-v="channels"><span class="ms">hub</span>Channels</button>
-    <button class="nav" data-v="staff"><span class="ms">badge</span>Staff<span class="cnt hidden" data-cnt="staff"></span></button>
+    <button class="nav" data-v="orders" data-perm="orders"><span class="ms">receipt_long</span>Orders<span class="cnt hidden" data-cnt="orders"></span></button>
+    <button class="nav" data-v="neworder" data-perm="orders"><span class="ms">add_call</span>New phone order</button>
+    <button class="nav" data-v="drivers" data-perm="drivers"><span class="ms">delivery_dining</span>Drivers</button>
+    <button class="nav" data-v="menu" data-perm="menu"><span class="ms">restaurant_menu</span>Menu &amp; Sold out</button>
+    <button class="nav" data-v="customers" data-perm="customers"><span class="ms">group</span>Customers</button>
+    <button class="nav nav-gold" data-v="loyalty" data-perm="members"><span class="ms">redeem</span>Loyalty &amp; Marketing<span class="star">★</span></button>
+    <button class="nav" data-v="analytics" data-perm="sales"><span class="ms">bar_chart</span>Analytics</button>
+    <button class="nav" data-v="channels" data-perm="sales"><span class="ms">hub</span>Channels</button>
+    <button class="nav" data-v="staff" data-perm="owner"><span class="ms">badge</span>Staff<span class="cnt hidden" data-cnt="staff"></span></button>
     <div class="grow"></div>
     <a class="site" href="home.html" target="_blank"><span class="ms">open_in_new</span>View website</a>
     <button class="nav" id="signout2" style="margin-top:4px"><span class="ms">logout</span>Sign out</button>
@@ -383,7 +400,7 @@ function lcHoursStatus(h, now) {
     <div class="mtop"><img src="icons/logo-transparent.png" alt=""><b>La Cabaña</b><button class="btn gold sm" data-newcard aria-label="Create member card" style="padding:0 10px"><span class="ms">add_card</span></button><button class="status" id="status-m"><i></i><span>Online</span></button><button class="btn sm" id="signout3" aria-label="Sign out" style="padding:0 10px"><span class="ms">logout</span></button></div>
     <div class="top">
       <h1 id="title">Dashboard</h1>
-      <div class="search"><span class="ms">search</span><input id="q" placeholder="Search customers, phone, items…" autocomplete="off"></div>
+      <div class="search" data-perm="customers"><span class="ms">search</span><input id="q" placeholder="Search customers, phone, items…" autocomplete="off"></div>
       <button class="btn gold" data-newcard><span class="ms">add_card</span>Member card</button>
       <button class="status" id="status"><i></i><span>Online</span></button>
       <span class="clock" id="clock"></span>
@@ -392,26 +409,32 @@ function lcHoursStatus(h, now) {
 
     <!-- DASHBOARD -->
     <section data-view="dash">
-      <div class="grid kpis" id="kpis"></div>
-      <div class="grid two">
+      <div class="pin-hero">
+        <div class="ph-ic"><span class="ms">local_bar</span></div>
+        <div class="ph-t"><b>Free drinks PIN</b><small>Guest shows a 4-digit PIN from a member's card. Up to 2 free drinks for the party.</small></div>
+        <div class="ph-in"><input id="pin-in" inputmode="numeric" maxlength="4" placeholder="····" autocomplete="off"><button class="btn main" id="pin-go">Use PIN</button></div>
+        <div id="pin-out"></div>
+      </div>
+      <div class="grid kpis" id="kpis" data-perm="sales"></div>
+      <div class="grid two" data-perm="sales">
         <div class="card"><div class="ch"><h2>Sales today by hour</h2><span class="muted" id="hour-tot"></span></div><div class="cols" id="hours"></div></div>
         <div class="card"><div class="ch"><h2>Where sales come from</h2><div class="seg" id="ch-days"><button class="on" data-d="1">Today</button><button data-d="7">7d</button><button data-d="30">30d</button></div></div><div id="chan"></div></div>
       </div>
       <div class="grid three" style="margin-top:14px">
         <div class="card"><div class="ch"><h2>Live website orders</h2><button class="btn sm" data-go="orders">Open</button></div><div id="dash-orders"></div></div>
-        <div class="card"><div class="ch"><h2>Top items (7 days)</h2></div><div id="top-items"></div></div>
-        <div class="card"><div class="ch"><h2>Top customers</h2><button class="btn sm" data-go="customers">View all</button></div><div id="top-cust"></div></div>
+        <div class="card" data-perm="sales"><div class="ch"><h2>Top items (7 days)</h2></div><div id="top-items"></div></div>
+        <div class="card" data-perm="customers"><div class="ch"><h2>Top customers</h2><button class="btn sm" data-go="customers">View all</button></div><div id="top-cust"></div></div>
       </div>
       <div class="gold-card" style="margin-top:14px">
         <div class="gc-ic"><span class="ms">card_membership</span></div>
         <div class="gc-txt"><b>Loyalty &amp; member cards</b><small>Give regulars a QR card. Every new customer they bring = $1.</small></div>
-        <div class="gc-stats" id="gc-stats"></div>
+        <div class="gc-stats" id="gc-stats" data-perm="points"></div>
         <div class="gc-btns"><button class="btn gold" data-newcard><span class="ms">add_card</span>Create member card</button><button class="btn gc-open" data-go="loyalty">Open loyalty</button></div>
       </div>
     </section>
 
     <!-- NEW PHONE ORDER -->
-    <section data-view="neworder" class="hidden">
+    <section data-view="neworder" data-perm="orders" class="hidden">
       <div class="po-grid">
         <div class="card po-menu">
           <input class="field" id="po-q" placeholder="Search the menu" autocomplete="off" style="margin-bottom:10px">
@@ -444,7 +467,7 @@ function lcHoursStatus(h, now) {
     </section>
 
     <!-- ORDERS -->
-    <section data-view="orders" class="hidden">
+    <section data-view="orders" data-perm="orders" class="hidden">
       <div class="row" style="margin-bottom:12px;flex-wrap:wrap">
         <div class="seg" id="ord-filter"><button class="on" data-f="open">Open</button><button data-f="done">Completed</button><button data-f="all">All</button></div>
         <span class="muted" style="flex:1">Website orders. New ones ding and glow orange.</span>
@@ -455,13 +478,13 @@ function lcHoursStatus(h, now) {
     </section>
 
     <!-- DRIVERS -->
-    <section data-view="drivers" class="hidden">
+    <section data-view="drivers" data-perm="drivers" class="hidden">
       <div class="banner"><h3>Uber driver</h3><p>Phone order? Send it with an Uber driver in a few taps.</p><button class="btn green" data-driver><svg viewBox="0 0 64 40" width="26" height="17" aria-hidden="true"><defs><linearGradient id="cg3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9ffd8"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs><path d="M6 27c0-3 1.6-5.2 4.4-6l7.3-2.1 6.9-7.4C26.4 9.6 28.8 8.6 31.3 8.6h9.4c2.6 0 5 1.1 6.6 3.1l5.3 6.6 4.2 1.1c2.6.7 4.2 3 4.2 5.6V29c0 1.4-1.1 2.5-2.5 2.5H8.5C7.1 31.5 6 30.4 6 29z" fill="url(#cg3)"/><path d="M22.5 18.6l5.4-5.6c.9-.9 2.1-1.4 3.4-1.4h3.9v7z" fill="#0a7a3f"/><path d="M38.2 11.6h2.5c1.6 0 3 .7 4 1.9l4.1 5.1H38.2z" fill="#0a7a3f"/><circle cx="18" cy="31" r="6.2" fill="#063" stroke="#fff" stroke-width="2.6"/><circle cx="48" cy="31" r="6.2" fill="#063" stroke="#fff" stroke-width="2.6"/><path d="M1 22h8M0 26.5h6" stroke="#b9ffd8" stroke-width="2.4" stroke-linecap="round"/></svg>Request driver</button></div>
       <div class="card"><div class="ch"><h2>Today's drivers</h2><button class="btn sm" id="drv-refresh"><span class="ms">refresh</span>Refresh</button></div><div id="drv-list"><div class="empty">Loading…</div></div></div>
     </section>
 
     <!-- MENU -->
-    <section data-view="menu" class="hidden">
+    <section data-view="menu" data-perm="menu" class="hidden">
       <div class="card" style="margin-bottom:14px">
         <div class="ch"><h2>Store hours</h2><span class="muted" id="hrs-now"></span></div>
         <p class="muted" style="margin:-4px 0 10px">Online ordering opens and closes by itself on these hours (Miami time). Leave a day blank if you're closed.</p>
@@ -486,7 +509,7 @@ function lcHoursStatus(h, now) {
     </section>
 
     <!-- CUSTOMERS -->
-    <section data-view="customers" class="hidden">
+    <section data-view="customers" data-perm="customers" class="hidden">
       <div class="grid kpis" id="cust-kpis" style="margin-bottom:14px"></div>
       <div class="card">
         <div class="ch"><h2>Customer list</h2><div class="seg" id="cust-f"><button class="on" data-f="all">All</button><button data-f="vip">VIP</button><button data-f="new">New</button><button data-f="inactive">Inactive</button><button data-f="mkt">Opted in</button></div><button class="btn sm" id="cust-csv"><span class="ms">download</span>Export</button></div>
@@ -496,10 +519,9 @@ function lcHoursStatus(h, now) {
     </section>
 
     <!-- LOYALTY -->
-    <section data-view="loyalty" class="hidden">
-      <div class="grid kpis" id="loy-kpis"></div>
-      <div class="card" style="margin-bottom:14px"><div class="ch"><h2>Free drink PIN</h2><a class="btn sm" href="pin.html" target="_blank"><span class="ms">dialpad</span>PIN pad for the register</a></div><div class="row" style="gap:8px"><input class="field" id="pin-in" inputmode="numeric" maxlength="4" placeholder="4-digit PIN" style="max-width:180px;font-family:Outfit;font-size:22px;letter-spacing:.3em;text-align:center"><button class="btn main" id="pin-go">Use PIN</button></div><div id="pin-out" style="margin-top:10px;font-weight:700"></div></div>
-      <div class="banner"><h3>Ambassador cards</h3><p>Give a regular a QR card. Every new customer they bring = 1 point = $1.</p><button class="btn main" id="add-member"><span class="ms">add_card</span>New member card</button></div>
+    <section data-view="loyalty" data-perm="members" class="hidden">
+      <div class="grid kpis" id="loy-kpis" data-perm="points"></div>
+      <div class="banner"><h3>Ambassador cards</h3><p>Give a regular a QR card. Friends who scan it get a PIN for up to 2 free drinks. Every one who comes in = $1 for the member.</p><button class="btn main" id="add-member"><span class="ms">add_card</span>New member card</button></div>
       <div class="grid two">
         <div class="card">
           <div class="ch"><h2>Members</h2></div>
@@ -511,7 +533,7 @@ function lcHoursStatus(h, now) {
             <div><b style="color:#fff">1.</b> Tap <b style="color:#fff">New member card</b> and type their name and phone.</div>
             <div><b style="color:#fff">2.</b> They scan the QR that pops up. That opens their member card.</div>
             <div><b style="color:#fff">3.</b> A friend scans the member's card and gets a <b style="color:#fff">4-digit PIN for up to 2 free drinks</b> right away.</div>
-            <div><b style="color:#fff">4.</b> They show the PIN with their meal. Type it in <b style="color:#fff">Free drink PIN</b> above. It works one time. The member gets <b style="color:#fff">1 point ($1)</b> and sees who came in. A first online order counts too.</div>
+            <div><b style="color:#fff">4.</b> They show the PIN with their meal. Type it in <b style="color:#fff">Free drinks PIN</b> at the top of the Dashboard. It works one time. The member gets <b style="color:#fff">1 point ($1)</b> and sees who came in. A first online order counts too.</div>
             <div><b style="color:#fff">5.</b> Paying a member out? Tap <b style="color:#fff">Redeem</b>.</div>
           </div>
           <div class="ch" style="margin-top:18px"><h2>Points from orders</h2></div>
@@ -520,11 +542,11 @@ function lcHoursStatus(h, now) {
           <div class="muted" style="font-size:14px;line-height:1.5">Sending texts and emails from here needs Twilio (texts) and Resend (emails) connected. Until then, use <b style="color:#fff">Export</b> in Customers to get everyone who opted in.</div>
         </div>
       </div>
-      <div class="card" style="margin-top:14px"><div class="ch"><h2>Recent points activity</h2></div><div id="ledger"></div></div>
+      <div class="card" style="margin-top:14px" data-perm="points"><div class="ch"><h2>Recent points activity</h2></div><div id="ledger"></div></div>
     </section>
 
     <!-- ANALYTICS -->
-    <section data-view="analytics" class="hidden">
+    <section data-view="analytics" data-perm="sales" class="hidden">
       <div class="row" style="margin-bottom:12px"><div class="seg" id="an-days"><button data-d="7">7 days</button><button class="on" data-d="30">30 days</button></div><span class="muted" id="an-sub"></span></div>
       <div class="grid kpis" id="an-kpis" style="margin-bottom:14px"></div>
       <div class="card" style="margin-bottom:14px"><div class="ch"><h2>Sales per day</h2></div><div class="cols" id="an-days-chart" style="height:200px"></div></div>
@@ -536,13 +558,13 @@ function lcHoursStatus(h, now) {
     </section>
 
     <!-- CHANNELS -->
-    <section data-view="channels" class="hidden">
+    <section data-view="channels" data-perm="sales" class="hidden">
       <p class="muted" style="margin:0 0 14px">Every sale that reaches Square is counted by channel. Delivery apps only show up here when they send their orders into Square.</p>
       <div class="grid three" id="integr"></div>
     </section>
 
     <!-- STAFF -->
-    <section data-view="staff" class="hidden">
+    <section data-view="staff" data-perm="owner" class="hidden">
       <div class="card" style="margin-bottom:14px">
         <div class="ch"><h2>Invite staff</h2></div>
         <p class="muted" style="margin:-4px 0 12px">Send this link. It opens the sign-up screen. When they finish, they show up below for you to approve.</p>
@@ -556,6 +578,7 @@ function lcHoursStatus(h, now) {
         <div class="card"><div class="ch"><h2>Waiting for approval</h2></div><div id="pending"><div class="muted">Nobody waiting.</div></div></div>
         <div class="card"><div class="ch"><h2>Staff</h2></div><div id="staff"></div>
           <p class="muted" style="margin-top:12px">New staff open <b style="color:#fff">lacabanagrill.net/operator.html</b> and tap "Create an account". They show up under Waiting for approval. Only you (the owner) can approve or remove people. Anyone you don't approve stays locked out.</p>
+          <p class="muted">New people start as <b style="color:#fff">Staff</b>: orders, drivers, menu, member cards and free drink PINs. No sales, cash or customer list. Tap <b style="color:#fff">Access</b> to make someone a Manager or change one thing.</p>
           <button class="btn" id="signout" style="margin-top:6px"><span class="ms">logout</span>Sign out</button></div>
       </div>
     </section>
@@ -566,15 +589,15 @@ function lcHoursStatus(h, now) {
 
 <nav class="bnav hidden" id="bnav">
   <button class="on" data-v="dash"><span class="ms">home</span>Home</button>
-  <button data-v="orders"><span class="ms">receipt_long</span>Orders<span class="cnt hidden" data-cnt="orders"></span></button>
-  <button data-v="neworder"><span class="ms">add_call</span>New order</button>
-  <button data-v="drivers"><span class="ms">delivery_dining</span>Drivers</button>
-  <button data-v="menu"><span class="ms">restaurant_menu</span>Menu</button>
-  <button data-v="customers"><span class="ms">group</span>Customers</button>
-  <button data-v="loyalty" class="bn-gold"><span class="ms">redeem</span>Loyalty</button>
-  <button data-v="analytics"><span class="ms">bar_chart</span>Analytics</button>
-  <button data-v="channels"><span class="ms">hub</span>Channels</button>
-  <button data-v="staff"><span class="ms">badge</span>Staff<span class="cnt hidden" data-cnt="staff"></span></button>
+  <button data-v="orders" data-perm="orders"><span class="ms">receipt_long</span>Orders<span class="cnt hidden" data-cnt="orders"></span></button>
+  <button data-v="neworder" data-perm="orders"><span class="ms">add_call</span>New order</button>
+  <button data-v="drivers" data-perm="drivers"><span class="ms">delivery_dining</span>Drivers</button>
+  <button data-v="menu" data-perm="menu"><span class="ms">restaurant_menu</span>Menu</button>
+  <button data-v="customers" data-perm="customers"><span class="ms">group</span>Customers</button>
+  <button data-v="loyalty" data-perm="members" class="bn-gold"><span class="ms">redeem</span>Loyalty</button>
+  <button data-v="analytics" data-perm="sales"><span class="ms">bar_chart</span>Analytics</button>
+  <button data-v="channels" data-perm="sales"><span class="ms">hub</span>Channels</button>
+  <button data-v="staff" data-perm="owner"><span class="ms">badge</span>Staff<span class="cnt hidden" data-cnt="staff"></span></button>
 </nav>
 
 <script>
@@ -608,19 +631,28 @@ function lcHoursStatus(h, now) {
     tick(); setInterval(tick, 15000);
     const v = (location.hash || '').slice(1); if(v && document.querySelector('[data-view="' + v + '"]')) go(v);
     const { data: own } = await sb.rpc('is_owner'); isOwner = !!own;
+    const { data: pm } = await sb.rpc('my_perms'); PERM = pm || {}; applyPerms();
     // only the owner sees and manages staff
     document.querySelectorAll('[data-v="staff"]').forEach(b => b.classList.toggle('hidden', !isOwner));
-    if(!isOwner && location.hash === '#staff') go('dash');
-    loadSettings(); loadAll(); loadCustomers(); loadMembers(); renderMenu();
+    if(!allowed((location.hash || '').slice(1) || 'dash')) go('dash');
+    loadSettings(); loadAll(); if(PERM.customers) loadCustomers(); loadMembers(); renderMenu();
     setInterval(loadAll, 20000);
     if(isOwner){ loadStaff(); setInterval(loadStaff, 30000); }
   })();
   sb.auth.onAuthStateChange((ev, s) => { if(s) session = s; if(ev === 'SIGNED_OUT') location.replace('operator.html'); });
   function tick(){ const d = new Date(); $('clock').textContent = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }) + '  ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); }
 
+  // ---------- permissions ----------
+  let PERM = null;
+  const PERM_KEYS = ['orders', 'drivers', 'menu', 'members', 'sales', 'customers', 'points', 'owner'];
+  const VIEW_PERM = { orders: 'orders', neworder: 'orders', drivers: 'drivers', menu: 'menu', customers: 'customers', loyalty: 'members', analytics: 'sales', channels: 'sales', staff: 'owner' };
+  function applyPerms(){ PERM_KEYS.forEach(k => document.body.classList.toggle('no-' + k, !PERM[k])); }
+  const allowed = v => !PERM || !VIEW_PERM[v] || !!PERM[VIEW_PERM[v]];
+
   // ---------- navigation ----------
   const TITLES = { neworder: 'New phone order', dash: 'Dashboard', orders: 'Orders', drivers: 'Uber drivers', menu: 'Hours, Menu & Sold out', customers: 'Customers', loyalty: 'Loyalty & Marketing', analytics: 'Analytics', channels: 'Channels', staff: 'Staff' };
   function go(v){
+    if(!allowed(v)) v = 'dash';
     document.querySelectorAll('[data-view]').forEach(s => s.classList.toggle('hidden', s.dataset.view !== v));
     document.querySelectorAll('.nav[data-v],.bnav [data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
     document.body.className = document.body.className.replace(/\bv-\S+/g, '').trim() + ' v-' + v;
@@ -648,7 +680,7 @@ function lcHoursStatus(h, now) {
       if(!firstLoad && fresh.length) ding();
       web.forEach(o => seenIds.add(o.id)); try { localStorage.setItem('lc_seen_orders', JSON.stringify([...seenIds].slice(-800))); } catch(e){}
       renderDash(); renderOrders();
-      if(!loaded30){ loaded30 = true; api(30).then(o => { mergeOrders(o); applyPhoneOrders(); renderDash(); renderOrders(); if(!$('tab-an-hidden')) renderAnalytics(); renderChannels(); renderCustomerKpis(); }).catch(() => { loaded30 = false; }); }
+      if(!loaded30 && PERM && PERM.sales){ loaded30 = true; api(30).then(o => { mergeOrders(o); applyPhoneOrders(); renderDash(); renderOrders(); if(!$('tab-an-hidden')) renderAnalytics(); renderChannels(); renderCustomerKpis(); }).catch(() => { loaded30 = false; }); }
       firstLoad = false;
     } catch(e){ if(firstLoad) $('kpis').innerHTML = '<div class="card empty" style="grid-column:1/-1">Couldn\'t reach Square. Pull to refresh.</div>'; }
   }
@@ -1137,7 +1169,7 @@ function lcHoursStatus(h, now) {
     const month = startOf(new Date().getDate() - 1);
     $('loy-kpis').innerHTML = kpi('card_membership', 'Member cards', members.length) + kpi('person_add', 'New customers brought', refs.length, '<span class="muted">' + refs.filter(x => new Date(x.created_at) >= month).length + ' this month</span>') +
       kpi('stars', 'Points owed', members.reduce((a, x) => a + x.points, 0), '<span class="muted">= ' + money0(members.reduce((a, x) => a + x.points, 0)) + '</span>') + kpi('loyalty', 'Customer points', customers.reduce((a, c) => a + (c.points || 0), 0)) + kpi('campaign', 'Opted in to deals', customers.filter(c => c.marketing).length);
-    $('mem-tbl').innerHTML = '<tr><th>Member</th><th>Brought</th><th>Points</th><th></th></tr>' + (members.length ? members.map(x => '<tr><td><div class="who"><div class="av">' + esc(initials(x.name)) + '</div><div style="min-width:0"><b>' + esc(x.name) + '</b><small>' + esc(fmtPhone(x.phone)) + (x.note ? ' · ' + esc(x.note) : '') + ' · ' + esc(x.code) + '</small></div></div></td><td>' + (cnt[x.code] || 0) + '</td><td><b style="font-family:Outfit;font-size:16px">' + x.points + '</b> <span class="muted">' + money0(x.points) + '</span></td><td style="white-space:nowrap"><button class="btn sm" data-card="' + esc(x.id) + '"><span class="ms">qr_code_2</span>Card</button> <button class="btn sm" data-pt="1" data-mid="' + esc(x.id) + '">+1</button> <button class="btn sm" data-redeem="' + esc(x.id) + '">Redeem</button></td></tr>').join('') : '<tr><td colspan="4"><div class="empty">No member cards yet. Tap "New member card".</div></td></tr>');
+    $('mem-tbl').innerHTML = '<tr><th>Member</th><th>Brought</th><th>Points</th><th></th></tr>' + (members.length ? members.map(x => '<tr><td><div class="who"><div class="av">' + esc(initials(x.name)) + '</div><div style="min-width:0"><b>' + esc(x.name) + '</b><small>' + esc(fmtPhone(x.phone)) + (x.note ? ' · ' + esc(x.note) : '') + ' · ' + esc(x.code) + '</small></div></div></td><td>' + (cnt[x.code] || 0) + '</td><td><b style="font-family:Outfit;font-size:16px">' + x.points + '</b> <span class="muted">' + money0(x.points) + '</span></td><td style="white-space:nowrap"><button class="btn sm" data-card="' + esc(x.id) + '"><span class="ms">qr_code_2</span>Card</button> <button class="btn sm" data-perm="points" data-pt="1" data-mid="' + esc(x.id) + '">+1</button> <button class="btn sm" data-perm="points" data-redeem="' + esc(x.id) + '">Redeem</button></td></tr>').join('') : '<tr><td colspan="4"><div class="empty">No member cards yet. Tap "New member card".</div></td></tr>');
     $('ledger').innerHTML = (l || []).length ? l.map(x => { const mm = members.find(y => y.id === x.member_id); return '<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><b style="font-family:Outfit;width:44px;color:' + (x.delta > 0 ? 'var(--gr)' : 'var(--rd)') + '">' + (x.delta > 0 ? '+' : '') + x.delta + '</b><div style="flex:1;min-width:0"><b style="font-size:14px">' + esc(mm ? mm.name : 'Member') + '</b><div class="muted">' + esc(x.reason || '') + (x.by_email ? ' · by ' + esc(x.by_email) : '') + '</div></div><span class="muted">' + new Date(x.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' }) + '</span></div>'; }).join('') : '<div class="empty">No points yet.</div>';
   }
   function modal(html){ const m = document.createElement('div'); m.className = 'modal'; m.innerHTML = '<div class="box">' + html + '</div>'; m.addEventListener('click', e => { if(e.target === m || e.target.closest('[data-close]')) m.remove(); }); document.body.appendChild(m); return m; }
@@ -1225,12 +1257,43 @@ function lcHoursStatus(h, now) {
   async function loadStaff(){
     const [{ data }, pend] = await Promise.all([sb.rpc('staff_list'), sb.rpc('pending_staff')]);
     const mine = (me.email || '').toLowerCase();
-    $('staff').innerHTML = (data || []).map(r => '<div class="who" style="padding:10px 0;border-bottom:1px solid var(--line)"><div class="av">' + esc(initials(r.name || r.email)) + '</div><div style="flex:1;min-width:0"><b>' + esc(r.name || r.email) + (r.email === 'tmtd305@gmail.com' ? ' <span class="badge y">OWNER</span>' : '') + (r.email === mine ? ' <span class="muted">(you)</span>' : '') + '</b><small>' + esc([fmtPhone(r.phone), r.email].filter(Boolean).join(' · ')) + '</small></div>' + (r.email === mine || r.email === 'tmtd305@gmail.com' ? '' : '<button class="btn sm" data-rm="' + esc(r.email) + '">Remove</button>') + '</div>').join('');
+    $('staff').innerHTML = (data || []).map(r => '<div class="who" style="padding:10px 0;border-bottom:1px solid var(--line)"><div class="av">' + esc(initials(r.name || r.email)) + '</div><div style="flex:1;min-width:0"><b>' + esc(r.name || r.email) + (r.email === 'tmtd305@gmail.com' ? ' <span class="badge y">OWNER</span>' : '') + (r.email === mine ? ' <span class="muted">(you)</span>' : '') + '</b><small>' + esc([fmtPhone(r.phone), r.email].filter(Boolean).join(' · ')) + '</small></div>' + (r.email === 'tmtd305@gmail.com' ? '' : '<span class="badge ' + (r.role === 'manager' ? 'y' : '') + '" style="margin-right:6px">' + (r.role === 'manager' ? 'MANAGER' : 'STAFF') + '</span><button class="btn sm" data-perms="' + esc(r.email) + '"><span class="ms">tune</span>Access</button>') + (r.email === mine || r.email === 'tmtd305@gmail.com' ? '' : ' <button class="btn sm" data-rm="' + esc(r.email) + '">Remove</button>') + '</div>').join('');
+    staffRows = data || [];
     const pl = (pend && pend.data) || [];
     $('pending').innerHTML = pl.length ? pl.map(r => '<div class="who" style="padding:10px 0;border-bottom:1px solid var(--line)"><div class="av">' + esc(initials(r.name || r.email)) + '</div><div style="flex:1;min-width:0"><b>' + esc(r.name || r.email) + '</b><small>' + esc([fmtPhone(r.phone), r.email].filter(Boolean).join(' · ')) + '</small></div><button class="btn main sm" data-ok="' + esc(r.email) + '">Approve</button></div>').join('') : '<div class="muted">Nobody waiting.</div>';
     document.querySelectorAll('[data-cnt="staff"]').forEach(c => { c.textContent = pl.length; c.classList.toggle('hidden', !pl.length); });
   }
   $('pending').addEventListener('click', async e => { const b = e.target.closest('[data-ok]'); if(!b) return; b.disabled = true; const { error } = await sb.rpc('add_operator', { p_email: b.dataset.ok }); toast(error ? 'Couldn\'t approve' : 'Approved'); loadStaff(); });
+  let staffRows = [];
+  const PERM_INFO = [
+    ['orders', 'Orders and phone orders', 'See and run orders, take phone orders'],
+    ['drivers', 'Uber drivers', 'Call and cancel delivery drivers'],
+    ['menu', 'Menu, hours, sold out', 'Mark items sold out, pause ordering'],
+    ['members', 'Member cards', 'Make member cards for regulars'],
+    ['sales', 'Sales, cash and analytics', 'Sales numbers, totals, charts, channels'],
+    ['customers', 'Customer list', 'Customer names, phones, emails, export'],
+    ['points', 'Loyalty points and payouts', 'Add points, pay members out']
+  ];
+  const PRESET = { staff: { orders: true, drivers: true, menu: true, members: true, sales: false, customers: false, points: false },
+                   manager: { orders: true, drivers: true, menu: true, members: true, sales: true, customers: true, points: true } };
+  function permsModal(email){
+    const r = staffRows.find(x => x.email === email); if(!r) return;
+    let role = r.role || 'staff', perms = Object.assign({}, PRESET.staff, r.perms || {});
+    const m = modal('<h3>' + esc(r.name || r.email) + '</h3><p class="muted" style="margin:0 0 8px">Free drink PINs work for everyone.</p><div class="role-seg"><button data-role="staff">Staff</button><button data-role="manager">Manager</button></div><div id="pl"></div><div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn plain" data-close>Cancel</button><button class="btn main" id="p-save">Save</button></div>');
+    const paint = () => {
+      m.querySelectorAll('[data-role]').forEach(b => b.classList.toggle('on', b.dataset.role === role));
+      m.querySelector('#pl').innerHTML = PERM_INFO.map(([k, t, d]) => '<label class="perm-row"><input type="checkbox" data-k="' + k + '"' + (perms[k] ? ' checked' : '') + '><div><b>' + t + '</b><small>' + d + '</small></div></label>').join('');
+    };
+    paint();
+    m.querySelector('.role-seg').onclick = e => { const b = e.target.closest('[data-role]'); if(!b) return; role = b.dataset.role; perms = Object.assign({}, PRESET[role]); paint(); };
+    m.querySelector('#pl').onchange = e => { const c = e.target.closest('[data-k]'); if(c) perms[c.dataset.k] = c.checked; };
+    m.querySelector('#p-save').onclick = async () => {
+      const { error } = await sb.rpc('set_staff', { p_email: r.email, p_role: role, p_perms: perms });
+      if(error){ toast('Couldn\'t save: ' + error.message); return; }
+      m.remove(); toast('Access saved'); loadStaff();
+    };
+  }
+  $('staff').addEventListener('click', e => { const b = e.target.closest('[data-perms]'); if(b) permsModal(b.dataset.perms); });
   $('staff').addEventListener('click', async e => { const b = e.target.closest('[data-rm]'); if(!b) return; if(!confirm('Remove ' + b.dataset.rm + ' from staff?')) return; const { error } = await sb.rpc('remove_operator', { p_email: b.dataset.rm }); toast(error ? 'Couldn\'t remove' : 'Removed'); loadStaff(); });
   // invite link
   const INVITE = location.origin + '/operator.html?invite=1';
