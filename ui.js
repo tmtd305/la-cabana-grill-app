@@ -154,28 +154,18 @@
     document.querySelectorAll('header img').forEach(function (img) { if (/googleusercontent/.test(img.src)) img.style.display = "none"; });
     document.querySelectorAll('button[aria-label="Search menu"]').forEach(function (b) { b.onclick = function (e) { e.preventDefault(); openSearch(); }; });
     document.querySelectorAll('button[aria-label="Enable deal notifications"]').forEach(function (b) { b.removeAttribute("onclick"); b.onclick = function (e) { e.preventDefault(); location.href = "messages.html"; }; });
-    // top right: the member card itself (was a person icon). Members open their card, everyone else joins the club.
-    if (!document.getElementById("lc-hcard-css")) {
-      var cs = document.createElement("style"); cs.id = "lc-hcard-css";
-      cs.textContent = ".lc-hcard{position:relative;overflow:hidden;flex-shrink:0;margin-left:6px;width:50px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#ffb27a,#f36310 55%,#b84203);border:1px solid rgba(255,214,180,.6);box-shadow:0 0 0 1px rgba(243,99,16,.35),0 4px 16px rgba(243,99,16,.55);animation:lcHcGlow 2.4s ease-in-out infinite}" +
-        ".lc-hcard .material-symbols-outlined{font-size:22px;color:#1a0800;font-variation-settings:'wght' 600}" +
-        ".lc-hcard:before{content:'';position:absolute;top:5px;left:5px;width:9px;height:7px;border-radius:2px;background:linear-gradient(135deg,#ffe2b8,#d99a4e)}" +
-        ".lc-hcard:after{content:'';position:absolute;top:-10px;bottom:-10px;width:14px;left:-30px;background:rgba(255,255,255,.55);transform:rotate(20deg);animation:lcHcShine 3.2s ease-in-out infinite}" +
-        "@keyframes lcHcShine{0%,55%{left:-30px}80%,100%{left:70px}}" +
-        "@keyframes lcHcGlow{0%,100%{box-shadow:0 0 0 1px rgba(243,99,16,.35),0 4px 16px rgba(243,99,16,.45)}50%{box-shadow:0 0 0 1px rgba(255,138,61,.7),0 4px 24px rgba(243,99,16,.85)}}" +
-        "@media (prefers-reduced-motion:reduce){.lc-hcard,.lc-hcard:after{animation:none}}";
-      document.head.appendChild(cs);
-    }
+    // top right spot is for the Español button (i18n.js puts it there); the member card lives in the bottom bar
     document.querySelectorAll('header [onclick="goToAccount()"], header .material-symbols-outlined').forEach(function (el) {
       var t = el.closest('[onclick="goToAccount()"]') || (el.textContent.trim() === "person" ? el.parentElement : null);
-      if (!t || t.closest("a") || t.classList.contains("lc-hcard")) return;
-      var mem = null; try { mem = JSON.parse(localStorage.getItem("lc_member") || "null"); } catch (e) {}
-      t.removeAttribute("onclick"); t.className = "lc-hcard";
-      t.setAttribute("role", "button"); t.setAttribute("aria-label", mem && mem.code ? "My member card" : "Join La Cabaña Club");
-      t.innerHTML = '<span class="material-symbols-outlined">qr_code_2</span>';
-      t.onclick = function () { location.href = mem && mem.code ? "card.html?c=" + encodeURIComponent(mem.code) : "join.html"; };
+      if (t && !t.closest("a")) t.style.display = "none";
     });
-    // signed in but card not looked up on this phone yet: find it by phone
+    // bottom bar: Account -> member card (members open their card, everyone else signs in or joins)
+    var cardHref = function () { var m = null; try { m = JSON.parse(localStorage.getItem("lc_member") || "null"); } catch (e) {} return m && m.code ? "card.html?c=" + encodeURIComponent(m.code) : "account.html"; };
+    document.querySelectorAll('nav a[data-path="account"], nav a[href="account.html"]').forEach(function (a) {
+      a.setAttribute("href", cardHref()); a.dataset.path = "account";
+      var ic = a.querySelector(".material-symbols-outlined"); if (ic) ic.textContent = "credit_card";
+      var lb = a.querySelectorAll("span"); if (lb.length > 1) lb[lb.length - 1].textContent = "Card";
+    });
     try {
       var acc = JSON.parse(localStorage.getItem("lacabana_account") || "null"), lm = JSON.parse(localStorage.getItem("lc_member") || "null");
       var dg = acc && String(acc.phone || "").replace(/\D/g, "").slice(-10);
@@ -183,7 +173,7 @@
         fetch("https://qzluvwpjtgeccfojutbt.supabase.co/rest/v1/rpc/member_by_phone", { method: "POST", headers: { apikey: "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ", "Content-Type": "application/json" }, body: JSON.stringify({ p_phone: dg }) })
           .then(function (r) { return r.json(); }).then(function (rows) {
             var m = rows && rows[0]; if (!m) return; m.phone = dg; localStorage.setItem("lc_member", JSON.stringify(m));
-            document.querySelectorAll(".lc-hcard").forEach(function (b) { b.setAttribute("aria-label", "My member card"); b.onclick = function () { location.href = "card.html?c=" + encodeURIComponent(m.code); }; });
+            document.querySelectorAll('nav a[data-path="account"]').forEach(function (a) { a.setAttribute("href", cardHref()); });
           }).catch(function () {});
       }
     } catch (e) {}

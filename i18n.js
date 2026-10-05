@@ -2,7 +2,7 @@
 // Dish names stay as they are; everything else switches. New text (cart, menus drawn later) is caught by an observer.
 (function () {
   var ES = {
-    "Home": "Inicio", "Menu": "Menú", "Orders": "Pedidos", "Cart": "Carrito", "Account": "Cuenta", "Messages": "Mensajes", "Policies": "Políticas",
+    "Home": "Inicio", "Menu": "Menú", "Orders": "Pedidos", "Cart": "Carrito", "Account": "Cuenta", "Card": "Tarjeta", "Messages": "Mensajes", "Policies": "Políticas",
     "Authentic Colombian grill, made fresh in Miami Beach.": "Parrilla colombiana auténtica, hecha al momento en Miami Beach.",
     "Colombian parrilla": "Parrilla colombiana", "Order now": "Ordena ya", "Deals": "Ofertas", "Call us": "Llámanos",
     "Fresh from the kitchen": "Recién salido de la cocina", "Made to order, every time.": "Hecho al momento, siempre.",
@@ -105,7 +105,7 @@
     "Type it twice.": "Escríbela dos veces.", "New password": "Contraseña nueva", "Again": "Otra vez", "Save password": "Guardar contraseña",
     "Check your email and tap the link to confirm your account. Then you can sign in on any phone.": "Revisa tu correo y toca el enlace para confirmar tu cuenta. Luego puedes entrar desde cualquier teléfono.",
     "MEMBER CARD": "TARJETA DE MIEMBRO", "Your free drink PIN": "Tu PIN de bebida gratis", "Show your waiter": "Muéstralo a tu mesero",
-    "Open card": "Abrir tarjeta", "Settings": "Ajustes", "Sign out": "Cerrar sesión", "‹ Back": "‹ Atrás", "‹ Home": "‹ Inicio",
+    "Open card": "Abrir tarjeta", "Settings": "Ajustes", "Account and settings": "Cuenta y ajustes", "Sign out": "Cerrar sesión", "‹ Back": "‹ Atrás", "‹ Home": "‹ Inicio",
     "Your info": "Tus datos", "Text me deals and order updates": "Envíenme ofertas y avisos de pedidos", "Save": "Guardar", "Change password": "Cambiar contraseña",
     "Saved": "Guardado", "Password changed.": "Contraseña cambiada.",
     "LOYALTY PROGRAM · FREE TO JOIN": "PROGRAMA DE LEALTAD · GRATIS", "A free drink": "Una bebida gratis", "with your meal.": "con tu comida.",
@@ -163,9 +163,10 @@
     b.innerHTML = '<span class="material-symbols-outlined">translate</span><span class="lf">' + (lang === "es" ? "English" : "Español") + '</span><span class="ls">' + (lang === "es" ? "EN" : "ES") + '</span>';
     b.onclick = function () { try { localStorage.setItem("lc_lang", lang === "es" ? "en" : "es"); } catch (e) {} location.reload(); };
     // next to the bell / card in the header; pages without a header get a small floating one
-    var bell = document.querySelector('header button[aria-label="Enable deal notifications"]') || document.querySelector("header .lc-hcard");
+    // top right corner of the header (where the profile icon used to be); pages without a header get a small floating one
+    var bell = document.querySelector('header button[aria-label="Enable deal notifications"]');
     var host = bell ? bell.parentElement : null;
-    if (host) host.insertBefore(b, host.firstChild); else { b.classList.add("float"); document.body.appendChild(b); }
+    if (host) { b.style.marginLeft = "4px"; host.appendChild(b); } else { b.classList.add("float"); document.body.appendChild(b); }
   }
   function start() {
     button();
