@@ -1169,7 +1169,7 @@ function lcHoursStatus(h, now) {
     const month = startOf(new Date().getDate() - 1);
     $('loy-kpis').innerHTML = kpi('card_membership', 'Member cards', members.length) + kpi('person_add', 'New customers brought', refs.length, '<span class="muted">' + refs.filter(x => new Date(x.created_at) >= month).length + ' this month</span>') +
       kpi('stars', 'Points owed', members.reduce((a, x) => a + x.points, 0), '<span class="muted">= ' + money0(members.reduce((a, x) => a + x.points, 0)) + '</span>') + kpi('loyalty', 'Customer points', customers.reduce((a, c) => a + (c.points || 0), 0)) + kpi('campaign', 'Opted in to deals', customers.filter(c => c.marketing).length);
-    $('mem-tbl').innerHTML = '<tr><th>Member</th><th>Brought</th><th>Points</th><th></th></tr>' + (members.length ? members.map(x => '<tr><td><div class="who"><div class="av">' + esc(initials(x.name)) + '</div><div style="min-width:0"><b>' + esc(x.name) + '</b><small>' + esc(fmtPhone(x.phone)) + (x.note ? ' · ' + esc(x.note) : '') + ' · ' + esc(x.code) + '</small></div></div></td><td>' + (cnt[x.code] || 0) + '</td><td><b style="font-family:Outfit;font-size:16px">' + x.points + '</b> <span class="muted">' + money0(x.points) + '</span></td><td style="white-space:nowrap"><button class="btn sm" data-card="' + esc(x.id) + '"><span class="ms">qr_code_2</span>Card</button> <button class="btn sm" data-perm="points" data-pt="1" data-mid="' + esc(x.id) + '">+1</button> <button class="btn sm" data-perm="points" data-redeem="' + esc(x.id) + '">Redeem</button></td></tr>').join('') : '<tr><td colspan="4"><div class="empty">No member cards yet. Tap "New member card".</div></td></tr>');
+    $('mem-tbl').innerHTML = '<tr><th>Member</th><th>Brought</th><th>Points</th><th></th></tr>' + (members.length ? members.map(x => '<tr><td><div class="who" data-edit="' + esc(x.id) + '" style="cursor:pointer"><div class="av">' + esc(initials(x.name)) + '</div><div style="min-width:0"><b>' + esc(x.name) + ' <span class="ms" style="font-size:15px;vertical-align:-2px;color:var(--fg2)">edit</span></b><small>' + esc(fmtPhone(x.phone)) + (x.note ? ' · ' + esc(x.note) : '') + ' · ' + esc(x.code) + '</small></div></div></td><td>' + (cnt[x.code] || 0) + '</td><td><b style="font-family:Outfit;font-size:16px">' + x.points + '</b> <span class="muted">' + money0(x.points) + '</span></td><td style="white-space:nowrap"><button class="btn sm" data-card="' + esc(x.id) + '"><span class="ms">qr_code_2</span>Card</button> <button class="btn sm" data-perm="points" data-pt="1" data-mid="' + esc(x.id) + '">+1</button> <button class="btn sm" data-perm="points" data-redeem="' + esc(x.id) + '">Redeem</button></td></tr>').join('') : '<tr><td colspan="4"><div class="empty">No member cards yet. Tap "New member card".</div></td></tr>');
     $('ledger').innerHTML = (l || []).length ? l.map(x => { const mm = members.find(y => y.id === x.member_id); return '<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><b style="font-family:Outfit;width:44px;color:' + (x.delta > 0 ? 'var(--gr)' : 'var(--rd)') + '">' + (x.delta > 0 ? '+' : '') + x.delta + '</b><div style="flex:1;min-width:0"><b style="font-size:14px">' + esc(mm ? mm.name : 'Member') + '</b><div class="muted">' + esc(x.reason || '') + (x.by_email ? ' · by ' + esc(x.by_email) : '') + '</div></div><span class="muted">' + new Date(x.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' }) + '</span></div>'; }).join('') : '<div class="empty">No points yet.</div>';
   }
   function modal(html){ const m = document.createElement('div'); m.className = 'modal'; m.innerHTML = '<div class="box">' + html + '</div>'; m.addEventListener('click', e => { if(e.target === m || e.target.closest('[data-close]')) m.remove(); }); document.body.appendChild(m); return m; }
@@ -1184,6 +1184,39 @@ function lcHoursStatus(h, now) {
       m.remove(); await loadMembers(); showCard(data);
     };
   };
+  // full member record: see and change everything
+  async function editMember(x){
+    if(!x) return;
+    const can = PERM && PERM.points;
+    const m = modal('<h3 style="margin-bottom:2px">' + esc(x.name) + '</h3><p class="muted" style="margin:0 0 14px">Member code <b style="color:#fff">' + esc(x.code) + '</b> · joined ' + new Date(x.created_at).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + (x.self_joined ? ' · on the website' : '') + '</p>' +
+      '<div class="stack"><label class="muted" style="font-size:12px">Name<input class="field" id="em-name" value="' + esc(x.name || '') + '"></label>' +
+      '<label class="muted" style="font-size:12px">Phone<input class="field" id="em-phone" type="tel" value="' + esc(x.phone || '') + '"></label>' +
+      '<label class="muted" style="font-size:12px">Email<input class="field" id="em-email" type="email" value="' + esc(x.email || '') + '"></label>' +
+      '<label class="muted" style="font-size:12px">Note (where they work, anything)<input class="field" id="em-note" value="' + esc(x.note || '') + '"></label>' +
+      (can ? '<label class="muted" style="font-size:12px">Points ($1 each)<input class="field" id="em-pts" type="number" min="0" value="' + (x.points || 0) + '"></label>' : '') + '</div>' +
+      '<div class="ch" style="margin-top:16px"><h2 style="font-size:15px">Free drink PINs</h2></div><div id="em-gifts" class="muted">Loading…</div>' +
+      '<div class="row" style="margin-top:16px;flex-wrap:wrap;gap:8px"><a class="btn sm" href="' + cardUrl(x.code) + '" target="_blank"><span class="ms">qr_code_2</span>Open card</a>' + (x.phone ? '<a class="btn sm" href="tel:' + esc(x.phone) + '"><span class="ms">call</span>Call</a><a class="btn sm" href="sms:' + esc(x.phone) + '&body=' + encodeURIComponent('Your La Cabaña member card: ' + cardUrl(x.code)) + '"><span class="ms">sms</span>Text card</a>' : '') + (isOwner ? '<button class="btn sm" id="em-del" style="color:var(--rd)"><span class="ms">delete</span>Delete</button>' : '') + '</div>' +
+      '<div class="row" style="margin-top:16px;justify-content:flex-end"><button class="btn plain" data-close>Cancel</button><button class="btn main" id="em-save">Save</button></div>');
+    sb.from('gifts').select('code,name,created_at,redeemed_at,welcome').eq('member_code', x.code).order('created_at', { ascending: false }).limit(30).then(({ data }) => {
+      const g = data || [];
+      m.querySelector('#em-gifts').innerHTML = g.length ? g.map(y => '<div class="row" style="justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)"><span><b style="color:#fff;font-family:Outfit;letter-spacing:.1em">' + esc(y.code) + '</b> ' + esc(y.welcome ? 'their own welcome drink' : (y.name || 'friend')) + '</span><span>' + (y.redeemed_at ? '<span class="badge g">USED ' + new Date(y.redeemed_at).toLocaleDateString([], { month: 'short', day: 'numeric' }) + '</span>' : '<span class="muted">not used</span>') + '</span></div>').join('') : 'None yet.';
+    });
+    m.querySelector('#em-save').onclick = async () => {
+      const name = m.querySelector('#em-name').value.trim(); if(!name){ toast('Add a name'); return; }
+      const upd = { name, phone: m.querySelector('#em-phone').value.trim() || null, email: m.querySelector('#em-email').value.trim() || null, note: m.querySelector('#em-note').value.trim() || null };
+      const { error } = await sb.from('loyalty_members').update(upd).eq('id', x.id);
+      if(error){ toast('Couldn\'t save: ' + error.message); return; }
+      if(can){ const np = Math.max(0, parseInt(m.querySelector('#em-pts').value, 10) || 0); if(np !== x.points) await sb.rpc('adjust_points', { p_member: x.id, p_delta: np - x.points, p_reason: 'Edited in dashboard' }); }
+      m.remove(); toast('Saved'); loadMembers();
+    };
+    const del = m.querySelector('#em-del');
+    if(del) del.onclick = async () => {
+      if(!confirm('Delete ' + x.name + '\'s member card? Their card link stops working.')) return;
+      const { error } = await sb.from('loyalty_members').delete().eq('id', x.id);
+      if(error){ toast('Couldn\'t delete: ' + error.message); return; }
+      m.remove(); toast('Deleted'); loadMembers();
+    };
+  }
   function showCard(x){
     const m = modal('<h3>' + esc(x.name) + '</h3><p class="muted" style="margin:0 0 14px">Member code <b style="color:#fff">' + esc(x.code) + '</b> · ' + x.points + ' points</p><div style="text-align:center"><div class="qrbox" id="qr"></div><p class="muted">Have ' + esc(x.name.split(' ')[0]) + ' scan this with their phone camera. It opens their member card.</p></div>' +
       '<div class="stack" style="margin-top:12px"><button class="btn main" id="c-share" style="width:100%"><span class="ms">ios_share</span>Send card to ' + esc(x.name.split(' ')[0]) + '</button><button class="btn" id="c-copy" style="width:100%"><span class="ms">link</span>Copy card link</button><button class="btn plain" data-close style="width:100%">Close</button></div>' +
@@ -1204,6 +1237,7 @@ function lcHoursStatus(h, now) {
   };
   $('pin-in').addEventListener('keydown', e => { if(e.key === 'Enter') $('pin-go').click(); });
   $('mem-tbl').addEventListener('click', async e => {
+    const ed = e.target.closest('[data-edit]'); if(ed){ editMember(members.find(x => x.id === ed.dataset.edit)); return; }
     const c = e.target.closest('[data-card]'), p = e.target.closest('[data-pt]'), r = e.target.closest('[data-redeem]');
     if(c){ showCard(members.find(x => x.id === c.dataset.card)); return; }
     if(p){ p.disabled = true; await sb.rpc('adjust_points', { p_member: p.dataset.mid, p_delta: 1, p_reason: 'Walk-in customer' }); toast('+1 point'); loadMembers(); return; }
