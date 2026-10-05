@@ -2,7 +2,7 @@
 // Dish names stay as they are; everything else switches. New text (cart, menus drawn later) is caught by an observer.
 (function () {
   var ES = {
-    "Home": "Inicio", "Menu": "Menú", "Orders": "Pedidos", "Cart": "Carrito", "Account": "Cuenta", "Card": "Tarjeta", "Messages": "Mensajes", "Policies": "Políticas",
+    "Home": "Inicio", "Menu": "Menú", "Orders": "Pedidos", "Cart": "Carrito", "Account": "Cuenta", "Card": "Tarjeta", "Member": "Miembro", "Messages": "Mensajes", "Policies": "Políticas",
     "Authentic Colombian grill, made fresh in Miami Beach.": "Parrilla colombiana auténtica, hecha al momento en Miami Beach.",
     "Colombian parrilla": "Parrilla colombiana", "Order now": "Ordena ya", "Deals": "Ofertas", "Call us": "Llámanos",
     "Fresh from the kitchen": "Recién salido de la cocina", "Made to order, every time.": "Hecho al momento, siempre.",

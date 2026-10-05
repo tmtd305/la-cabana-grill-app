@@ -164,7 +164,7 @@
     document.querySelectorAll('nav a[data-path="account"], nav a[href="account.html"]').forEach(function (a) {
       a.setAttribute("href", cardHref()); a.dataset.path = "account";
       var ic = a.querySelector(".material-symbols-outlined"); if (ic) ic.textContent = "credit_card";
-      var lb = a.querySelectorAll("span"); if (lb.length > 1) lb[lb.length - 1].textContent = "Card";
+      var lb = a.querySelectorAll("span"); if (lb.length > 1) lb[lb.length - 1].textContent = "Member";
     });
     try {
       var acc = JSON.parse(localStorage.getItem("lacabana_account") || "null"), lm = JSON.parse(localStorage.getItem("lc_member") || "null");
