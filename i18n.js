@@ -156,7 +156,7 @@
     if (document.getElementById("lc-lang")) return;
     var css = document.createElement("style");
     css.textContent = "#lc-lang{all:unset;box-sizing:border-box;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 11px;border-radius:999px;border:1px solid rgba(243,99,16,.6);color:#fff;font:800 12.5px Manrope,sans-serif;letter-spacing:.02em;background:rgba(243,99,16,.08)}" +
-      "#lc-lang .material-symbols-outlined{font-size:17px;color:#ff8a3d}#lc-lang .ls{display:none}@media (max-width:420px){#lc-lang{padding:0 9px}#lc-lang .lf{display:none}#lc-lang .ls{display:inline}}#lc-lang.float{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;z-index:60;background:rgba(12,12,12,.85)}";
+      "#lc-lang .material-symbols-outlined{font-size:17px;color:#ff8a3d}#lc-lang .ls{display:none}@media (max-width:420px){#lc-lang{padding:0 11px}#lc-lang .material-symbols-outlined{display:none}}#lc-lang.float{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;z-index:60;background:rgba(12,12,12,.85)}";
     document.head.appendChild(css);
     var b = document.createElement("button"); b.id = "lc-lang"; b.type = "button"; b.setAttribute("data-noi18n", "");
     b.setAttribute("aria-label", lang === "es" ? "Switch to English" : "Cambiar a español");
