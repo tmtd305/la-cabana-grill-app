@@ -411,7 +411,7 @@ function lcHoursStatus(h, now) {
     <section data-view="dash">
       <div class="pin-hero">
         <div class="ph-ic"><span class="ms">local_bar</span></div>
-        <div class="ph-t"><b>Free drinks PIN</b><small>Guest shows a 4-digit PIN from a member's card. Up to 2 free drinks for the party.</small></div>
+        <div class="ph-t"><b>Free drinks PIN</b><small>Guest shows a 4-digit PIN. 1 free drink per person, 2 for the table.</small></div>
         <div class="ph-in"><input id="pin-in" inputmode="numeric" maxlength="4" placeholder="····" autocomplete="off"><button class="btn main" id="pin-go">Use PIN</button></div>
         <div id="pin-out"></div>
       </div>
@@ -521,7 +521,7 @@ function lcHoursStatus(h, now) {
     <!-- LOYALTY -->
     <section data-view="loyalty" data-perm="members" class="hidden">
       <div class="grid kpis" id="loy-kpis" data-perm="points"></div>
-      <div class="banner"><h3>Ambassador cards</h3><p>Give a regular a QR card. Friends who scan it get a PIN for up to 2 free drinks. Every one who comes in = $1 for the member.</p><button class="btn main" id="add-member"><span class="ms">add_card</span>New member card</button></div>
+      <div class="banner"><h3>Ambassador cards</h3><p>Give a regular a QR card. Friends who scan it get a free drink PIN: 1 per person, 2 for the table. Every one who comes in = $1 for the member.</p><button class="btn main" id="add-member"><span class="ms">add_card</span>New member card</button></div>
       <div class="grid two">
         <div class="card">
           <div class="ch"><h2>Members</h2></div>
@@ -532,7 +532,7 @@ function lcHoursStatus(h, now) {
           <div class="stack muted" style="font-size:14px;line-height:1.5">
             <div><b style="color:#fff">1.</b> Tap <b style="color:#fff">New member card</b> and type their name and phone.</div>
             <div><b style="color:#fff">2.</b> They scan the QR that pops up. That opens their member card.</div>
-            <div><b style="color:#fff">3.</b> A friend scans the member's card and gets a <b style="color:#fff">4-digit PIN for up to 2 free drinks</b> right away.</div>
+            <div><b style="color:#fff">3.</b> A friend scans the member's card and gets a <b style="color:#fff">4-digit free drink PIN</b> (1 per person, 2 for the table) right away.</div>
             <div><b style="color:#fff">4.</b> They show the PIN with their meal. Type it in <b style="color:#fff">Free drinks PIN</b> at the top of the Dashboard. It works one time. The member gets <b style="color:#fff">1 point ($1)</b> and sees who came in. A first online order counts too.</div>
             <div><b style="color:#fff">5.</b> Paying a member out? Tap <b style="color:#fff">Redeem</b>.</div>
           </div>
@@ -1233,7 +1233,7 @@ function lcHoursStatus(h, now) {
     if(error || !r){ out.style.color = 'var(--rd)'; out.textContent = /not_found/.test(error && error.message) ? 'That PIN doesn\'t exist.' : 'Couldn\'t check it: ' + (error ? error.message : ''); return; }
     if(r.already){ out.style.color = 'var(--rd)'; out.textContent = 'Already used ' + new Date(r.redeemed_at).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) + '. No free drink.'; return; }
     if(r.member_name === 'welcome'){ out.style.color = 'var(--gr)'; out.textContent = 'Good. 1 free drink' + (r.name ? ' for ' + r.name : '') + '. New club member welcome drink.'; $('pin-in').value = ''; return; }
-    out.style.color = 'var(--gr)'; out.textContent = 'Good. Up to 2 free drinks' + (r.name ? ' for ' + r.name + "'s party" : ' for this party') + '. From ' + r.member_name + ' (+$1 to them).'; $('pin-in').value = ''; loadMembers();
+    out.style.color = 'var(--gr)'; out.textContent = 'Good. Free drink' + (r.name ? ' for ' + r.name : '') + ': 1 if alone, 2 for the table. From ' + r.member_name + ' (+$1 to them).'; $('pin-in').value = ''; loadMembers();
   };
   $('pin-in').addEventListener('keydown', e => { if(e.key === 'Enter') $('pin-go').click(); });
   $('mem-tbl').addEventListener('click', async e => {

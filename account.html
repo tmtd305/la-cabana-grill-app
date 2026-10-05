@@ -2,223 +2,325 @@
 <html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/><link rel="manifest" href="manifest.json"/><meta name="theme-color" content="#131313"/><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#131313;color:#e5e2e1;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script src="data.js"></script><script src="cart.js"></script><script src="notifications.js"></script><script src="account.js"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "surface-variant": "#353534", "on-primary-container": "#4d1900", "on-tertiary-container": "#00226e", "on-secondary-container": "#5b3800", "outline-variant": "#594137", "surface-container-low": "#1c1b1b", "surface-tint": "#ffb596", "surface-dim": "#131313", "error-container": "#93000a", "on-surface-variant": "#e2bfb2", "on-secondary-fixed-variant": "#653e00", "secondary-fixed-dim": "#ffb95f", "flame-glow": "rgba(230, 90, 0, 0.24)", "on-secondary-fixed": "#2a1700", "surface-container-highest": "#353534", "on-tertiary-fixed": "#00164e", "tertiary-fixed": "#dce1ff", "on-error": "#690005", "colombian-red": "#DC2626", "on-primary-fixed-variant": "#7d2d00", "outline": "#a98a7e", "inverse-surface": "#e5e2e1", "secondary-fixed": "#ffddb8", "surface-container-lowest": "#0e0e0e", "text-secondary": "#9CA3AF", "text-primary": "#F9FAFB", "error": "#ffb4ab", "on-primary": "#581e00", "text-muted": "#6B7280", "surface-raised": "#242424", "tertiary-fixed-dim": "#b6c4ff", "background": "#131313", "on-background": "#e5e2e1", "primary": "#ffb596", "secondary-container": "#ee9800", "border-highlight": "rgba(230, 90, 0, 0.35)", "on-error-container": "#ffdad6", "border-subtle": "rgba(255, 255, 255, 0.08)", "surface": "#131313", "primary-fixed-dim": "#ffb596", "on-tertiary": "#05297a", "tertiary": "#b6c4ff", "colombian-blue": "#2563EB", "primary-container": "#f36310", "surface-bright": "#393939", "surface-container": "#201f1f", "surface-elevated": "#2E2E2E", "inverse-primary": "#a33e00", "secondary": "#ffb95f", "tertiary-container": "#748de1", "surface-container-high": "#2a2a2a", "on-surface": "#e5e2e1", "on-tertiary-fixed-variant": "#264191", "primary-fixed": "#ffdbcd", "colombian-yellow": "#FBBF24", "surface-charcoal": "#1A1A1A", "inverse-on-surface": "#313030", "on-primary-fixed": "#360f00", "on-secondary": "#472a00" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-xl": "2rem", "space-xs": "0.25rem", "gutter-tablet": "1.5rem", "space-sm": "0.5rem", "space-lg": "1.5rem", "gutter": "1rem", "space-2xl": "3rem", "margin-tablet": "2rem", "space-md": "1rem", "margin": "1rem" }, fontFamily: { "body-md": ["Manrope"], "headline-md": ["Outfit"], "label-lg": ["Manrope"], "display-lg-mobile": ["Outfit"], "body-lg": ["Manrope"], "headline-lg": ["Outfit"], "label-caps": ["Outfit"], "title-sm": ["Outfit"], "headline-xl": ["Outfit"], "body-sm": ["Manrope"], "label-md": ["Manrope"], "display-lg": ["Outfit"] }, fontSize: { "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }], "headline-md": ["18px", { lineHeight: "24px", fontWeight: "600" }], "label-lg": ["14px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "600" }], "display-lg-mobile": ["32px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700" }], "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }], "headline-lg": ["22px", { lineHeight: "28px", fontWeight: "600" }], "label-caps": ["11px", { lineHeight: "14px", letterSpacing: "0.08em", fontWeight: "700" }], "title-sm": ["16px", { lineHeight: "22px", fontWeight: "600" }], "headline-xl": ["28px", { lineHeight: "34px", letterSpacing: "-0.015em", fontWeight: "600" }], "body-sm": ["12px", { lineHeight: "16px", fontWeight: "400" }], "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }], "display-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.02em", fontWeight: "700" }] } } } };</script><link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2"/><link rel="icon" type="image/png" href="icons/favicon-64.png?v=2"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-title" content="La Cabaña"/><style id="lc-noxscroll">html{overflow-x:hidden;touch-action:manipulation}html,body{max-width:100%;overscroll-behavior-x:none}body{overflow-x:clip;position:relative}main{overflow-x:clip}</style><style id="lc-cloak">html{background:#131313}body{opacity:0}html.lc-splash::before{content:"";position:fixed;inset:0;z-index:2147483646;background:#fff url(icons/logo-transparent.png) center 44%/min(64vw,280px) auto no-repeat;animation:lcSpIn .6s ease both}html.lc-splash::after{content:"";position:fixed;left:50%;top:calc(44% + 118px);width:110px;height:3px;margin-left:-55px;border-radius:3px;z-index:2147483647;background:linear-gradient(90deg,transparent,#f36310,transparent);background-size:200% 100%;animation:lcSpBar 1.1s linear infinite}html.lc-splash-out::before{animation:lcSpOut .5s ease forwards}html.lc-splash-out::after{opacity:0;transition:opacity .25s}@keyframes lcSpIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}@keyframes lcSpOut{from{opacity:1;transform:none}to{opacity:0;transform:scale(1.06)}}@keyframes lcSpBar{from{background-position:200% 0}to{background-position:-200% 0}}</style><script>(function(){var d=document.documentElement,first=false;try{first=!sessionStorage.getItem("lc_splash");sessionStorage.setItem("lc_splash","1")}catch(e){}if(first)d.classList.add("lc-splash");function show(){document.body.style.transition="opacity .25s";document.body.style.opacity="1"}document.addEventListener("DOMContentLoaded",function(){requestAnimationFrame(function(){requestAnimationFrame(show)})});setTimeout(function(){if(document.body)show()},1200);if(first){var t0=Date.now(),done=false;var out=function(){if(done)return;done=true;setTimeout(function(){d.classList.add("lc-splash-out");setTimeout(function(){d.classList.remove("lc-splash","lc-splash-out")},520)},Math.max(0,1900-(Date.now()-t0)))};window.addEventListener("load",out);setTimeout(out,3500)}})();</script><link rel="stylesheet" href="desktop.css?v=2" media="(min-width: 1024px)"/></head><body data-page="account" class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen selection:bg-primary-container selection:text-white"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_4px_20px_rgba(0,0,0,0.45)]"><div class="h-20 px-gutter flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><img alt="La Cabaña logo" class="h-8 w-auto object-contain shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5gyisworKjgP_IkZqsOdfA_PsuLIqwuySE3MjDCLMD9urOUsKMYXBpF0FGvY8tvbngHJNvjcGJ9rh4A6JLIAM58Kd3ME-84nN8Cb6S1S_Gf6RjZ5iovKW9MTuLMrj_oDDq6Ya8cYTLjbqO1eWrZZKp7Xl2fIxfXGByqt-lsQ0DPvAb-WMF_A2Lw2kubdkJ2nPCSC-jhIxSJms3NQiszAi8XlftDwYn6YJdHKoGBjd4LTFXU6tVio6"/><div class="flex flex-col min-w-0"><div class="flex items-center gap-1"><span class="font-headline-md text-headline-md text-text-primary truncate tracking-tight">Account</span></div></div></div><a href="home.html" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-text-primary hover:bg-surface-raised transition-all"><span class="material-symbols-outlined text-[22px]">close</span></a></div></header><main class="flex-1 w-full bg-surface pt-20 pb-28"><div class="flex flex-col w-full px-gutter space-y-space-lg">
 
-<div id="account-view" class="hidden flex-col gap-space-lg">
-<a id="mem-card" href="#" class="hidden" style="display:none;position:relative;border-radius:22px;overflow:hidden;padding:18px;text-decoration:none;color:#fff;background:radial-gradient(120% 80% at 100% 0%,rgba(255,138,61,.55),transparent 55%),linear-gradient(160deg,#241309,#120a05 60%,#0d0907);border:1px solid rgba(255,154,82,.4);box-shadow:0 18px 44px rgba(243,99,16,.22)">
+<style>
+  .ac-card{background:#1c1b1b;border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:18px}
+  .ac-tabs{display:flex;background:#0e0e0e;border-radius:999px;padding:4px;gap:4px}
+  .ac-tabs button{all:unset;cursor:pointer;flex:1;text-align:center;padding:11px 0;border-radius:999px;font:800 14.5px Manrope,sans-serif;color:#9CA3AF}
+  .ac-tabs button.on{background:#f36310;color:#fff;box-shadow:0 4px 14px rgba(243,99,16,.4)}
+  .ac-f{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+  .ac-f span{font:700 12px Manrope,sans-serif;color:#e2bfb2}
+  .ac-f input{height:50px;border-radius:14px;background:#141414;border:1px solid #2a2a2a;padding:0 15px;color:#fff;font:600 16px Manrope,sans-serif;outline:none}
+  .ac-f input:focus{border-color:#f36310}
+  .ac-btn{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:54px;border-radius:999px;font:800 16px Manrope,sans-serif}
+  .ac-btn.main{background:#f36310;color:#fff;box-shadow:0 8px 24px rgba(243,99,16,.35)}
+  .ac-btn.line{border:1px solid #333;color:#fff}
+  .ac-btn.red{color:#ffb4ab}
+  .ac-btn[disabled]{opacity:.5}
+  .ac-link{all:unset;cursor:pointer;color:#ff8a3d;font:700 14px Manrope,sans-serif}
+  .ac-err{color:#f87171;font:700 14px Manrope,sans-serif;margin:-2px 0 10px}
+  .ac-ok{color:#4ade80;font:700 14px Manrope,sans-serif;margin:-2px 0 10px}
+  .ac-perk{display:flex;gap:10px;align-items:center;font:700 14px Manrope,sans-serif;color:#f5f5f5;margin-bottom:8px}
+  .ac-perk .material-symbols-outlined{color:#f36310}
+  .ac-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.06);font:600 15px Manrope,sans-serif;color:#f5f5f5}
+  .ac-row:last-child{border-bottom:0}
+  .ac-row .material-symbols-outlined{color:#f36310;font-size:20px}
+  .ac-h{font:700 22px Outfit,sans-serif;color:#F9FAFB;margin:0}
+  .ac-sub{font:500 13px Manrope,sans-serif;color:#6B7280;margin:4px 0 0}
+  .ac-note{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.4);color:#fde68a;border-radius:14px;padding:12px 14px;font:700 13.5px Manrope,sans-serif}
+  .ac-check{display:flex;gap:10px;align-items:flex-start;font:500 13px Manrope,sans-serif;color:#9CA3AF;margin:4px 0 14px}
+  .ac-check input{width:20px;height:20px;accent-color:#f36310;flex:none;margin-top:1px}
+  [data-ac]{display:none}[data-ac].on{display:flex;flex-direction:column;gap:16px}
+</style>
+
+<!-- signed out: sign in or join -->
+<div data-ac="out">
+<div class="ac-tabs"><button data-tab="in" class="on">Sign in</button><button data-tab="join">Join the club</button></div>
+<form id="ac-in" class="ac-card" autocomplete="on">
+<h1 class="ac-h">Welcome back</h1><p class="ac-sub" style="margin-bottom:16px">Sign in with your email or phone number.</p>
+<label class="ac-f"><span>Email or phone</span><input id="in-id" autocomplete="username" placeholder="you@email.com or (305) 555-0100"></label>
+<label class="ac-f"><span>Password</span><input id="in-pw" type="password" autocomplete="current-password" placeholder="Your password"></label>
+<div class="ac-err" id="in-err" hidden></div>
+<button class="ac-btn main" type="submit">Sign in</button>
+<div style="text-align:center;margin-top:14px"><button type="button" class="ac-link" data-go="forgot">Forgot password?</button></div>
+</form>
+<form id="ac-join" class="ac-card" style="display:none" autocomplete="on">
+<h1 class="ac-h">Join La Cabaña Club</h1><p class="ac-sub" style="margin-bottom:14px">Your account is your loyalty membership. It's free.</p>
+<div class="ac-perk"><span class="material-symbols-outlined">local_bar</span>A free drink when you order a meal</div>
+<div class="ac-perk"><span class="material-symbols-outlined">qr_code_2</span>Your own member card</div>
+<div class="ac-perk" style="margin-bottom:16px"><span class="material-symbols-outlined">group_add</span>Friends you bring get free drinks, you get $1</div>
+<label class="ac-f"><span>Full name</span><input id="j-name" autocomplete="name" autocapitalize="words" placeholder="Jane Rodriguez" required></label>
+<label class="ac-f"><span>Phone</span><input id="j-phone" type="tel" autocomplete="tel" placeholder="(305) 555-0100" required></label>
+<label class="ac-f"><span>Email</span><input id="j-email" type="email" autocomplete="email" placeholder="jane@email.com" required></label>
+<label class="ac-f"><span>Address</span><input id="j-addr" autocomplete="street-address" placeholder="123 Ocean Dr, Miami Beach, FL" required></label>
+<label class="ac-f"><span>Password</span><input id="j-pw" type="password" autocomplete="new-password" placeholder="At least 6 characters" required></label>
+<label class="ac-check"><input id="j-sms" type="checkbox" checked><span>Text me deals and order updates. Msg &amp; data rates may apply. Reply STOP to opt out.</span></label>
+<div class="ac-err" id="j-err" hidden></div>
+<button class="ac-btn main" type="submit">Join La Cabaña Club</button>
+</form>
+</div>
+
+<!-- forgot password -->
+<form data-ac="forgot" id="ac-forgot" class="ac-card">
+<h1 class="ac-h">Reset your password</h1><p class="ac-sub" style="margin-bottom:16px">We'll email you a link to make a new one.</p>
+<label class="ac-f"><span>Email</span><input id="fg-email" type="email" autocomplete="email" placeholder="you@email.com"></label>
+<div class="ac-err" id="fg-err" hidden></div><div class="ac-ok" id="fg-ok" hidden></div>
+<button class="ac-btn main" type="submit">Send reset link</button>
+<button type="button" class="ac-btn line" data-go="out">Back to sign in</button>
+</form>
+
+<!-- new password (from the email link) -->
+<form data-ac="reset" id="ac-reset" class="ac-card">
+<h1 class="ac-h">Make a new password</h1><p class="ac-sub" style="margin-bottom:16px">Type it twice.</p>
+<label class="ac-f"><span>New password</span><input id="rs-pw" type="password" autocomplete="new-password" placeholder="At least 6 characters"></label>
+<label class="ac-f"><span>Again</span><input id="rs-pw2" type="password" autocomplete="new-password"></label>
+<div class="ac-err" id="rs-err" hidden></div>
+<button class="ac-btn main" type="submit">Save password</button>
+</form>
+
+<!-- signed in -->
+<div data-ac="in">
+<div class="ac-note" id="ac-confirm" hidden>Check your email and tap the link to confirm your account. Then you can sign in on any phone.</div>
+<a id="mem-card" href="#" style="display:none;position:relative;border-radius:22px;overflow:hidden;padding:18px;text-decoration:none;color:#fff;background:radial-gradient(120% 80% at 100% 0%,rgba(255,138,61,.55),transparent 55%),linear-gradient(160deg,#241309,#120a05 60%,#0d0907);border:1px solid rgba(255,154,82,.4);box-shadow:0 18px 44px rgba(243,99,16,.22)">
 <div style="display:flex;align-items:center;justify-content:space-between"><img src="icons/logo-transparent.png" alt="" style="height:34px"><span style="font:800 10px Manrope,sans-serif;letter-spacing:.18em;color:#ffb27a;border:1px solid rgba(255,178,122,.45);border-radius:999px;padding:4px 9px">MEMBER CARD</span></div>
 <div id="mem-name" style="font:800 24px Outfit,sans-serif;margin:14px 0 2px"></div>
 <div id="mem-pin" style="display:none;align-items:center;justify-content:space-between;gap:10px;background:#f36310;color:#1a0800;border-radius:14px;padding:10px 14px;margin:8px 0 10px"><span style="font:800 13px Manrope,sans-serif">Your free drink PIN<br><span style="font-weight:600">Show your waiter</span></span><b style="font:800 30px Outfit,sans-serif;letter-spacing:.14em"></b></div>
 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div id="mem-sub" style="font:700 13px Manrope,sans-serif;color:#d9c3b4"></div><span style="display:inline-flex;align-items:center;gap:6px;background:#f36310;color:#1a0800;font:800 14px Manrope,sans-serif;border-radius:999px;padding:9px 14px"><span class="material-symbols-outlined" style="font-size:18px">qr_code_2</span>Open card</span></div>
 </a>
-<div class="bg-surface-container rounded-xl p-space-lg flex items-center gap-space-sm">
+<div class="ac-card" style="display:flex;align-items:center;gap:14px">
 <label class="relative w-16 h-16 rounded-full bg-primary bg-cover bg-center flex items-center justify-center shrink-0 cursor-pointer" id="view-photo" title="Change photo"><span class="material-symbols-outlined text-on-primary text-[28px]" id="view-photo-icon">person</span><span class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary-container flex items-center justify-center shadow"><span class="material-symbols-outlined text-white text-[14px]">photo_camera</span></span><input type="file" accept="image/*" class="hidden" id="view-photo-input"></label>
-<div class="min-w-0">
-<p id="view-name" class="font-headline-md text-headline-md text-text-primary truncate"></p>
-<p id="view-email" class="font-body-sm text-body-sm text-text-muted truncate"></p>
+<div class="min-w-0"><p id="view-name" class="font-headline-md text-headline-md text-text-primary truncate"></p><p id="view-email" class="font-body-sm text-body-sm text-text-muted truncate"></p></div>
 </div>
+<div class="ac-card" style="padding:6px 18px">
+<div class="ac-row"><span class="material-symbols-outlined">call</span><span id="view-phone"></span></div>
+<div class="ac-row"><span class="material-symbols-outlined">location_on</span><span id="view-address"></span></div>
 </div>
-<div class="bg-surface-container rounded-xl p-space-lg flex flex-col gap-space-md">
-<div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary-container text-[20px]">call</span><p id="view-phone" class="font-body-md text-body-md text-text-primary"></p></div>
-<div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary-container text-[20px]">location_on</span><p id="view-address" class="font-body-md text-body-md text-text-primary"></p></div>
-<div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary-container text-[20px]">sms</span><p id="view-sms" class="font-body-md text-body-md text-text-primary"></p></div>
-</div>
-<button onclick="editAccount()" class="w-full h-12 rounded-full bg-surface-container-high text-text-primary font-label-lg text-label-lg flex items-center justify-center gap-2"><span class="material-symbols-outlined text-[18px]">edit</span>Edit Info</button>
-<button onclick="signOutAccount()" class="w-full h-12 rounded-full text-error font-label-lg text-label-lg flex items-center justify-center gap-2">Sign Out</button>
+<button class="ac-btn line" data-go="settings"><span class="material-symbols-outlined">settings</span>Settings</button>
+<button class="ac-btn red" id="ac-out">Sign out</button>
 </div>
 
-<form id="signin-form" class="hidden flex-col gap-space-lg">
-<div>
-<h1 class="font-headline-lg text-headline-lg text-text-primary">Sign In</h1>
-<p class="font-body-sm text-body-sm text-text-muted mt-1">Type the phone number you used before.</p>
-</div>
-<label class="flex flex-col gap-1">
-<span class="font-label-md text-label-md text-on-surface-variant">Phone Number</span>
-<input id="s-phone" required type="tel" inputmode="tel" autocomplete="tel" placeholder="(305) 555-0100" class="h-12 rounded-xl bg-surface-container-low px-4 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
-</label>
-<p id="s-err" class="hidden font-body-sm text-body-sm" style="color:#f87171;font-weight:700"></p>
-<button type="submit" class="w-full h-14 rounded-full bg-primary-container text-white font-label-lg text-label-lg shadow-[0_8px_24px_rgba(243,99,16,0.35)]">Sign In</button>
-<button type="button" onclick="showMode('create')" class="w-full h-12 rounded-full text-text-primary font-label-lg text-label-lg">New here? <span class="text-primary-container">Join La Cabaña Club</span></button>
+<!-- settings -->
+<div data-ac="settings">
+<div style="display:flex;align-items:center;gap:8px"><button class="ac-link" data-go="in" style="color:#9CA3AF">‹ Back</button></div>
+<form id="ac-set" class="ac-card">
+<h1 class="ac-h" style="margin-bottom:14px">Your info</h1>
+<label class="ac-f"><span>Full name</span><input id="st-name" autocomplete="name" autocapitalize="words"></label>
+<label class="ac-f"><span>Phone</span><input id="st-phone" type="tel" autocomplete="tel"></label>
+<label class="ac-f"><span>Address</span><input id="st-addr" autocomplete="street-address"></label>
+<label class="ac-f"><span>Email</span><input id="st-email" type="email" autocomplete="email"></label>
+<label class="ac-check"><input id="st-sms" type="checkbox"><span>Text me deals and order updates</span></label>
+<div class="ac-err" id="st-err" hidden></div><div class="ac-ok" id="st-ok" hidden></div>
+<button class="ac-btn main" type="submit">Save</button>
 </form>
-
-<form id="account-form" class="flex flex-col gap-space-lg">
-<button type="button" id="to-signin" onclick="showMode('signin')" class="w-full h-14 rounded-full border border-primary-container text-text-primary font-label-lg text-label-lg flex items-center justify-center gap-2" style="box-shadow:0 0 14px rgba(243,99,16,.25)"><span class="material-symbols-outlined text-[20px] text-primary-container">login</span>Already have an account? Sign in</button>
-<div>
-<h1 class="font-headline-lg text-headline-lg text-text-primary">Join La Cabaña Club</h1>
-<p class="font-body-sm text-body-sm text-text-muted mt-1">Your account is your loyalty membership. It's free.</p>
-<div style="display:grid;gap:8px;margin-top:12px">
-<div style="display:flex;gap:10px;align-items:center;font:700 14px Manrope,sans-serif;color:#f5f5f5"><span class="material-symbols-outlined" style="color:#f36310">local_bar</span>A free drink when you order a meal</div>
-<div style="display:flex;gap:10px;align-items:center;font:700 14px Manrope,sans-serif;color:#f5f5f5"><span class="material-symbols-outlined" style="color:#f36310">qr_code_2</span>Your own member card on your profile</div>
-<div style="display:flex;gap:10px;align-items:center;font:700 14px Manrope,sans-serif;color:#f5f5f5"><span class="material-symbols-outlined" style="color:#f36310">group_add</span>Friends you bring get free drinks, you get $1 each</div>
-<div style="display:flex;gap:10px;align-items:center;font:700 14px Manrope,sans-serif;color:#f5f5f5"><span class="material-symbols-outlined" style="color:#f36310">bolt</span>Faster checkout and order updates</div>
-</div>
-</div>
-<div class="flex flex-col gap-space-sm">
-<div class="flex items-center gap-space-md">
-<label class="relative w-20 h-20 rounded-full bg-surface-container-low bg-cover bg-center flex items-center justify-center shrink-0 cursor-pointer border-2 border-dashed border-outline-variant" id="f-photo-prev"><span class="material-symbols-outlined text-text-muted text-[30px]" id="f-photo-icon">add_a_photo</span><input type="file" accept="image/*" class="hidden" id="f-photo"></label>
-<div><p class="font-label-lg text-label-lg text-text-primary">Profile photo</p><p class="font-body-sm text-body-sm text-text-muted">So our team recognizes you at pickup.</p></div>
-</div>
-<label class="flex flex-col gap-1">
-<span class="font-label-md text-label-md text-on-surface-variant">Full Name</span>
-<input id="f-name" required type="text" placeholder="Jane Rodriguez" class="h-12 rounded-xl bg-surface-container-low px-4 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
-</label>
-<label class="flex flex-col gap-1">
-<span class="font-label-md text-label-md text-on-surface-variant">Phone Number</span>
-<input id="f-phone" required type="tel" placeholder="(305) 555-0100" class="h-12 rounded-xl bg-surface-container-low px-4 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
-</label>
-<label class="flex flex-col gap-1">
-<span class="font-label-md text-label-md text-on-surface-variant">Email</span>
-<input id="f-email" required type="email" placeholder="jane@email.com" class="h-12 rounded-xl bg-surface-container-low px-4 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
-</label>
-<label class="flex flex-col gap-1">
-<span class="font-label-md text-label-md text-on-surface-variant">Address</span>
-<input id="f-address" required type="text" placeholder="123 Ocean Dr, Miami Beach, FL" class="h-12 rounded-xl bg-surface-container-low px-4 text-text-primary placeholder:text-text-muted outline-none focus:ring-2 focus:ring-primary-container"/>
-</label>
-</div>
-<label class="flex items-start gap-space-sm bg-surface-container rounded-xl p-space-md cursor-pointer">
-<input id="f-sms" type="checkbox" checked class="accent-primary-container w-5 h-5 mt-0.5 shrink-0"/>
-<span class="font-body-sm text-body-sm text-text-secondary">Yes, text me deals and order updates. Msg &amp; data rates may apply. Reply STOP to opt out anytime.</span>
-</label>
-<button type="submit" class="w-full h-14 rounded-full bg-primary-container text-white font-label-lg text-label-lg shadow-[0_8px_24px_rgba(243,99,16,0.35)]">Join La Cabaña Club</button>
+<form id="ac-pw" class="ac-card">
+<h1 class="ac-h" style="margin-bottom:14px">Change password</h1>
+<label class="ac-f"><span>New password</span><input id="pw-1" type="password" autocomplete="new-password" placeholder="At least 6 characters"></label>
+<label class="ac-f"><span>Again</span><input id="pw-2" type="password" autocomplete="new-password"></label>
+<div class="ac-err" id="pw-err" hidden></div><div class="ac-ok" id="pw-ok" hidden></div>
+<button class="ac-btn main" type="submit">Change password</button>
 </form>
+</div>
 
 </div></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-8px_24px_rgba(0,0,0,0.55)]" data-active-classes="text-primary-container font-headline-md"><div class="h-16 px-gutter flex items-center justify-around"><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="home" href="home.html"><span class="material-symbols-outlined text-[24px]">local_fire_department</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="menu" href="menu.html"><span class="material-symbols-outlined text-[24px]">restaurant_menu</span><span class="font-label-caps text-label-caps">Menu</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="orders" href="orders.html"><span class="material-symbols-outlined text-[24px]">receipt_long</span><span class="font-label-caps text-label-caps">Orders</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="favorites" href="home.html#favorites"><span class="material-symbols-outlined text-[24px]">favorite</span><span class="font-label-caps text-label-caps">Favorites</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 transition-colors text-primary-container font-headline-md" data-path="account" href="account.html"><span class="material-symbols-outlined text-[24px]">account_circle</span><span class="font-label-caps text-label-caps">Account</span></a></div></nav>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-function renderAccount() {
-  const account = getAccount();
-  const formEl = document.getElementById("account-form");
-  const viewEl = document.getElementById("account-view");
-  if (account) {
-    formEl.classList.add("hidden");
-    viewEl.classList.remove("hidden");
-    viewEl.classList.add("flex");
-    document.getElementById("view-name").textContent = account.name;
-    document.getElementById("view-email").textContent = account.email;
-    document.getElementById("view-phone").textContent = account.phone;
-    document.getElementById("view-address").textContent = account.address;
-    document.getElementById("view-sms").textContent = account.sms ? "SMS marketing: On" : "SMS marketing: Off";
-    setPhoto("view-photo", "view-photo-icon", account.photo);
-    showMemberCard(account.phone);
-  } else {
-    formEl.classList.remove("hidden");
-    document.getElementById("to-signin").classList.remove("hidden");
-    viewEl.classList.add("hidden");
-    viewEl.classList.remove("flex");
+// Customer accounts: real logins (email or phone + password), reset by email, settings.
+// Own storage key so a customer login never mixes with a staff login on the same phone.
+var SB_URL = "https://qzluvwpjtgeccfojutbt.supabase.co", SB_KEY = "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ";
+var csb = supabase.createClient(SB_URL, SB_KEY, { auth: { storageKey: "lc-customer-auth", persistSession: true, detectSessionInUrl: true } });
+var $ = function (id) { return document.getElementById(id); };
+var rpc = function (fn, body) { return fetch(SB_URL + "/rest/v1/rpc/" + fn, { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(function (r) { return r.status === 204 ? null : r.json(); }); };
+var digits = function (p) { return String(p || "").replace(/\D/g, "").slice(-10); };
+var fmtPh = function (p) { var d = digits(p); return d.length === 10 ? "(" + d.slice(0, 3) + ") " + d.slice(3, 6) + "-" + d.slice(6) : (p || ""); };
+function msg(id, t) { var e = $(id); if (!e) return; e.textContent = t || ""; e.hidden = !t; }
+function busy(form, on, label) { var b = form.querySelector('button[type="submit"]'); if (!b) return; if (on) { b.dataset.t = b.textContent; b.textContent = label || "…"; b.disabled = true; } else { b.textContent = b.dataset.t || b.textContent; b.disabled = false; } }
+function device() { var v = localStorage.getItem("lc_vid"); if (!v) { v = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem("lc_vid", v); } return v; }
+
+var view = "out";
+function show(v) {
+  view = v;
+  document.querySelectorAll("[data-ac]").forEach(function (el) { el.classList.toggle("on", el.dataset.ac === v); });
+  if (v === "in") paintIn();
+  if (v === "settings") paintSettings();
+  window.scrollTo(0, 0);
+}
+document.addEventListener("click", function (e) {
+  var g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); show(g.dataset.go); return; }
+  var t = e.target.closest("[data-tab]"); if (t) {
+    document.querySelectorAll("[data-tab]").forEach(function (b) { b.classList.toggle("on", b === t); });
+    $("ac-in").style.display = t.dataset.tab === "in" ? "" : "none"; $("ac-join").style.display = t.dataset.tab === "join" ? "" : "none";
   }
+});
+
+// keep the device copy (used by checkout) in sync with the real account
+function syncLocal(user) {
+  var md = (user && user.user_metadata) || {}, a = getAccount() || {};
+  saveAccount({ name: md.name || a.name || "", phone: md.phone || a.phone || "", email: user.email || a.email || "", address: md.address || a.address || "", sms: md.sms != null ? !!md.sms : !!a.sms, photo: a.photo || "" });
+}
+
+function paintIn() {
+  var a = getAccount() || {};
+  $("view-name").textContent = a.name || ""; $("view-email").textContent = a.email || "";
+  $("view-phone").textContent = fmtPh(a.phone) || "Add your phone in Settings";
+  $("view-address").textContent = a.address || "Add your address in Settings";
+  setPhoto("view-photo", "view-photo-icon", a.photo);
+  $("ac-confirm").hidden = !localStorage.getItem("lc_pending_confirm");
+  showMemberCard(a.phone);
+}
+function paintSettings() {
+  var a = getAccount() || {};
+  $("st-name").value = a.name || ""; $("st-phone").value = a.phone || ""; $("st-addr").value = a.address || ""; $("st-email").value = a.email || ""; $("st-sms").checked = !!a.sms;
+  msg("st-err"); msg("st-ok"); msg("pw-err"); msg("pw-ok");
 }
 
 // loyalty member? their card goes first on the profile
 async function showMemberCard(phone) {
-  var el = document.getElementById("mem-card"), digits = String(phone || "").replace(/\D/g, "");
+  var el = $("mem-card"), d = digits(phone);
   var paint = function (m) {
     if (!m) { el.style.display = "none"; return; }
     el.href = "card.html?c=" + encodeURIComponent(m.code); el.style.display = "block";
-    document.getElementById("mem-name").textContent = m.name;
-    document.getElementById("mem-sub").textContent = m.code + " · $" + (m.points || 0) + " earned";
+    $("mem-name").textContent = m.name; $("mem-sub").textContent = m.code + " · $" + (m.points || 0) + " earned";
     var wl = null; try { wl = JSON.parse(localStorage.getItem("lc_welcome") || "null"); } catch (e) {}
-    var pb = document.getElementById("mem-pin");
+    var pb = $("mem-pin");
     if (wl && wl.code === m.code && wl.pin && !wl.used) {
       pb.style.display = "flex"; pb.querySelector("b").textContent = wl.pin;
-      fetch("https://qzluvwpjtgeccfojutbt.supabase.co/rest/v1/rpc/pin_used", { method: "POST", headers: { apikey: "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ", "Content-Type": "application/json" }, body: JSON.stringify({ p_code: wl.pin, p_device: localStorage.getItem("lc_vid") || "" }) })
-        .then(function (r) { return r.json(); }).then(function (used) { if (used === true) { wl.used = true; localStorage.setItem("lc_welcome", JSON.stringify(wl)); pb.style.display = "none"; } }).catch(function () {});
+      rpc("pin_used", { p_code: wl.pin, p_device: device() }).then(function (used) { if (used === true) { wl.used = true; localStorage.setItem("lc_welcome", JSON.stringify(wl)); pb.style.display = "none"; } }).catch(function () {});
     } else pb.style.display = "none";
   };
   var cached = null; try { cached = JSON.parse(localStorage.getItem("lc_member") || "null"); } catch (e) {}
-  if (cached && cached.phone === digits.slice(-10)) paint(cached);
-  if (digits.length < 10) { paint(null); return; }
+  if (cached && cached.phone === d) paint(cached);
+  if (d.length < 10) { paint(null); return; }
   try {
-    var r = await fetch("https://qzluvwpjtgeccfojutbt.supabase.co/rest/v1/rpc/member_by_phone", { method: "POST", headers: { apikey: "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ", "Content-Type": "application/json" }, body: JSON.stringify({ p_phone: digits }) });
-    var m = (await r.json())[0] || null;
-    if (m) { m.phone = digits.slice(-10); localStorage.setItem("lc_member", JSON.stringify(m)); } else localStorage.removeItem("lc_member");
+    var m = ((await rpc("member_by_phone", { p_phone: d })) || [])[0] || null;
+    if (m) { m.phone = d; localStorage.setItem("lc_member", JSON.stringify(m)); } else localStorage.removeItem("lc_member");
     paint(m);
   } catch (e) {}
 }
 
-function showMode(mode) {
-  var si = document.getElementById("signin-form"), cr = document.getElementById("account-form");
-  si.classList.toggle("hidden", mode !== "signin"); si.classList.toggle("flex", mode === "signin");
-  cr.classList.toggle("hidden", mode === "signin");
-  if (mode === "signin") document.getElementById("s-phone").focus();
-  window.scrollTo(0, 0);
-}
-document.getElementById("signin-form").addEventListener("submit", async function (e) {
-  e.preventDefault();
-  var ph = document.getElementById("s-phone").value.trim(), err = document.getElementById("s-err");
-  var show = function (t) { err.textContent = t; err.classList.toggle("hidden", !t); };
-  if (ph.replace(/\D/g, "").length < 10) return show("Type your 10-digit phone number.");
-  show("");
-  try {
-    var r = await fetch("https://qzluvwpjtgeccfojutbt.supabase.co/rest/v1/rpc/account_signin", { method: "POST", headers: { apikey: "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ", "Content-Type": "application/json" }, body: JSON.stringify({ p_phone: ph }) });
-    var row = (await r.json())[0];
-    if (!row || !row.name) return show("We don't have that number yet. Tap Join La Cabaña Club below.");
-    saveAccount({ name: row.name, phone: ph, email: "", address: "", sms: true, photo: "" });
-    showToast("Welcome back, " + row.name.split(" ")[0]);
-    document.getElementById("signin-form").classList.add("hidden"); document.getElementById("signin-form").classList.remove("flex");
-    renderAccount();
-  } catch (x) { show("Couldn't sign in. Try again."); }
-});
-
-function editAccount() {
-  const account = getAccount();
-  if (account) {
-    document.getElementById("f-name").value = account.name;
-    document.getElementById("f-phone").value = account.phone;
-    document.getElementById("f-email").value = account.email;
-    document.getElementById("f-address").value = account.address;
-    document.getElementById("f-sms").checked = account.sms;
-    formPhoto = account.photo || "";
-    setPhoto("f-photo-prev", "f-photo-icon", formPhoto);
-  }
-  document.getElementById("account-view").classList.add("hidden");
-  document.getElementById("account-view").classList.remove("flex");
-  document.getElementById("account-form").classList.remove("hidden");
-  document.getElementById("to-signin").classList.add("hidden");
-}
-
 var formPhoto = "";
-function setPhoto(boxId, iconId, photo) {
-  var box = document.getElementById(boxId), icon = document.getElementById(iconId);
-  box.style.backgroundImage = photo ? "url(" + photo + ")" : "";
-  icon.style.display = photo ? "none" : "";
-}
-document.getElementById("f-photo").addEventListener("change", async function (e) {
+function setPhoto(boxId, iconId, photo) { var box = $(boxId), icon = $(iconId); box.style.backgroundImage = photo ? "url(" + photo + ")" : ""; icon.style.display = photo ? "none" : ""; }
+$("view-photo-input").addEventListener("change", async function (e) {
   var f = e.target.files && e.target.files[0]; if (!f) return;
-  try { formPhoto = await shrinkPhoto(f); setPhoto("f-photo-prev", "f-photo-icon", formPhoto); } catch (err) { showToast(err.message); }
-});
-document.getElementById("view-photo-input").addEventListener("change", async function (e) {
-  var f = e.target.files && e.target.files[0]; if (!f) return;
-  try { var a = getAccount(); a.photo = await shrinkPhoto(f); saveAccount(a); renderAccount(); showToast("Photo updated"); } catch (err) { showToast(err.message); }
+  try { var a = getAccount() || {}; a.photo = await shrinkPhoto(f); saveAccount(a); paintIn(); showToast("Photo updated"); } catch (err) { showToast(err.message); }
 });
 
-function signOutAccount() {
-  clearAccount();
-  renderAccount();
-  showToast("Signed out");
-}
-
-document.getElementById("account-form").addEventListener("submit", function (e) {
-  e.preventDefault();
-  saveAccount({
-    name: document.getElementById("f-name").value.trim(),
-    phone: document.getElementById("f-phone").value.trim(),
-    email: document.getElementById("f-email").value.trim(),
-    address: document.getElementById("f-address").value.trim(),
-    sms: document.getElementById("f-sms").checked,
-    photo: formPhoto
-  });
-  try { fetch("https://qzluvwpjtgeccfojutbt.supabase.co/rest/v1/rpc/save_app_account", { method: "POST", headers: { apikey: "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ", "Content-Type": "application/json" }, body: JSON.stringify({ p_phone: document.getElementById("f-phone").value.trim(), p_name: document.getElementById("f-name").value.trim(), p_email: document.getElementById("f-email").value.trim(), p_sms: document.getElementById("f-sms").checked }) }); } catch (x) {}
-  var joined = /[?&]join=1/.test(location.search);
-  var dev = localStorage.getItem("lc_vid"); if (!dev) { dev = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem("lc_vid", dev); }
-  fetch("https://qzluvwpjtgeccfojutbt.supabase.co/rest/v1/rpc/join_loyalty", { method: "POST", headers: { apikey: "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ", "Content-Type": "application/json" }, body: JSON.stringify({ p_name: document.getElementById("f-name").value.trim(), p_phone: document.getElementById("f-phone").value.trim(), p_device: dev }) })
-    .then(function (r) { return r.json(); }).then(function (j) {
-      var r = j && j[0]; if (!r) return;
-      if (r.pin) localStorage.setItem("lc_welcome", JSON.stringify({ code: r.code, pin: r.pin }));
-      renderAccount(); showToast("You're in the club. Your free drink PIN is on your card");
-    }).catch(function () {});
-  showToast(joined ? "Welcome to La Cabaña Club" : "Account saved");
-  renderAccount();
-  if (joined) setTimeout(function () { location.href = "home.html"; }, 1400);   // came from "Join free": back to ordering
+// sign in: email or phone + password
+$("ac-in").addEventListener("submit", async function (e) {
+  e.preventDefault(); var f = this, id = $("in-id").value.trim(), pw = $("in-pw").value;
+  if (!id || !pw) return msg("in-err", "Type your email or phone and your password.");
+  msg("in-err"); busy(f, true, "Signing in…");
+  try {
+    var email = id;
+    if (id.indexOf("@") < 0) {
+      if (digits(id).length < 10) { busy(f, false); return msg("in-err", "Type your email, or your 10-digit phone number."); }
+      var r = await fetch(SB_URL + "/rest/v1/rpc/login_email", { method: "POST", headers: { apikey: SB_KEY, "Content-Type": "application/json" }, body: JSON.stringify({ p_phone: id, p_password: pw }) });
+      var j = await r.json();
+      if (!r.ok) { busy(f, false); return msg("in-err", /too_many/.test(j.message || "") ? "Too many tries. Wait 15 minutes or use Forgot password." : "Couldn't sign in. Try again."); }
+      if (!j) { busy(f, false); return msg("in-err", "Wrong phone or password."); }
+      email = j;
+    }
+    var res = await csb.auth.signInWithPassword({ email: email, password: pw });
+    busy(f, false);
+    if (res.error) return msg("in-err", /confirm/i.test(res.error.message) ? "Confirm your email first. Check your inbox for our link." : "Wrong email or password.");
+    localStorage.removeItem("lc_pending_confirm"); syncLocal(res.data.user);
+    showToast("Welcome back, " + ((getAccount() || {}).name || "").split(" ")[0]); show("in");
+  } catch (x) { busy(f, false); msg("in-err", "Couldn't sign in. Try again."); }
 });
 
-document.addEventListener("DOMContentLoaded", renderAccount);
+// join = create the account + become a club member
+$("ac-join").addEventListener("submit", async function (e) {
+  e.preventDefault(); var f = this;
+  var name = $("j-name").value.trim(), phone = $("j-phone").value.trim(), email = $("j-email").value.trim().toLowerCase(), addr = $("j-addr").value.trim(), pw = $("j-pw").value, sms = $("j-sms").checked;
+  if (!name || !email || !addr) return msg("j-err", "Fill in every box.");
+  if (digits(phone).length < 10) return msg("j-err", "Type your 10-digit phone number.");
+  if (pw.length < 6) return msg("j-err", "Password needs at least 6 characters.");
+  msg("j-err"); busy(f, true, "Joining…");
+  var res = await csb.auth.signUp({ email: email, password: pw, options: { emailRedirectTo: location.origin + "/account.html", data: { name: name, phone: phone, address: addr, sms: sms, customer: true } } });
+  if (res.error) { busy(f, false); return msg("j-err", /registered|exists/i.test(res.error.message) ? "That email already has an account. Tap Sign in." : res.error.message); }
+  var a = getAccount() || {};
+  saveAccount({ name: name, phone: phone, email: email, address: addr, sms: sms, photo: a.photo || "" });
+  if (!res.data.session) localStorage.setItem("lc_pending_confirm", email); else localStorage.removeItem("lc_pending_confirm");
+  rpc("save_app_account", { p_phone: phone, p_name: name, p_email: email, p_sms: sms }).catch(function () {});
+  try {
+    var r = ((await rpc("join_loyalty", { p_name: name, p_phone: phone, p_device: device() })) || [])[0];
+    if (r && r.pin) localStorage.setItem("lc_welcome", JSON.stringify({ code: r.code, pin: r.pin }));
+  } catch (x) {}
+  busy(f, false); showToast("Welcome to La Cabaña Club"); show("in");
+});
+
+// forgot password: email a reset link
+$("ac-forgot").addEventListener("submit", async function (e) {
+  e.preventDefault(); var f = this, email = $("fg-email").value.trim();
+  if (email.indexOf("@") < 0) return msg("fg-err", "Type the email on your account.");
+  msg("fg-err"); msg("fg-ok"); busy(f, true, "Sending…");
+  var r = await csb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + "/account.html" });
+  busy(f, false);
+  if (r.error) return msg("fg-err", /rate|seconds/i.test(r.error.message) ? "Wait a minute, then try again." : "Couldn't send it. Try again.");
+  msg("fg-ok", "Sent. Open the email and tap the link to make a new password.");
+});
+
+// came back from the reset email
+$("ac-reset").addEventListener("submit", async function (e) {
+  e.preventDefault(); var f = this, p1 = $("rs-pw").value, p2 = $("rs-pw2").value;
+  if (p1.length < 6) return msg("rs-err", "At least 6 characters."); if (p1 !== p2) return msg("rs-err", "They don't match.");
+  busy(f, true, "Saving…"); var r = await csb.auth.updateUser({ password: p1 }); busy(f, false);
+  if (r.error) return msg("rs-err", r.error.message);
+  syncLocal(r.data.user); showToast("Password changed"); show("in");
+});
+
+// settings: name, phone, address, email, texts
+$("ac-set").addEventListener("submit", async function (e) {
+  e.preventDefault(); var f = this;
+  var name = $("st-name").value.trim(), phone = $("st-phone").value.trim(), addr = $("st-addr").value.trim(), email = $("st-email").value.trim().toLowerCase(), sms = $("st-sms").checked;
+  if (!name) return msg("st-err", "Add your name."); if (phone && digits(phone).length < 10) return msg("st-err", "Check your phone number.");
+  msg("st-err"); msg("st-ok"); busy(f, true, "Saving…");
+  var a = getAccount() || {}, note = "Saved";
+  var s = (await csb.auth.getSession()).data.session;
+  if (s) {
+    var upd = { data: { name: name, phone: phone, address: addr, sms: sms } };
+    if (email && email !== (s.user.email || "").toLowerCase()) { upd.email = email; note = "Saved. Check your new email to confirm the change."; }
+    var r = await csb.auth.updateUser(upd);
+    if (r.error) { busy(f, false); return msg("st-err", r.error.message); }
+  }
+  saveAccount({ name: name, phone: phone, email: s ? (a.email || email) : email, address: addr, sms: sms, photo: a.photo || "" });
+  rpc("save_app_account", { p_phone: phone, p_name: name, p_email: email, p_sms: sms }).catch(function () {});
+  busy(f, false); msg("st-ok", note);
+});
+$("ac-pw").addEventListener("submit", async function (e) {
+  e.preventDefault(); var f = this, p1 = $("pw-1").value, p2 = $("pw-2").value;
+  if (p1.length < 6) return msg("pw-err", "At least 6 characters."); if (p1 !== p2) return msg("pw-err", "They don't match.");
+  var s = (await csb.auth.getSession()).data.session;
+  if (!s) return msg("pw-err", "Confirm your email and sign in first.");
+  msg("pw-err"); busy(f, true, "Saving…"); var r = await csb.auth.updateUser({ password: p1 }); busy(f, false);
+  if (r.error) return msg("pw-err", r.error.message);
+  $("pw-1").value = ""; $("pw-2").value = ""; msg("pw-ok", "Password changed.");
+});
+
+$("ac-out").onclick = async function () {
+  await csb.auth.signOut(); clearAccount();
+  ["lc_member", "lc_pending_confirm"].forEach(function (k) { localStorage.removeItem(k); });
+  showToast("Signed out"); show("out");
+};
+
+csb.auth.onAuthStateChange(function (ev, s) {
+  if (ev === "PASSWORD_RECOVERY") { show("reset"); return; }
+  if (ev === "SIGNED_IN" && s && view === "out") { localStorage.removeItem("lc_pending_confirm"); syncLocal(s.user); show("in"); }
+});
+
+(async function start() {
+  var s = (await csb.auth.getSession()).data.session;
+  if (/type=recovery/.test(location.hash)) { show("reset"); return; }
+  if (s) { syncLocal(s.user); show("in"); return; }
+  var a = getAccount();
+  if (a && localStorage.getItem("lc_pending_confirm")) { show("in"); return; }
+  show("out");
+  // an older device-only account: help them make a real one with the same info
+  if (a) {
+    $("j-name").value = a.name || ""; $("j-phone").value = a.phone || ""; $("j-email").value = a.email || ""; $("j-addr").value = a.address || "";
+    $("in-id").value = a.email || a.phone || "";
+  }
+  if (/[?&]join=1/.test(location.search)) document.querySelector('[data-tab="join"]').click();
+})();
 </script>
+
 <script src="ui.js"></script><script src="ptr.js"></script>
 </body></html>
