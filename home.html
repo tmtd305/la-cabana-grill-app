@@ -101,7 +101,8 @@
   .lc-mb-k{font:800 11px Outfit,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#4cc417;}
   .lc-mb h4{font:800 17px/1.2 Outfit,sans-serif;color:#fff;margin:2px 0;}
   .lc-mb p{font:500 12.5px/1.35 Manrope,sans-serif;color:#9CA3AF;}
-  .lc-mb a{flex-shrink:0;padding:10px 14px;border-radius:14px;background:#4cc417;color:#0b1a00;font:800 13px Manrope,sans-serif;text-decoration:none;}
+  .lc-club{text-decoration:none;background:linear-gradient(135deg,#2a1206 0%,#1c1b1b 65%)!important;border-color:rgba(243,99,16,.45)!important}.lc-club .lc-mb-k{color:#ff8a3d}.lc-go{flex-shrink:0;padding:10px 14px;border-radius:14px;background:#f36310;color:#1a0800;font:800 13px Manrope,sans-serif}
+.lc-mb a{flex-shrink:0;padding:10px 14px;border-radius:14px;background:#4cc417;color:#0b1a00;font:800 13px Manrope,sans-serif;text-decoration:none;}
   .lc-reel-row{display:flex;gap:12px;overflow-x:auto;margin:0 -16px;padding:0 16px 4px;scroll-padding:0 16px;scroll-snap-type:x mandatory;scrollbar-width:none;}
   .lc-reel-row::-webkit-scrollbar{display:none;}
   .lc-reel{position:relative;flex:0 0 62%;aspect-ratio:9/16;border-radius:22px;overflow:hidden;background:#1c1b1b;scroll-snap-align:start;box-shadow:0 14px 30px rgba(0,0,0,.5);}
@@ -407,8 +408,14 @@
 
 
   // Membership card: join to get a free juice with every meal (hidden while MEMBER_PERKS is off)
-  if (MEMBER_PERKS) {
+  {
     const a = typeof getAccount === 'function' ? getAccount() : null, j = (typeof JUICES !== 'undefined' && JUICES[2]) || {};
+    let mem = null; try { mem = JSON.parse(localStorage.getItem('lc_member') || 'null'); } catch (e) {}
+    document.getElementById('lc-member').innerHTML = mem && mem.code
+      ? '<a class="lc-mb lc-club" href="card.html?c=' + encodeURIComponent(mem.code) + '"><img src="icons/logo-transparent.png" alt="" style="object-fit:contain;background:#1a0c05;padding:6px"/><div class="min-w-0 flex-1"><div class="lc-mb-k">La Cabaña Club</div><h4>Your member card</h4><p>Show it to friends. They get free drinks, you get $1.</p></div><span class="lc-go">Open</span></a>'
+      : '<a class="lc-mb lc-club" href="join.html"><img src="' + esc(j.img || 'images/juice-mango.jpg') + '" alt=""/><div class="min-w-0 flex-1"><div class="lc-mb-k">La Cabaña Club · Free</div><h4>Join and get a free drink</h4><p>With your meal. Plus your own member card.</p></div><span class="lc-go">Join</span></a>';
+  }
+  if (false) {
     document.getElementById('lc-member').innerHTML = a
       ? '<div class="lc-mb"><img src="' + esc(j.img || '') + '" alt=""/><div class="min-w-0"><div class="lc-mb-k">Member</div><h4>Hi ' + esc((a.name || '').split(' ')[0]) + ', your juice is on us</h4><p>A free natural juice comes with every meal.</p></div></div>'
       : '<div class="lc-mb"><img src="' + esc(j.img || '') + '" alt=""/><div class="min-w-0 flex-1"><div class="lc-mb-k">Members only</div><h4>Free juice with every meal</h4><p>Join free in 30 seconds.</p></div><a href="account.html?join=1">Join free</a></div>';

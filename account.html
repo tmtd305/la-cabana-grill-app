@@ -6,6 +6,7 @@
 <a id="mem-card" href="#" class="hidden" style="display:none;position:relative;border-radius:22px;overflow:hidden;padding:18px;text-decoration:none;color:#fff;background:radial-gradient(120% 80% at 100% 0%,rgba(255,138,61,.55),transparent 55%),linear-gradient(160deg,#241309,#120a05 60%,#0d0907);border:1px solid rgba(255,154,82,.4);box-shadow:0 18px 44px rgba(243,99,16,.22)">
 <div style="display:flex;align-items:center;justify-content:space-between"><img src="icons/logo-transparent.png" alt="" style="height:34px"><span style="font:800 10px Manrope,sans-serif;letter-spacing:.18em;color:#ffb27a;border:1px solid rgba(255,178,122,.45);border-radius:999px;padding:4px 9px">MEMBER CARD</span></div>
 <div id="mem-name" style="font:800 24px Outfit,sans-serif;margin:14px 0 2px"></div>
+<div id="mem-pin" style="display:none;align-items:center;justify-content:space-between;gap:10px;background:#f36310;color:#1a0800;border-radius:14px;padding:10px 14px;margin:8px 0 10px"><span style="font:800 13px Manrope,sans-serif">Your free drink PIN<br><span style="font-weight:600">Show your waiter</span></span><b style="font:800 30px Outfit,sans-serif;letter-spacing:.14em"></b></div>
 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div id="mem-sub" style="font:700 13px Manrope,sans-serif;color:#d9c3b4"></div><span style="display:inline-flex;align-items:center;gap:6px;background:#f36310;color:#1a0800;font:800 14px Manrope,sans-serif;border-radius:999px;padding:9px 14px"><span class="material-symbols-outlined" style="font-size:18px">qr_code_2</span>Open card</span></div>
 </a>
 <div class="bg-surface-container rounded-xl p-space-lg flex items-center gap-space-sm">
@@ -35,14 +36,20 @@
 </label>
 <p id="s-err" class="hidden font-body-sm text-body-sm" style="color:#f87171;font-weight:700"></p>
 <button type="submit" class="w-full h-14 rounded-full bg-primary-container text-white font-label-lg text-label-lg shadow-[0_8px_24px_rgba(243,99,16,0.35)]">Sign In</button>
-<button type="button" onclick="showMode('create')" class="w-full h-12 rounded-full text-text-primary font-label-lg text-label-lg">New here? <span class="text-primary-container">Create an account</span></button>
+<button type="button" onclick="showMode('create')" class="w-full h-12 rounded-full text-text-primary font-label-lg text-label-lg">New here? <span class="text-primary-container">Join free, get a free drink</span></button>
 </form>
 
 <form id="account-form" class="flex flex-col gap-space-lg">
 <button type="button" id="to-signin" onclick="showMode('signin')" class="w-full h-14 rounded-full border border-primary-container text-text-primary font-label-lg text-label-lg flex items-center justify-center gap-2" style="box-shadow:0 0 14px rgba(243,99,16,.25)"><span class="material-symbols-outlined text-[20px] text-primary-container">login</span>Already have an account? Sign in</button>
 <div>
-<h1 class="font-headline-lg text-headline-lg text-text-primary">Create Your Account</h1>
-<p class="font-body-sm text-body-sm text-text-muted mt-1">Save your info for faster checkout and order updates.</p>
+<h1 class="font-headline-lg text-headline-lg text-text-primary">Join La Cabaña Club</h1>
+<p class="font-body-sm text-body-sm text-text-muted mt-1">Your account is your loyalty membership. It's free.</p>
+<div style="display:grid;gap:8px;margin-top:12px">
+<div style="display:flex;gap:10px;align-items:center;font:700 14px Manrope,sans-serif;color:#f5f5f5"><span class="material-symbols-outlined" style="color:#f36310">local_bar</span>1 free drink with your meal, right away</div>
+<div style="display:flex;gap:10px;align-items:center;font:700 14px Manrope,sans-serif;color:#f5f5f5"><span class="material-symbols-outlined" style="color:#f36310">qr_code_2</span>Your own member card on your profile</div>
+<div style="display:flex;gap:10px;align-items:center;font:700 14px Manrope,sans-serif;color:#f5f5f5"><span class="material-symbols-outlined" style="color:#f36310">group_add</span>Friends you bring get free drinks, you get $1 each</div>
+<div style="display:flex;gap:10px;align-items:center;font:700 14px Manrope,sans-serif;color:#f5f5f5"><span class="material-symbols-outlined" style="color:#f36310">bolt</span>Faster checkout and order updates</div>
+</div>
 </div>
 <div class="flex flex-col gap-space-sm">
 <div class="flex items-center gap-space-md">
@@ -70,7 +77,7 @@
 <input id="f-sms" type="checkbox" checked class="accent-primary-container w-5 h-5 mt-0.5 shrink-0"/>
 <span class="font-body-sm text-body-sm text-text-secondary">Yes, text me deals and order updates. Msg &amp; data rates may apply. Reply STOP to opt out anytime.</span>
 </label>
-<button type="submit" class="w-full h-14 rounded-full bg-primary-container text-white font-label-lg text-label-lg shadow-[0_8px_24px_rgba(243,99,16,0.35)]">Create Account</button>
+<button type="submit" class="w-full h-14 rounded-full bg-primary-container text-white font-label-lg text-label-lg shadow-[0_8px_24px_rgba(243,99,16,0.35)]">Join free and get my drink</button>
 </form>
 
 </div></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-8px_24px_rgba(0,0,0,0.55)]" data-active-classes="text-primary-container font-headline-md"><div class="h-16 px-gutter flex items-center justify-around"><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="home" href="home.html"><span class="material-symbols-outlined text-[24px]">local_fire_department</span><span class="font-label-caps text-label-caps">Home</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="menu" href="menu.html"><span class="material-symbols-outlined text-[24px]">restaurant_menu</span><span class="font-label-caps text-label-caps">Menu</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="orders" href="orders.html"><span class="material-symbols-outlined text-[24px]">receipt_long</span><span class="font-label-caps text-label-caps">Orders</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 text-text-secondary transition-colors hover:text-text-primary" data-path="favorites" href="home.html#favorites"><span class="material-symbols-outlined text-[24px]">favorite</span><span class="font-label-caps text-label-caps">Favorites</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-full gap-0.5 transition-colors text-primary-container font-headline-md" data-path="account" href="account.html"><span class="material-symbols-outlined text-[24px]">account_circle</span><span class="font-label-caps text-label-caps">Account</span></a></div></nav>
@@ -106,6 +113,13 @@ async function showMemberCard(phone) {
     el.href = "card.html?c=" + encodeURIComponent(m.code); el.style.display = "block";
     document.getElementById("mem-name").textContent = m.name;
     document.getElementById("mem-sub").textContent = m.code + " · $" + (m.points || 0) + " earned";
+    var wl = null; try { wl = JSON.parse(localStorage.getItem("lc_welcome") || "null"); } catch (e) {}
+    var pb = document.getElementById("mem-pin");
+    if (wl && wl.code === m.code && wl.pin && !wl.used) {
+      pb.style.display = "flex"; pb.querySelector("b").textContent = wl.pin;
+      fetch("https://qzluvwpjtgeccfojutbt.supabase.co/rest/v1/rpc/pin_used", { method: "POST", headers: { apikey: "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ", "Content-Type": "application/json" }, body: JSON.stringify({ p_code: wl.pin, p_device: localStorage.getItem("lc_vid") || "" }) })
+        .then(function (r) { return r.json(); }).then(function (used) { if (used === true) { wl.used = true; localStorage.setItem("lc_welcome", JSON.stringify(wl)); pb.style.display = "none"; } }).catch(function () {});
+    } else pb.style.display = "none";
   };
   var cached = null; try { cached = JSON.parse(localStorage.getItem("lc_member") || "null"); } catch (e) {}
   if (cached && cached.phone === digits.slice(-10)) paint(cached);
@@ -134,7 +148,7 @@ document.getElementById("signin-form").addEventListener("submit", async function
   try {
     var r = await fetch("https://qzluvwpjtgeccfojutbt.supabase.co/rest/v1/rpc/account_signin", { method: "POST", headers: { apikey: "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ", "Content-Type": "application/json" }, body: JSON.stringify({ p_phone: ph }) });
     var row = (await r.json())[0];
-    if (!row || !row.name) return show("We don't have that number yet. Tap Create an account.");
+    if (!row || !row.name) return show("We don't have that number yet. Tap Join free below.");
     saveAccount({ name: row.name, phone: ph, email: "", address: "", sms: true, photo: "" });
     showToast("Welcome back, " + row.name.split(" ")[0]);
     document.getElementById("signin-form").classList.add("hidden"); document.getElementById("signin-form").classList.remove("flex");
@@ -192,7 +206,14 @@ document.getElementById("account-form").addEventListener("submit", function (e) 
   });
   try { fetch("https://qzluvwpjtgeccfojutbt.supabase.co/rest/v1/rpc/save_app_account", { method: "POST", headers: { apikey: "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ", "Content-Type": "application/json" }, body: JSON.stringify({ p_phone: document.getElementById("f-phone").value.trim(), p_name: document.getElementById("f-name").value.trim(), p_email: document.getElementById("f-email").value.trim(), p_sms: document.getElementById("f-sms").checked }) }); } catch (x) {}
   var joined = /[?&]join=1/.test(location.search);
-  showToast(joined ? "Welcome. Your free juice comes with every meal" : "Account created");
+  var dev = localStorage.getItem("lc_vid"); if (!dev) { dev = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem("lc_vid", dev); }
+  fetch("https://qzluvwpjtgeccfojutbt.supabase.co/rest/v1/rpc/join_loyalty", { method: "POST", headers: { apikey: "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ", "Content-Type": "application/json" }, body: JSON.stringify({ p_name: document.getElementById("f-name").value.trim(), p_phone: document.getElementById("f-phone").value.trim(), p_device: dev }) })
+    .then(function (r) { return r.json(); }).then(function (j) {
+      var r = j && j[0]; if (!r) return;
+      if (r.pin) localStorage.setItem("lc_welcome", JSON.stringify({ code: r.code, pin: r.pin }));
+      renderAccount(); showToast("You're in the club. Your free drink PIN is on your card");
+    }).catch(function () {});
+  showToast(joined ? "Welcome to La Cabaña Club" : "Account saved");
   renderAccount();
   if (joined) setTimeout(function () { location.href = "home.html"; }, 1400);   // came from "Join free": back to ordering
 });

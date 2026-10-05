@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Join La Cabaña Club</title>
+<meta property="og:title" content="Join La Cabaña Club, get a free drink"/><meta property="og:description" content="Free to join. Your member card plus a free drink with your meal."/>
+<meta name="theme-color" content="#0c0c0c"/>
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png?v=2"/><link rel="icon" type="image/png" href="icons/favicon-64.png?v=2"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet"/>
+<script src="account.js"></script>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:#0c0c0c;color:#f5f5f5;font-family:Manrope,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:420px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 16px) 18px calc(env(safe-area-inset-bottom) + 28px)}
+  .back{display:inline-flex;align-items:center;gap:4px;color:#9a9a9a;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:10px}
+  .hero{position:relative;border-radius:26px;overflow:hidden;min-height:230px;background:#1a0d05 url(images/juice-mango.jpg) center/cover;display:flex;flex-direction:column;justify-content:flex-end;padding:20px}
+  .hero:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,12,12,.05),rgba(12,12,12,.93))}
+  .hero>*{position:relative}
+  .hero img.logo{position:absolute;top:14px;left:14px;height:42px}
+  .k{font-size:12px;font-weight:800;letter-spacing:.16em;color:#ffb27a}
+  h1{font-family:Outfit;font-size:31px;line-height:1.05;margin:6px 0 4px}
+  h1 em{font-style:normal;color:#ff8a3d}
+  .sub{color:#cfcfcf;font-size:14.5px}
+  .perks{display:grid;gap:8px;margin-top:14px}
+  .perk{display:flex;gap:12px;align-items:center;background:#161616;border:1px solid #262626;border-radius:16px;padding:12px 14px;font-size:14.5px;font-weight:700}
+  .perk i{font-style:normal;flex:none;width:30px;height:30px;border-radius:50%;border:1px solid #f36310;color:#ff8a3d;display:flex;align-items:center;justify-content:center;font:800 13px Outfit}
+  .box{background:#161616;border:1px solid #262626;border-radius:22px;padding:18px;margin-top:14px}
+  label{display:block;font-size:12px;font-weight:800;color:#9a9a9a;margin:0 0 6px;letter-spacing:.06em;text-transform:uppercase}
+  input{width:100%;font:600 17px Manrope,sans-serif;color:#fff;background:#0f0f0f;border:1px solid #2e2e2e;border-radius:14px;padding:14px;margin-bottom:12px;outline:none}
+  input:focus{border-color:#f36310}
+  .btn{all:unset;box-sizing:border-box;display:flex;align-items:center;justify-content:center;width:100%;font:800 16px Manrope,sans-serif;border-radius:16px;padding:15px;cursor:pointer;text-align:center}
+  .btn.main{background:linear-gradient(135deg,#ff8a3d,#f36310);color:#1a0800}
+  .btn.ghost{border:1px solid #333;color:#fff;margin-top:10px}
+  .btn[disabled]{opacity:.5}
+  .err{color:#ff7a7a;font-size:14px;font-weight:700;margin:-4px 0 10px}
+  .fine{color:#7a7a7a;font-size:12.5px;line-height:1.5;margin:12px 2px 0;text-align:center}
+  .ticket{background:linear-gradient(150deg,#ff9a52,#f36310 55%,#c94a05);color:#1a0800;border-radius:24px;padding:20px;margin-top:14px;text-align:center;box-shadow:0 20px 50px rgba(243,99,16,.28)}
+  .ticket small{font-weight:800;font-size:12px;letter-spacing:.16em}
+  .pin{font-family:Outfit;font-weight:800;font-size:70px;letter-spacing:.16em;line-height:1;margin:8px 0 4px;padding-left:.16em}
+  .ticket .w{font-weight:700;font-size:14px;line-height:1.4;margin-top:8px}
+  .used{background:#1d1d1d;color:#8a8a8a;box-shadow:none}
+</style>
+</head><body>
+<div class="wrap" id="w"></div>
+<script>
+(function () {
+  const SB = 'https://qzluvwpjtgeccfojutbt.supabase.co', H = { apikey: 'sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ', 'Content-Type': 'application/json' };
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const ls = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
+  let dev = ls('lc_vid'); if (!dev) { dev = Math.random().toString(36).slice(2) + Date.now().toString(36); ls('lc_vid', dev); }
+  const w = document.getElementById('w');
+  const acct = typeof getAccount === 'function' ? getAccount() : null;
+
+  function done(r) {
+    w.innerHTML = '<a class="back" href="home.html">‹ Home</a>' +
+      '<div style="text-align:center"><img src="icons/logo-transparent.png" alt="" style="height:46px"><div class="k" style="margin-top:8px">WELCOME TO THE CLUB</div><h1>' + (r.existing ? 'Welcome back, ' : 'You\'re in, ') + esc(String(r.name).split(' ')[0]) + '</h1></div>' +
+      (r.pin ? '<div class="ticket' + (r.pin_used ? ' used' : '') + '"><small>' + (r.pin_used ? 'USED' : 'YOUR FREE DRINK PIN') + '</small><div class="pin">' + esc(r.pin) + '</div><div style="font-weight:800;font-size:13px">' + (r.pin_used ? 'Already used' : 'Works one time') + '</div>' + (r.pin_used ? '' : '<div class="w">1 free drink with your meal.<br>Show this PIN to your waiter.</div>') + '</div>' : '') +
+      '<a class="btn main" style="margin-top:14px" href="card.html?c=' + encodeURIComponent(r.code) + '">Open my member card</a>' +
+      '<a class="btn ghost" href="menu.html">See the menu</a>' +
+      '<p class="fine">Your card is also on your Account page. Share it: every friend who comes in gets free drinks and you get $1.</p>';
+  }
+
+  w.innerHTML = '<a class="back" href="home.html">‹ Home</a>' +
+    '<div class="hero"><img class="logo" src="icons/logo-transparent.png" alt=""><div class="k">LA CABAÑA CLUB · FREE</div><h1>Join and get<br><em>a free drink.</em></h1><div class="sub">With your meal. Takes 20 seconds.</div></div>' +
+    '<div class="perks"><div class="perk"><i>1</i>A free drink with your meal, right away</div><div class="perk"><i>2</i>Your own member card on your phone</div><div class="perk"><i>3</i>Share it: friends get free drinks, you get $1 each</div></div>' +
+    '<div class="box"><label for="j-name">Your name</label><input id="j-name" autocomplete="name" autocapitalize="words" placeholder="First and last name" value="' + esc(acct && acct.name || '') + '">' +
+    '<label for="j-phone">Phone</label><input id="j-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(305) 555-0123" value="' + esc(acct && acct.phone || '') + '"><div class="err" id="j-err" hidden></div>' +
+    '<button class="btn main" id="j-go">Join free</button><p class="fine">One free drink per person. Your number is only for your card. No spam.</p></div>';
+
+  const err = t => { const e = document.getElementById('j-err'); e.textContent = t; e.hidden = !t; };
+  document.getElementById('j-go').onclick = async ev => {
+    const name = document.getElementById('j-name').value.trim(), phone = document.getElementById('j-phone').value.trim();
+    if (!name) return err('Add your name.');
+    if (phone.replace(/\D/g, '').length < 10) return err('Add your 10-digit phone number.');
+    err(''); const b = ev.currentTarget; b.disabled = true; b.textContent = 'Joining…';
+    try {
+      const res = await fetch(SB + '/rest/v1/rpc/join_loyalty', { method: 'POST', headers: H, body: JSON.stringify({ p_name: name, p_phone: phone, p_device: dev }) });
+      const j = await res.json(); if (!res.ok) throw new Error(j.message || 'error');
+      const r = j[0];
+      // sign them in on this phone so the card shows on their profile
+      if (typeof saveAccount === 'function') { const a = getAccount() || { email: '', address: '', sms: true, photo: '' }; a.name = a.name || r.name; a.phone = phone; saveAccount(a); }
+      ls('lc_member', JSON.stringify({ code: r.code, name: r.name, points: 0, phone: phone.replace(/\D/g, '').slice(-10) }));
+      if (r.pin) ls('lc_welcome', JSON.stringify({ code: r.code, pin: r.pin }));
+      done(r); scrollTo(0, 0);
+    } catch (e) { b.disabled = false; b.textContent = 'Join free'; err(/bad_phone/.test(e.message) ? 'Check your phone number.' : 'Something went wrong. Try again.'); }
+  };
+})();
+</script>
+</body></html>
