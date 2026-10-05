@@ -27,10 +27,15 @@
   .go{all:unset;grid-column:1/-1;height:62px;border-radius:18px;background:#f36310;color:#1a0800;display:flex;align-items:center;justify-content:center;font:800 19px Manrope;cursor:pointer}
   .go[disabled]{opacity:.4}
   a{color:#ff8a3d}
+  .login{display:none;flex-direction:column;gap:10px;margin-top:30px}
+  .login input{font:600 17px Manrope,sans-serif;color:#fff;background:#141414;border:1px solid #2e2e2e;border-radius:14px;padding:15px;outline:none;user-select:text}
+  .login input:focus{border-color:#f36310}
+  body.out .login{display:flex}body.out .dots,body.out .msg,body.out .pad{display:none}
 </style>
 </head><body>
 <div class="wrap">
   <div class="top"><img src="icons/logo-transparent.png" alt=""><b>Free drinks PIN</b></div>
+  <form class="login" id="login"><div style="font-weight:700;color:#9a9a9a">Staff sign in (one time on this device)</div><input id="em" type="email" placeholder="Staff email" autocomplete="username"><input id="pw" type="password" placeholder="Password" autocomplete="current-password"><button class="go" type="submit">Sign in</button><div id="lerr" style="color:#f87171;font-weight:700"></div></form>
   <div class="dots" id="dots"><div class="d"></div><div class="d"></div><div class="d"></div><div class="d"></div></div>
   <div class="msg idle" id="msg">Type the guest's 4-digit PIN</div>
   <div class="pad" id="pad">
@@ -44,6 +49,14 @@
 <script>
   const sb = supabase.createClient('https://qzluvwpjtgeccfojutbt.supabase.co', 'sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ');
   let v = '', busy = false;
+  (async () => { const { data } = await sb.auth.getSession(); if (!data.session) document.body.classList.add('out'); })();
+  document.getElementById('login').onsubmit = async e => {
+    e.preventDefault(); const le = document.getElementById('lerr'); le.textContent = '';
+    const { error } = await sb.auth.signInWithPassword({ email: document.getElementById('em').value.trim(), password: document.getElementById('pw').value });
+    if (error) { le.textContent = 'Wrong email or password.'; return; }
+    const { data: ok } = await sb.rpc('is_operator'); if (!ok) { le.textContent = 'This account isn\'t staff.'; await sb.auth.signOut(); return; }
+    document.body.classList.remove('out');
+  };
   const msg = (t, c) => { const m = document.getElementById('msg'); m.className = 'msg ' + c; m.innerHTML = t; };
   const paint = () => { document.querySelectorAll('.d').forEach((d, i) => { d.textContent = v[i] || ''; d.classList.toggle('on', i === v.length); }); document.getElementById('go').disabled = v.length !== 4; };
   paint();
@@ -58,7 +71,7 @@
     const { data, error } = await sb.rpc('redeem_gift', { p_code: v }); busy = false;
     const r = data && data[0];
     if (error) {
-      if (/not_operator|JWT|auth/i.test(error.message)) msg('Sign in first: <a href="admin.html">open the dashboard</a>, sign in, then come back.', 'no');
+      if (/not_operator|JWT|auth|permission/i.test(error.message)) { document.body.classList.add('out'); return; }
       else if (/not_found/.test(error.message)) msg('PIN ' + v + ' doesn\'t exist.<br>No free drink.', 'no');
       else msg('Couldn\'t check it. Try again.', 'no');
       return;
