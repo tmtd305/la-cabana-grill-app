@@ -387,6 +387,7 @@ function lcHoursStatus(h, now) {
     <button class="nav" data-v="drivers" data-perm="drivers"><span class="ms">delivery_dining</span>Drivers</button>
     <button class="nav" data-v="menu" data-perm="menu"><span class="ms">restaurant_menu</span>Menu &amp; Sold out</button>
     <button class="nav" data-v="customers" data-perm="customers"><span class="ms">group</span>Customers</button>
+    <button class="nav" data-v="catering"><span class="ms">room_service</span>Catering<span class="cnt hidden" data-cnt="catering"></span></button>
     <button class="nav nav-gold" data-v="loyalty" data-perm="members"><span class="ms">redeem</span>Loyalty &amp; Marketing<span class="star">★</span></button>
     <button class="nav" data-v="analytics" data-perm="sales"><span class="ms">bar_chart</span>Analytics</button>
     <button class="nav" data-v="channels" data-perm="sales"><span class="ms">hub</span>Channels</button>
@@ -518,6 +519,15 @@ function lcHoursStatus(h, now) {
       </div>
     </section>
 
+    <!-- CATERING -->
+    <section data-view="catering" class="hidden">
+      <div class="card">
+        <div class="ch"><h2>Catering requests</h2><div class="seg" id="cat-f"><button class="on" data-f="open">Open</button><button data-f="all">All</button></div><button class="btn sm" id="cat-refresh"><span class="ms">refresh</span>Refresh</button></div>
+        <div class="scroll"><table class="tbl" id="cat-tbl"><tr><td class="empty">Loading…</td></tr></table></div>
+        <p class="muted" style="margin:12px 0 0">Quote requests from the website catering page (catering.html), newest first. Open = new, contacted or booked.</p>
+      </div>
+    </section>
+
     <!-- LOYALTY -->
     <section data-view="loyalty" data-perm="members" class="hidden">
       <div class="grid kpis" id="loy-kpis" data-perm="points"></div>
@@ -594,6 +604,7 @@ function lcHoursStatus(h, now) {
   <button data-v="drivers" data-perm="drivers"><span class="ms">delivery_dining</span>Drivers</button>
   <button data-v="menu" data-perm="menu"><span class="ms">restaurant_menu</span>Menu</button>
   <button data-v="customers" data-perm="customers"><span class="ms">group</span>Customers</button>
+  <button data-v="catering"><span class="ms">room_service</span>Catering<span class="cnt hidden" data-cnt="catering"></span></button>
   <button data-v="loyalty" data-perm="members" class="bn-gold"><span class="ms">redeem</span>Loyalty</button>
   <button data-v="analytics" data-perm="sales"><span class="ms">bar_chart</span>Analytics</button>
   <button data-v="channels" data-perm="sales"><span class="ms">hub</span>Channels</button>
@@ -635,7 +646,7 @@ function lcHoursStatus(h, now) {
     // only the owner sees and manages staff
     document.querySelectorAll('[data-v="staff"]').forEach(b => b.classList.toggle('hidden', !isOwner));
     if(!allowed((location.hash || '').slice(1) || 'dash')) go('dash');
-    loadSettings(); loadAll(); if(PERM.customers) loadCustomers(); loadMembers(); renderMenu();
+    loadSettings(); loadAll(); if(PERM.customers) loadCustomers(); loadMembers(); renderMenu(); loadCatering(); setInterval(loadCatering, 60000);
     setInterval(loadAll, 20000);
     if(isOwner){ loadStaff(); setInterval(loadStaff, 30000); }
   })();
@@ -650,14 +661,14 @@ function lcHoursStatus(h, now) {
   const allowed = v => !PERM || !VIEW_PERM[v] || !!PERM[VIEW_PERM[v]];
 
   // ---------- navigation ----------
-  const TITLES = { neworder: 'New phone order', dash: 'Dashboard', orders: 'Orders', drivers: 'Uber drivers', menu: 'Hours, Menu & Sold out', customers: 'Customers', loyalty: 'Loyalty & Marketing', analytics: 'Analytics', channels: 'Channels', staff: 'Staff' };
+  const TITLES = { neworder: 'New phone order', dash: 'Dashboard', orders: 'Orders', drivers: 'Uber drivers', menu: 'Hours, Menu & Sold out', customers: 'Customers', catering: 'Catering', loyalty: 'Loyalty & Marketing', analytics: 'Analytics', channels: 'Channels', staff: 'Staff' };
   function go(v){
     if(!allowed(v)) v = 'dash';
     document.querySelectorAll('[data-view]').forEach(s => s.classList.toggle('hidden', s.dataset.view !== v));
     document.querySelectorAll('.nav[data-v],.bnav [data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
     document.body.className = document.body.className.replace(/\bv-\S+/g, '').trim() + ' v-' + v;
     $('title').textContent = TITLES[v]; history.replaceState(null, '', '#' + v); window.scrollTo(0, 0);
-    if(v === 'drivers') loadDeliveries(); if(v === 'neworder') poRenderMenu(); if(v === 'analytics') renderAnalytics(); if(v === 'channels') renderChannels(); if(v === 'loyalty') loadMembers(); if(v === 'customers') loadCustomers();
+    if(v === 'drivers') loadDeliveries(); if(v === 'neworder') poRenderMenu(); if(v === 'analytics') renderAnalytics(); if(v === 'channels') renderChannels(); if(v === 'loyalty') loadMembers(); if(v === 'customers') loadCustomers(); if(v === 'catering') loadCatering();
   }
   document.addEventListener('click', e => { const b = e.target.closest('[data-v]'); if(b && (b.classList.contains('nav') || b.closest('.bnav'))) go(b.dataset.v); const g = e.target.closest('[data-go]'); if(g) go(g.dataset.go); });
 
@@ -1287,6 +1298,44 @@ function lcHoursStatus(h, now) {
         '<div class="row" style="gap:18px;margin-bottom:10px"><div><small class="muted">30 days</small><div style="font-family:Outfit;font-size:22px;font-weight:700">' + money0(sum(c)) + '</div></div><div><small class="muted">Orders</small><div style="font-family:Outfit;font-size:22px;font-weight:700">' + n(c) + '</div></div></div>' +
         '<div class="muted" style="font-size:13px;line-height:1.5">' + (on && !own ? 'Orders are coming into Square, so they\'re counted here. Customer phones and emails are hidden by the app.' : txt) + '</div></div>'; }).join('');
   }
+
+  // ---------- catering requests (catering.html) ----------
+  let catering = [], catFilter = 'open';
+  const CAT_ST = ['new', 'contacted', 'booked', 'closed'], CAT_BADGE = { new: 'o', contacted: 'y', booked: 'g', closed: '' };
+  async function loadCatering(){
+    const { data, error } = await sb.from('catering_requests').select('*').order('created_at', { ascending: false }).limit(500);
+    if(error){ $('cat-tbl').innerHTML = '<tr><td class="empty">Couldn\'t load catering requests</td></tr>'; return; }
+    catering = data || []; renderCatering();
+  }
+  function renderCatering(){
+    const n = catering.filter(r => (r.status || 'new') === 'new').length;
+    document.querySelectorAll('[data-cnt="catering"]').forEach(c => { c.textContent = n; c.classList.toggle('hidden', !n); });
+    const rows = catering.filter(r => catFilter === 'all' || (r.status || 'new') !== 'closed');
+    const evDate = r => { if(!r.event_date) return '—'; const d = new Date(r.event_date + 'T12:00:00'); return d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', year: d.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined }); };
+    const evTime = t => { const m = String(t || '').match(/^(\d{1,2}):(\d{2})/); if(!m) return esc(t || ''); const h = +m[1]; return ((h % 12) || 12) + ':' + m[2] + (h < 12 ? ' AM' : ' PM'); };
+    $('cat-tbl').innerHTML = '<tr><th>Event</th><th>Guests</th><th>Name</th><th>Phone</th><th>Dishes</th><th>Notes</th><th>Status</th></tr>' + (rows.length ? rows.map(r => {
+      const st = r.status || 'new';
+      const how = r.fulfillment === 'delivery' ? '<span class="badge y">Delivery</span>' + (r.address ? '<div class="muted" style="margin-top:4px">' + esc(r.address) + '</div>' : '') : r.fulfillment === 'pickup' ? '<span class="badge">Pickup</span>' : '';
+      return '<tr><td><b>' + esc(evDate(r)) + '</b><div class="muted">' + evTime(r.event_time) + '</div><div class="muted" style="font-size:11.5px;margin-top:2px">Received ' + esc(new Date(r.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })) + '</div></td>' +
+        '<td><b style="font-family:Outfit,sans-serif;font-size:18px">' + esc(r.guests ?? '—') + '</b> <span class="muted">guests</span></td>' +
+        '<td><b>' + esc(r.name) + '</b>' + (r.email ? '<div class="muted"><a href="mailto:' + esc(r.email) + '" style="color:inherit">' + esc(r.email) + '</a></div>' : '') + '</td>' +
+        '<td><a href="tel:' + esc(String(r.phone || '').replace(/[^\d+]/g, '')) + '" style="color:var(--or2);font-weight:800;text-decoration:none;white-space:nowrap">' + esc(fmtPhone(r.phone)) + '</a></td>' +
+        '<td>' + ((r.dishes || []).length ? (r.dishes || []).map(d => '<span class="badge" style="margin:0 4px 4px 0">' + esc(d) + '</span>').join('') : '<span class="muted">—</span>') + '</td>' +
+        '<td style="max-width:280px">' + how + (r.notes ? '<div style="margin-top:' + (how ? '6px' : '0') + ';white-space:pre-wrap;font-size:13px">' + esc(r.notes) + '</div>' : (how ? '' : '<span class="muted">—</span>')) + '</td>' +
+        '<td><select class="field" data-cat="' + esc(r.id) + '" style="width:auto;height:36px;font-size:13.5px;font-weight:800">' + CAT_ST.map(s => '<option value="' + s + '"' + (s === st ? ' selected' : '') + '>' + s.charAt(0).toUpperCase() + s.slice(1) + '</option>').join('') + '</select> <span class="badge ' + (CAT_BADGE[st] || '') + '" style="margin-left:4px">' + esc(st) + '</span></td></tr>';
+    }).join('') : '<tr><td colspan="7" class="empty">' + (catering.length ? 'No open catering requests' : 'No catering requests yet') + '</td></tr>');
+  }
+  $('cat-f').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if(!b) return; catFilter = b.dataset.f; $('cat-f').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); renderCatering(); });
+  $('cat-refresh').onclick = loadCatering;
+  $('cat-tbl').addEventListener('change', async e => {
+    const sel = e.target.closest('[data-cat]'); if(!sel) return;
+    const r = catering.find(x => x.id === sel.dataset.cat); if(!r) return;
+    const prev = r.status || 'new', st = sel.value; sel.disabled = true;
+    const { error } = await sb.from('catering_requests').update({ status: st }).eq('id', r.id);
+    sel.disabled = false;
+    if(error){ sel.value = prev; toast('Couldn\'t save'); return; }
+    r.status = st; toast('Saved: ' + st); renderCatering();
+  });
 
   // ---------- staff ----------
   async function loadStaff(){

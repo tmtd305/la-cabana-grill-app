@@ -56,6 +56,7 @@
       '<a href="home.html#favorites"><span class="material-symbols-outlined">favorite</span>Favorites</a>' +
       '<a href="orders.html"><span class="material-symbols-outlined">receipt_long</span>Your orders</a>' +
       '<a href="messages.html"><span class="material-symbols-outlined">chat</span>Messages</a>' +
+      '<a href="catering.html"><span class="material-symbols-outlined">room_service</span>Catering</a>' +
       '<div class="sep"></div>' +
       '<a href="' + reviewHref + '" target="_blank" rel="noopener"><span class="material-symbols-outlined">star</span>Review us on Google</a>' +
       '<a href="tel:' + PHONE + '"><span class="material-symbols-outlined">call</span>Call the restaurant</a>' +

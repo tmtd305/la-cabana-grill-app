@@ -124,7 +124,8 @@
     "Search skirt steak, bandeja paisa, juices...": "Busca churrasco, bandeja paisa, jugos...", "Street address": "Dirección", "Apt": "Apto", "City": "Ciudad",
     "Your name": "Tu nombre", "Phone number": "Teléfono", "Gate code or note for the driver (optional)": "Código o nota para el domiciliario (opcional)",
     "you@email.com or (305) 555-0100": "tu@correo.com o (305) 555-0100", "Your password": "Tu contraseña", "At least 6 characters": "Mínimo 6 caracteres",
-    "First and last name": "Nombre y apellido", "Search": "Buscar"
+    "First and last name": "Nombre y apellido", "Search": "Buscar",
+    "Feeding a group?": "¿Comida para un grupo?", "Offices, parties & events. Request a quote.": "Oficinas, fiestas y eventos. Pide una cotización.", "Get a quote": "Cotizar"
   };
   var RX = [
     [/^Today's special · (\w+)$/, function (m) { return "Especial de hoy · " + ({ Monday: "Lunes", Tuesday: "Martes", Wednesday: "Miércoles", Thursday: "Jueves", Friday: "Viernes", Saturday: "Sábado", Sunday: "Domingo" }[m[1]] || m[1]); }],
