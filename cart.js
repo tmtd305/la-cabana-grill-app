@@ -3,6 +3,83 @@ const CART_KEY = "lacabana_cart";
 const ORDERS_KEY = "lacabana_orders";
 const FREE_JUICE_PROMO = "FREEJUICE";
 
+// ---------- FIRSTJUICE: one free fresh juice on a customer's first order with a meal ----------
+// The customer types the code in the cart, then picks a flavor. The juice goes in the cart as its own $0 line
+// (opts.promo = "FIRSTJUICE") so Square, the kitchen ticket and the receipt all show it by name.
+// "First order" = nothing ordered from this device yet; the server also checks the phone number against the
+// customers table at payment time (api/process-payment.js), so a new device doesn't get a second one.
+const FIRST_JUICE_CODE = "FIRSTJUICE";
+const FIRST_JUICE_USED_KEY = "lc_firstjuice_used";
+const PROMO_CODE_KEY = "lacabana_promo_code";
+const FIRST_JUICE_ERROR = "Code valid on your first order with a meal";
+// sections that count as a meal (not drinks, juices, desserts, sides, bakery, appetizers or kids)
+const MEAL_CATEGORIES = ["steak", "chicken", "roast", "seafood", "rice", "pork", "burgers", "sandwiches", "arepas", "salads", "promo"];
+
+function isFreeJuiceLine(l) {
+  return !!(l && l.opts && l.opts.promo === FIRST_JUICE_CODE);
+}
+function isMealItem(item) {
+  return !!item && MEAL_CATEGORIES.includes(item.category) && item.price > 0;
+}
+function isFirstTimeCustomer() {
+  try {
+    return !localStorage.getItem(FIRST_JUICE_USED_KEY) && getOrders().length === 0;
+  } catch (e) {
+    return true;
+  }
+}
+function getPromoCode() {
+  try { return localStorage.getItem(PROMO_CODE_KEY) || ""; } catch (e) { return ""; }
+}
+function clearPromoCode() {
+  try { localStorage.removeItem(PROMO_CODE_KEY); } catch (e) {}
+}
+// why the code can't be used right now ("" = it can)
+function firstJuiceProblem(lines) {
+  if (!isFirstTimeCustomer()) return FIRST_JUICE_ERROR;
+  if (!(lines || cartLines()).some((l) => !isFreeJuiceLine(l) && isMealItem(l.item))) return FIRST_JUICE_ERROR + ". Add a main dish to use it.";
+  return "";
+}
+function applyPromoCode(code) {
+  const c = String(code || "").trim().toUpperCase();
+  if (!c) return { ok: false, error: "Enter a promo code" };
+  if (c !== FIRST_JUICE_CODE) return { ok: false, error: "That code isn't valid" };
+  const problem = firstJuiceProblem();
+  if (problem) return { ok: false, error: problem };
+  try { localStorage.setItem(PROMO_CODE_KEY, c); } catch (e) {}
+  return { ok: true };
+}
+// the free juice (customer picks the flavor); replaces any earlier pick, always qty 1
+function addFirstJuice(juiceId) {
+  const item = findItem(juiceId);
+  if (!item || item.category !== "juice" || getPromoCode() !== FIRST_JUICE_CODE || firstJuiceProblem()) return false;
+  const opts = { promo: FIRST_JUICE_CODE };
+  const cart = getCart().filter((c) => !isFreeJuiceLine(c));
+  cart.push({ key: lineKey(juiceId, opts), id: juiceId, qty: 1, opts });
+  saveCart(cart);
+  return true;
+}
+function removeFirstJuice() {
+  clearPromoCode();
+  saveCart(getCart().filter((c) => !isFreeJuiceLine(c)));
+}
+// keep the cart honest: at most one free juice, qty 1, and only while the code still applies
+function enforceFirstJuice() {
+  const cart = getCart();
+  const free = cart.filter(isFreeJuiceLine);
+  if (!free.length) return;
+  const lines = cartLines();
+  const valid = getPromoCode() === FIRST_JUICE_CODE && !firstJuiceProblem(lines);
+  const keep = valid ? free[0] : null;
+  if (keep && keep.qty === 1 && free.length === 1) return;
+  saveCart(cart.filter((c) => !isFreeJuiceLine(c) || c === keep).map((c) => (c === keep ? { ...c, qty: 1 } : c)));
+}
+// name used on the Square order / kitchen ticket / receipt, e.g. "FIRSTJUICE – free juice: Lulo"
+function lineName(l) {
+  if (isFreeJuiceLine(l)) return FIRST_JUICE_CODE + " – free juice: " + l.item.name.replace(/\s*Juice\b/i, "").trim();
+  return l.item.name;
+}
+
 // A cart line is { key, id, qty, opts }. opts holds the choices made on the dish screen
 // (free drink, meat, add-ons, note); lines with different choices stay separate.
 // key is attribute-safe (id + short hash) so it can go straight into onclick handlers.
@@ -53,6 +130,7 @@ function setQty(key, qty) {
   const cart = getCart();
   const line = cart.find((c) => c.key === key);
   if (!line) return;
+  if (isFreeJuiceLine(line) && qty > 1) qty = 1;   // one free juice per order
   if (qty <= 0) {
     removeFromCart(key);
     return;
@@ -67,6 +145,7 @@ function clearCart() {
 
 // item price + paid add-ons
 function unitPrice(item, opts) {
+  if (opts && opts.promo === FIRST_JUICE_CODE) return 0;
   const addons = (opts && opts.addons) || [];
   return +(item.price + addons.reduce((s, a) => s + a.price * (a.qty || 1), 0)).toFixed(2);
 }
@@ -74,6 +153,7 @@ function unitPrice(item, opts) {
 // e.g. "Grilled meat · Free drink: Mango Juice · + Lulo Juice · Note: no onions"
 function optsSummary(opts) {
   if (!opts) return "";
+  if (opts.promo === FIRST_JUICE_CODE) return "First-meal free juice ($0, code FIRSTJUICE)";
   const parts = [];
   if (opts.meat) parts.push(opts.meat);
   if (opts.drink && opts.drink !== "No Drink") parts.push("Free drink: " + opts.drink);
@@ -100,7 +180,7 @@ function hasFreeJuicePromo(lines) {
 
 // Cheapest juice line becomes free when a specialty entree is in the cart.
 function computeTotals(lines) {
-  const juiceLines = lines.filter((l) => l.item.category === "juice");
+  const juiceLines = lines.filter((l) => l.item.category === "juice" && !isFreeJuiceLine(l));
   const promoActive = hasFreeJuicePromo(lines) && juiceLines.length > 0;
   let discount = 0;
   let cheapestJuiceId = null;
@@ -143,7 +223,7 @@ function placeOrder(tipAmount, extra) {
   const order = {
     id: "LC-" + Math.floor(1000 + Math.random() * 9000),
     placedAt: new Date().toISOString(),
-    lines: lines.map((l) => ({ id: l.id, name: l.item.name, qty: l.qty, price: l.unit, options: optsSummary(l.opts), opts: l.opts })),
+    lines: lines.map((l) => ({ id: l.id, name: lineName(l), qty: l.qty, price: l.unit, options: optsSummary(l.opts), opts: l.opts })),
     subtotal: totals.subtotal,
     discount: totals.discount,
     taxes: totals.taxes,
@@ -157,6 +237,9 @@ function placeOrder(tipAmount, extra) {
   const orders = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
   orders.unshift(order);
   localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+  // any paid order means this customer isn't first-time anymore
+  try { localStorage.setItem(FIRST_JUICE_USED_KEY, order.placedAt); } catch (e) {}
+  clearPromoCode();
   clearCart();
   return order;
 }

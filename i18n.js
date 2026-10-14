@@ -125,6 +125,14 @@
     "Your name": "Tu nombre", "Phone number": "Teléfono", "Gate code or note for the driver (optional)": "Código o nota para el domiciliario (opcional)",
     "you@email.com or (305) 555-0100": "tu@correo.com o (305) 555-0100", "Your password": "Tu contraseña", "At least 6 characters": "Mínimo 6 caracteres",
     "First and last name": "Nombre y apellido", "Search": "Buscar",
+    "FREE fresh juice with your first meal": "Jugo natural GRATIS con tu primera comida", "Use code": "Usa el código", "at checkout.": "al pagar.",
+    "First order": "Primer pedido", "Promo code": "Código promocional", "Enter code": "Escribe el código", "Apply": "Aplicar", "FIRSTJUICE applied": "FIRSTJUICE aplicado",
+    "Pick your free fresh juice:": "Elige tu jugo natural gratis:", "Your free juice is in your order. Tap to change the flavor:": "Tu jugo gratis está en tu pedido. Toca para cambiar el sabor:",
+    "First-meal free juice": "Jugo gratis de primera comida", "FREE": "GRATIS", "Added · $0.00": "Agregado · $0.00", "Remove": "Quitar",
+    "Code valid on your first order with a meal": "Código válido en tu primer pedido con un plato principal",
+    "Code valid on your first order with a meal. Add a main dish to use it.": "Código válido en tu primer pedido con un plato principal. Agrega un plato para usarlo.",
+    "That code isn't valid": "Ese código no es válido", "Enter a promo code": "Escribe un código promocional",
+    "Pick your free juice flavor (or remove the code)": "Elige el sabor de tu jugo gratis (o quita el código)",
     "Feeding a group?": "¿Comida para un grupo?", "Offices, parties & events. Request a quote.": "Oficinas, fiestas y eventos. Pide una cotización.", "Get a quote": "Cotizar"
   };
   var RX = [

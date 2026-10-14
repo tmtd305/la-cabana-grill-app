@@ -908,7 +908,7 @@ const CATEGORIES = [
   "label": "Drinks",
   "es": "Bebidas",
   "note": "",
-  "banner": "images/menu/jugos.jpg"
+  "banner": "images/juice-mango.jpg"
  }
 ];
 

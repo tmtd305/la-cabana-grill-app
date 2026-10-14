@@ -50,6 +50,30 @@ async function createSquareOrder({ accessToken, locationId, apiHost, order, ref 
   return d.order;
 }
 
+// FIRSTJUICE: one free juice on a customer's first order. Keeps at most one $0 juice line (qty 1) and
+// refuses it when this phone number already has an order in the customers table (needs LC_SUPABASE_SECRET_KEY;
+// without it only the browser-side check applies). Returns an error message, or "" when the order is fine.
+async function checkFirstJuice(order) {
+  const free = order.lines.filter((l) => l && l.promo === "FIRSTJUICE");
+  if (!free.length) return "";
+  if (free.length > 1 || (free[0].qty | 0) !== 1) return "Only one free juice per order";
+  if (!/FIRSTJUICE – free juice: /.test(String(free[0].name || ""))) return "Invalid promo line";
+  free[0].price = 0;
+  if (!order.lines.some((l) => l.promo !== "FIRSTJUICE" && Number(l.price) > 0)) return "Code valid on your first order with a meal";
+  let ph = String(order.phone || "").replace(/\D/g, "");
+  if (ph.length === 11 && ph[0] === "1") ph = ph.slice(1);
+  const key = process.env.LC_SUPABASE_SECRET_KEY;
+  if (!key || ph.length !== 10) return "";
+  try {
+    const h = { apikey: key };
+    if (!key.startsWith("sb_")) h.Authorization = "Bearer " + key;
+    const r = await fetch(LC_SUPABASE_URL + "/rest/v1/customers?phone=eq." + ph + "&select=orders", { headers: h });
+    const rows = r.ok ? await r.json() : [];
+    if (rows[0] && Number(rows[0].orders) > 0) return "USED";
+  } catch (e) { console.error("checkFirstJuice", e.message); }
+  return "";
+}
+
 // Customer list for the staff dashboard / marketing (needs LC_SUPABASE_SECRET_KEY). Never blocks the sale.
 async function saveCustomer(order, ref, total) {
   try {
@@ -101,6 +125,9 @@ export default async function handler(req, res) {
     // ---------- regular cart checkout (unchanged) ----------
     if (!amount || amount <= 0) { res.status(400).json({ error: "Missing sourceId or invalid amount" }); return; }
     if (order && Array.isArray(order.lines) && order.lines.length) {
+      const fj = await checkFirstJuice(order);
+      if (fj === "USED") { res.status(409).json({ error: "Code FIRSTJUICE is valid on your first order only. We took the free juice off, nothing was charged. Tap Place order again.", code: "FIRSTJUICE_USED" }); return; }
+      if (fj) { res.status(400).json({ error: fj }); return; }
       const ref = "APP-" + Date.now().toString(36).toUpperCase();
       const sq = await createSquareOrder({ accessToken, locationId, apiHost, order, ref });
       if (sq) {
