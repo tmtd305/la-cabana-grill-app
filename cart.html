@@ -62,7 +62,7 @@
 </div>
 <div id="promo-juice" class="hidden flex flex-col gap-2">
 <div class="flex items-center justify-between gap-2">
-<p class="font-title-sm text-title-sm text-text-primary flex items-center gap-2 min-w-0"><span class="material-symbols-outlined text-[20px]" style="color:#4cc417">check_circle</span><span>FIRSTJUICE applied</span></p>
+<p class="font-title-sm text-title-sm text-text-primary flex items-center gap-2 min-w-0"><span class="material-symbols-outlined text-[20px]" style="color:#4cc417">check_circle</span><span>Free juice with your first order</span></p>
 <button id="promo-remove" type="button" class="font-label-md text-label-md text-text-secondary hover:text-error shrink-0">Remove</button>
 </div>
 <p id="promo-juice-hint" class="font-body-sm text-body-sm text-text-secondary">Pick your free fresh juice:</p>
@@ -177,6 +177,9 @@
     card.classList.toggle('hidden', lines.length === 0);
     // code was applied but no longer fits (meal removed, already ordered): drop it and say why
     if (getPromoCode() === FIRST_JUICE_CODE && firstJuiceProblem(lines)) { clearPromoCode(); showPromoError(firstJuiceProblem(lines)); }
+    // first order with a meal: the free juice is offered automatically, no code to type (unless they tapped Remove)
+    let declined = false; try { declined = sessionStorage.getItem('lc_fj_declined') === '1'; } catch (e) {}
+    if (getPromoCode() !== FIRST_JUICE_CODE && !declined && !firstJuiceProblem(lines)) applyPromoCode(FIRST_JUICE_CODE);
     const applied = getPromoCode() === FIRST_JUICE_CODE;
     document.getElementById('promo-entry').classList.toggle('hidden', applied);
     document.getElementById('promo-juice').classList.toggle('hidden', !applied);
@@ -207,7 +210,7 @@
   }
   document.getElementById('promo-apply').addEventListener('click', onApplyPromo);
   document.getElementById('promo-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); onApplyPromo(); } });
-  document.getElementById('promo-remove').addEventListener('click', () => { removeFirstJuice(); showPromoError(''); renderCartPage(); });
+  document.getElementById('promo-remove').addEventListener('click', () => { try { sessionStorage.setItem('lc_fj_declined', '1'); } catch (e) {} removeFirstJuice(); showPromoError(''); renderCartPage(); });
 
 
   // ---------- Pickup or delivery (Uber Direct) ----------
@@ -378,7 +381,7 @@
     if (window.LC_PAUSED) { showToast(window.LC_PAUSED_MSG || 'Online ordering is paused right now. Call us to order.'); return false; }
     const so = cartLines().filter(l => window.LC_SOLD_OUT && LC_SOLD_OUT.has(l.id));
     if (so.length) { showToast(so[0].item.name + ' is sold out. Remove it to continue.'); return false; }
-    if (getPromoCode() === FIRST_JUICE_CODE && !cartLines().some(isFreeJuiceLine)) { showToast('Pick your free juice flavor (or remove the code)'); document.getElementById('promo-card').scrollIntoView({ behavior: 'smooth', block: 'center' }); return false; }
+    if (getPromoCode() === FIRST_JUICE_CODE && !cartLines().some(isFreeJuiceLine)) { showToast('Pick your free juice flavor (or tap Remove)'); document.getElementById('promo-card').scrollIntoView({ behavior: 'smooth', block: 'center' }); return false; }
     const needInfo = (m) => { showToast(m); document.getElementById('infoCard').scrollIntoView({ behavior: 'smooth', block: 'center' }); return false; };
     if (!val('c-name')) return needInfo('Add your name');
     if (val('c-phone').replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '').length !== 10) return needInfo('Add your 10-digit phone number');
@@ -432,7 +435,7 @@
       if (!res.ok || !data.success) {
         if (data.code === 'FIRSTJUICE_USED') {   // this phone number has ordered before: take the free juice off, nothing was charged
           try { localStorage.setItem(FIRST_JUICE_USED_KEY, 'server'); } catch (x) {}
-          removeFirstJuice(); renderCartPage(); showPromoError(FIRST_JUICE_ERROR);
+          try { sessionStorage.setItem('lc_fj_declined', '1'); } catch (e) {} removeFirstJuice(); renderCartPage(); showPromoError('The free juice is for a first order only. We took it off, nothing was charged.');
           document.getElementById('promo-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         throw new Error(data.error || 'Payment failed');

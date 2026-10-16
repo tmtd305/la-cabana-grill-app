@@ -61,28 +61,41 @@ async function createSquareOrder({ accessToken, locationId, apiHost, order, ref 
   return d.order;
 }
 
-// FIRSTJUICE: one free juice on a customer's first order. Keeps at most one $0 juice line (qty 1) and
-// refuses it when this phone number already has an order in the customers table (needs LC_SUPABASE_SECRET_KEY;
-// without it only the browser-side check applies). Returns an error message, or "" when the order is fine.
-async function checkFirstJuice(order) {
+// FIRSTJUICE: one free juice on a customer's first order with a meal. checkFirstJuice() checks the cart shape
+// (one $0 juice, qty 1, with a main dish); claimFirstJuice() then locks it to this phone number and email in Supabase
+// (first_juice_claims, atomic) right before the charge, and releaseFirstJuice() frees it only if that charge fails.
+const MEAL_CATEGORIES = ["steak", "chicken", "roast", "seafood", "rice", "pork", "burgers", "sandwiches", "arepas", "salads", "promo"];
+const LC_SUPABASE_KEY = process.env.LC_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_LA6q8PrfQSRC5d7tanAamg_erxp0ShJ";
+function checkFirstJuice(order) {
   const free = order.lines.filter((l) => l && l.promo === "FIRSTJUICE");
   if (!free.length) return "";
   if (free.length > 1 || (free[0].qty | 0) !== 1) return "Only one free juice per order";
-  if (!/FIRSTJUICE – free juice: /.test(String(free[0].name || ""))) return "Invalid promo line";
-  free[0].price = 0;
-  if (!order.lines.some((l) => l.promo !== "FIRSTJUICE" && Number(l.price) > 0)) return "Code valid on your first order with a meal";
+  if (!order.lines.some((l) => !l.promo && l.item && MEAL_CATEGORIES.includes(l.item.category) && l.price > 0)) return "Code valid on your first order with a meal";
   let ph = String(order.phone || "").replace(/\D/g, "");
   if (ph.length === 11 && ph[0] === "1") ph = ph.slice(1);
-  const key = process.env.LC_SUPABASE_SECRET_KEY;
-  if (!key || ph.length !== 10) return "";
-  try {
-    const h = { apikey: key };
-    if (!key.startsWith("sb_")) h.Authorization = "Bearer " + key;
-    const r = await fetch(LC_SUPABASE_URL + "/rest/v1/customers?phone=eq." + ph + "&select=orders", { headers: h });
-    const rows = r.ok ? await r.json() : [];
-    if (rows[0] && Number(rows[0].orders) > 0) return "USED";
-  } catch (e) { console.error("checkFirstJuice", e.message); }
+  if (ph.length !== 10) return "Add your phone number to get the free juice";
   return "";
+}
+// same person, different spelling: John.Doe+x@Gmail.com -> johndoe@gmail.com
+function normEmail(e) {
+  let [u, d] = String(e || "").trim().toLowerCase().split("@");
+  if (!u || !d) return "";
+  u = u.split("+")[0];
+  if (d === "gmail.com" || d === "googlemail.com") { u = u.replace(/\./g, ""); d = "gmail.com"; }
+  return u + "@" + d;
+}
+async function sbRpc(fn, body) {
+  const r = await fetch(LC_SUPABASE_URL + "/rest/v1/rpc/" + fn, { method: "POST", headers: { apikey: LC_SUPABASE_KEY, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(fn + " " + r.status);
+  const t = await r.text();
+  return t ? JSON.parse(t) : null;
+}
+async function claimFirstJuice(order, ref) {
+  try { return (await sbRpc("claim_first_juice", { p_phone: String(order.phone || ""), p_email: normEmail(order.email), p_ref: ref })) === true; }
+  catch (e) { console.error("claimFirstJuice", e.message); return false; }   // can't verify -> no free juice
+}
+async function releaseFirstJuice(ref) {
+  try { await sbRpc("release_first_juice", { p_ref: ref }); } catch (e) { console.error("releaseFirstJuice", e.message); }
 }
 
 // Customer list for the staff dashboard / marketing (needs LC_SUPABASE_SECRET_KEY). Never blocks the sale.
@@ -141,8 +154,7 @@ export default async function handler(req, res) {
     const priced = priceLines(menu, order.lines);
     if (priced.error) { res.status(400).json({ error: priced.error }); return; }
     const sOrder = { ...order, lines: priced.lines };
-    const fj = await checkFirstJuice(sOrder);
-    if (fj === "USED") { res.status(409).json({ error: "Code FIRSTJUICE is valid on your first order only. We took the free juice off, nothing was charged. Tap Place order again.", code: "FIRSTJUICE_USED" }); return; }
+    const fj = checkFirstJuice(sOrder);
     if (fj) { res.status(400).json({ error: fj }); return; }
     sOrder.discount = discountFor(menu, priced.lines);
     sOrder.deliveryFee = 0;
@@ -157,12 +169,16 @@ export default async function handler(req, res) {
     if (amount != null && Math.abs(Number(amount) - expected) > 0.05) {
       res.status(409).json({ error: "Prices were updated. Refresh the page to see your new total. Nothing was charged.", code: "TOTAL_CHANGED", expected }); return;
     }
-    const ref = "APP-" + Date.now().toString(36).toUpperCase();
+    const ref = "APP-" + Date.now().toString(36).toUpperCase() + crypto.randomBytes(3).toString("hex").toUpperCase();
+    const hasFreeJuice = priced.lines.some((l) => l.promo === "FIRSTJUICE");
+    if (hasFreeJuice && !(await claimFirstJuice(order, ref))) {
+      res.status(409).json({ error: "The free juice is for a first order only, and this phone number or email already got one. We took it off, nothing was charged. Tap Place order again.", code: "FIRSTJUICE_USED" }); return;
+    }
     const sq = await createSquareOrder({ accessToken, locationId, apiHost, order: sOrder, ref });
-    if (!sq) { res.status(502).json({ error: "We couldn't send your order to the kitchen. Nothing was charged. Please try again or call us." }); return; }
+    if (!sq) { if (hasFreeJuice) await releaseFirstJuice(ref); res.status(502).json({ error: "We couldn't send your order to the kitchen. Nothing was charged. Please try again or call us." }); return; }
     const r2 = await charge({ accessToken, locationId, apiHost, sourceId, orderId: sq.id, tip, amountCents: sq.total_money.amount,
       idempotencyKey: ref + "-" + String(sourceId).slice(-16), note: "La Cabana Grill app order " + ref });
-    if (!r2.ok) { res.status(r2.status).json({ error: r2.data.errors ? r2.data.errors[0].detail : "Payment failed" }); return; }
+    if (!r2.ok) { if (hasFreeJuice) await releaseFirstJuice(ref); res.status(r2.status).json({ error: r2.data.errors ? r2.data.errors[0].detail : "Payment failed" }); return; }
     const p = r2.data.payment;
     const charged = (p.total_money ? p.total_money.amount : p.amount_money.amount) / 100;
     await saveCustomer(order, ref, charged);
