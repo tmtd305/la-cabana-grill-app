@@ -119,6 +119,7 @@ function addToCart(id, qty = 1, opts = null) {
     cart.push({ key, id, qty, opts: o });
   }
   saveCart(cart);
+  if (window.lcTrack) lcTrack("AddToCart", { content_ids: [id], content_type: "product", value: +(unitPrice(item, o) * qty).toFixed(2), currency: "USD" });
   showToast(`Added ${qty > 1 ? qty + "× " : ""}${item.name} ($${(unitPrice(item, o) * qty).toFixed(2)})`);
 }
 

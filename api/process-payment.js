@@ -1,9 +1,20 @@
 // Square payments for La Cabaña Grill.
-// 1) Regular cart checkout: { sourceId, amount, orderId }  (unchanged)
+// 1) Regular cart checkout: { sourceId, amount, order: { lines: [{ id, qty, opts }], quote, tip, ... } } — prices from data.js
 // 2) Talk-to-order: { sourceId, talkOrderId, talkToken } — the amount comes from the order the restaurant built
 //    (never from the browser), and on success the order is marked paid so the operator screen shows it instantly.
 //    Needs LC_SUPABASE_SECRET_KEY (Supabase secret key of the la-cabana-grill project) in Vercel env vars.
 const LC_SUPABASE_URL = process.env.LC_SUPABASE_URL || "https://qzluvwpjtgeccfojutbt.supabase.co";
+import crypto from "crypto";
+import { loadMenu, priceLines, discountFor } from "./_pricing.js";
+import { sendPurchase } from "./_meta.js";
+
+// delivery quotes are signed by api/uber-direct.js; the fee is only trusted when the signature matches
+function quoteFeeCents(q) {
+  const secret = process.env.UBER_DIRECT_CLIENT_SECRET;
+  if (!q || !q.quoteId || !secret) return null;
+  const sig = crypto.createHmac("sha256", secret).update(q.quoteId + "|" + q.feeCents).digest("hex").slice(0, 32);
+  return sig === q.sig && Number.isInteger(q.feeCents) && q.feeCents >= 0 ? q.feeCents : null;
+}
 
 async function charge({ accessToken, locationId, apiHost, sourceId, amount, idempotencyKey, note, orderId, tip, amountCents }) {
   const body = { source_id: sourceId, idempotency_key: idempotencyKey, amount_money: { amount: amountCents != null ? amountCents : Math.round(amount * 100), currency: "USD" }, location_id: locationId, note };
@@ -88,7 +99,7 @@ async function saveCustomer(order, ref, total) {
 
 export default async function handler(req, res) {
   if (req.method !== "POST") { res.status(405).json({ error: "Method not allowed" }); return; }
-  const { sourceId, amount, orderId, talkOrderId, talkToken, order } = req.body || {};
+  const { sourceId, amount, talkOrderId, talkToken, order } = req.body || {};
   const accessToken = process.env.SQUARE_ACCESS_TOKEN;
   const locationId = process.env.SQUARE_LOCATION_ID;
   const env = process.env.SQUARE_ENV === "production" ? "production" : "sandbox";
@@ -122,31 +133,41 @@ export default async function handler(req, res) {
       return;
     }
 
-    // ---------- regular cart checkout (unchanged) ----------
-    if (!amount || amount <= 0) { res.status(400).json({ error: "Missing sourceId or invalid amount" }); return; }
-    if (order && Array.isArray(order.lines) && order.lines.length) {
-      const fj = await checkFirstJuice(order);
-      if (fj === "USED") { res.status(409).json({ error: "Code FIRSTJUICE is valid on your first order only. We took the free juice off, nothing was charged. Tap Place order again.", code: "FIRSTJUICE_USED" }); return; }
-      if (fj) { res.status(400).json({ error: fj }); return; }
-      const ref = "APP-" + Date.now().toString(36).toUpperCase();
-      const sq = await createSquareOrder({ accessToken, locationId, apiHost, order, ref });
-      if (sq) {
-        const tip = Math.max(0, Math.min(1000, Number(order.tip || 0)));
-        const r2 = await charge({ accessToken, locationId, apiHost, sourceId, orderId: sq.id, tip, amountCents: sq.total_money.amount,
-          idempotencyKey: ref + "-" + String(sourceId).slice(-16), note: "La Cabana Grill app order " + ref });
-        if (!r2.ok) { res.status(r2.status).json({ error: r2.data.errors ? r2.data.errors[0].detail : "Payment failed" }); return; }
-        const p = r2.data.payment;
-        await saveCustomer(order, ref, (p.total_money ? p.total_money.amount : p.amount_money.amount) / 100);
-        res.status(200).json({ success: true, paymentId: p.id, status: p.status, squareOrderId: sq.id, reference: ref, charged: (p.total_money ? p.total_money.amount : p.amount_money.amount) / 100 });
-        return;
-      }
-      // if Square refused the order, still take the payment the old way so the sale isn't lost
+    // ---------- regular cart checkout ----------
+    // Prices, discount, tax and delivery fee are worked out here from the menu (data.js) and the signed delivery
+    // quote, never taken from the browser. If the Square order can't be created, nothing is charged.
+    if (!order || !Array.isArray(order.lines) || !order.lines.length) { res.status(400).json({ error: "Your cart is empty. Refresh the page and try again." }); return; }
+    const menu = await loadMenu();
+    const priced = priceLines(menu, order.lines);
+    if (priced.error) { res.status(400).json({ error: priced.error }); return; }
+    const sOrder = { ...order, lines: priced.lines };
+    const fj = await checkFirstJuice(sOrder);
+    if (fj === "USED") { res.status(409).json({ error: "Code FIRSTJUICE is valid on your first order only. We took the free juice off, nothing was charged. Tap Place order again.", code: "FIRSTJUICE_USED" }); return; }
+    if (fj) { res.status(400).json({ error: fj }); return; }
+    sOrder.discount = discountFor(menu, priced.lines);
+    sOrder.deliveryFee = 0;
+    if (order.fulfillment === "delivery") {
+      const fc = quoteFeeCents(order.quote);
+      if (fc == null) { res.status(400).json({ error: "Delivery price expired. Get a new price and try again." }); return; }
+      sOrder.deliveryFee = fc / 100;
     }
-    const r = await charge({ accessToken, locationId, apiHost, sourceId, amount,
-      idempotencyKey: (orderId || "order") + "-" + Date.now() + "-" + Math.random().toString(36).slice(2),
-      note: orderId ? ("La Cabana Grill order " + orderId) : "La Cabana Grill order" });
-    if (!r.ok) { res.status(r.status).json({ error: r.data.errors ? r.data.errors[0].detail : "Payment failed" }); return; }
-    res.status(200).json({ success: true, paymentId: r.data.payment.id, status: r.data.payment.status });
+    const tip = Math.max(0, Math.min(1000, Math.round(Number(order.tip || 0) * 100) / 100));
+    const subtotal = priced.lines.reduce((t, l) => t + l.price * l.qty, 0);
+    const expected = +(subtotal - sOrder.discount + +((subtotal - sOrder.discount) * menu.taxRate).toFixed(2) + tip + sOrder.deliveryFee).toFixed(2);
+    if (amount != null && Math.abs(Number(amount) - expected) > 0.05) {
+      res.status(409).json({ error: "Prices were updated. Refresh the page to see your new total. Nothing was charged.", code: "TOTAL_CHANGED", expected }); return;
+    }
+    const ref = "APP-" + Date.now().toString(36).toUpperCase();
+    const sq = await createSquareOrder({ accessToken, locationId, apiHost, order: sOrder, ref });
+    if (!sq) { res.status(502).json({ error: "We couldn't send your order to the kitchen. Nothing was charged. Please try again or call us." }); return; }
+    const r2 = await charge({ accessToken, locationId, apiHost, sourceId, orderId: sq.id, tip, amountCents: sq.total_money.amount,
+      idempotencyKey: ref + "-" + String(sourceId).slice(-16), note: "La Cabana Grill app order " + ref });
+    if (!r2.ok) { res.status(r2.status).json({ error: r2.data.errors ? r2.data.errors[0].detail : "Payment failed" }); return; }
+    const p = r2.data.payment;
+    const charged = (p.total_money ? p.total_money.amount : p.amount_money.amount) / 100;
+    await saveCustomer(order, ref, charged);
+    await sendPurchase({ req, ref, value: charged, order, lines: priced.lines, meta: order.meta });
+    res.status(200).json({ success: true, paymentId: p.id, status: p.status, squareOrderId: sq.id, reference: ref, charged });
   } catch (err) {
     res.status(500).json({ error: "Payment processing error: " + err.message });
   }
